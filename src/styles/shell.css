@@ -426,6 +426,11 @@
 .foot__links p:has(.foot__x) {
   align-self: center;
 }
+/* GitHub and X side by side; each keeps its own 44px target. */
+.foot__social {
+  display: flex;
+  gap: 26px;
+}
 .foot__x {
   display: inline-flex;
   align-items: center;

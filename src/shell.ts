@@ -12,6 +12,7 @@ const X_ICON = `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
 
 export const X_URL = "https://x.com/siro_agent";
 export const GITHUB_URL = "https://github.com/siroagent/siro";
+const GITHUB_ICON = `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.36-3.87-1.36-.52-1.33-1.28-1.69-1.28-1.69-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.79 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.42-2.69 5.39-5.26 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"/></svg>`;
 
 export type Page = "home" | "ask" | "tools" | "budget" | "activity" | "docs" | "shipped" | "sell" | "privacy" | "404";
 
@@ -86,11 +87,13 @@ function rail(page: Page) {
           <a href="/docs"${page === "docs" ? ' aria-current="page"' : ""}>Docs<small>${pageOf("docs").what}</small></a>
           <a href="/shipped"${page === "shipped" ? ' aria-current="page"' : ""}>Shipped<small>${pageOf("shipped").what}</small></a>
           <a href="${X_URL}" target="_blank" rel="noopener noreferrer">Siro on X<small>@siro_agent</small></a>
+          <a href="${GITHUB_URL}" target="_blank" rel="noopener noreferrer">Source on GitHub<small>siroagent/siro</small></a>
         </div>
       </div>
     </nav>
     <div class="rail__end">
       <button class="search-well" type="button" data-search aria-label="Search pages and tools (Command K)"><span>Search</span><kbd>⌘K</kbd></button>
+      <a class="icon-key" href="${GITHUB_URL}" target="_blank" rel="noopener noreferrer" aria-label="Siro source on GitHub" title="siroagent/siro on GitHub">${GITHUB_ICON}</a>
       <a class="icon-key" href="${X_URL}" target="_blank" rel="noopener noreferrer" aria-label="Siro on X">${X_ICON}</a>
     </div>
   </div>
@@ -156,7 +159,7 @@ function footer() {
         <p><span class="label">Use</span><a href="/ask">Ask</a><a href="/tools">Tools</a><a href="/budget">Budget</a></p>
         <p><span class="label">Check</span><a href="/activity">Activity</a><a href="/shipped">Shipped</a><a href="/privacy">Privacy</a></p>
         <p><span class="label">Build</span><a href="/docs">Docs</a><a href="/sell">Sell a tool</a><a href="/v1/resources">Catalog JSON</a><a href="/docs#mcp">MCP</a><a href="/docs#cli">CLI</a><a href="${GITHUB_URL}" target="_blank" rel="noopener noreferrer">Source on GitHub</a></p>
-        <p><a class="foot__x" href="${X_URL}" target="_blank" rel="noopener noreferrer" aria-label="Siro on X (@siro_agent)" title="@siro_agent on X">${X_ICON}</a></p>
+        <p class="foot__social"><a class="foot__x" href="${GITHUB_URL}" target="_blank" rel="noopener noreferrer" aria-label="Siro source on GitHub (siroagent/siro)" title="siroagent/siro on GitHub">${GITHUB_ICON}</a><a class="foot__x" href="${X_URL}" target="_blank" rel="noopener noreferrer" aria-label="Siro on X (@siro_agent)" title="@siro_agent on X">${X_ICON}</a></p>
       </nav>
       ${tokenLine()}
       <p class="foot__status label" id="foot-status" aria-live="polite">${RESOURCES.length} tools listed</p>
@@ -271,7 +274,7 @@ function openMenu() {
     `<div class="scrim" data-close-menu></div>
 <div class="dialog menu-sheet" id="menu-sheet" role="dialog" aria-modal="true" aria-label="Menu">
   <div class="menu-sheet__top"><b>Menu</b><button class="key key--sm" type="button" data-close-menu>Close</button></div>
-  <nav aria-label="All pages">${PAGES.map((p) => `<a href="${p.href}"><b>${p.name}</b><span>${p.what}</span></a>`).join("")}<a href="${X_URL}" target="_blank" rel="noopener noreferrer"><b>Siro on X</b><span>@siro_agent</span></a></nav>
+  <nav aria-label="All pages">${PAGES.map((p) => `<a href="${p.href}"><b>${p.name}</b><span>${p.what}</span></a>`).join("")}<a href="${X_URL}" target="_blank" rel="noopener noreferrer"><b>Siro on X</b><span>@siro_agent</span></a><a href="${GITHUB_URL}" target="_blank" rel="noopener noreferrer"><b>Source on GitHub</b><span>siroagent/siro</span></a></nav>
   <button class="key menu-sheet__search" type="button" data-search-from-menu>Search pages and tools</button>
 </div>`,
   );
