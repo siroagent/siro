@@ -7,14 +7,27 @@ updates:
     groups:
       actions:
         patterns: ["*"]
+  # One pull request per week for minor and patch updates. Major versions change APIs the
+  # payment code relies on (viem, @noble, @scure) and are upgraded by hand with tests.
   - package-ecosystem: npm
     directory: /
     schedule:
       interval: weekly
     groups:
-      dev:
-        dependency-type: development
+      site:
+        patterns: ["*"]
+        update-types: [minor, patch]
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: npm
     directory: /cli
     schedule:
       interval: weekly
+    groups:
+      cli:
+        patterns: ["*"]
+        update-types: [minor, patch]
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]

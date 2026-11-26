@@ -22,6 +22,16 @@ Every Siro tool answers an unpaid call with an HTTP 402 quote: the amount, the n
 - **Sell a tool**: list your own HTTPS API; buyers pay your address directly over x402 and Siro takes no cut.
 - **$SIRO holder pricing**: a paying wallet holding 1,000,000 $SIRO on Robinhood Chain is quoted 25% less and gets 10 free runs a day of Siro's data tools; 10,000,000 gets 50% and 30. Payments stay in stablecoins; $SIRO is never spent.
 
+## Status
+
+Live since November 2026; this repository was opened on 26 November 2026, and the service it holds was running before that. Everything below can be checked from outside:
+
+- **Payments on-chain.** The first settled call was on 15 November 2026, on Base ([tx](https://basescan.org/tx/0xe54c4a781f8076f9a0fe94945150a77eaa88b8c643d3c96b501f719d696ab012)). Every call since is in the public ledger with its transaction: [`/api/ledger?limit=500`](https://siroagent.com/api/ledger?limit=500), totals in [`/api/stats`](https://siroagent.com/api/stats).
+- **Results.** Calls paid by Siro's own wallets show the full result next to the payment: [`/api/proofs`](https://siroagent.com/api/proofs).
+- **Listed elsewhere.** The remote MCP server is in the [official MCP Registry](https://registry.modelcontextprotocol.io/v0/servers?search=com.siroagent) as `com.siroagent/siro`, and the tools are listed in Coinbase's x402 Bazaar discovery index.
+- **$SIRO.** The only official contract is [`0x4471866fee3309c542386ff2a2ffa755e8298497`](https://robinhoodchain.blockscout.com/token/0x4471866fee3309c542386ff2a2ffa755e8298497) on Robinhood Chain; holder balances are read from it on every quote.
+- **Not yet.** No external security audit has been done. Usage is small: see the totals above rather than any number written here.
+
 ## Try it
 
 ```bash
@@ -95,7 +105,7 @@ Planned work and its issues: [ROADMAP.md](ROADMAP.md).
 
 ## Security
 
-Report vulnerabilities privately: see [SECURITY.md](SECURITY.md). The design assumptions and what Siro does and does not protect are in [docs/threat-model.md](docs/threat-model.md).
+Report vulnerabilities privately: see [SECURITY.md](SECURITY.md). The design assumptions and what Siro does and does not protect are in [docs/threat-model.md](docs/threat-model.md). How a wallet derives its Solana key from its EVM key is in [docs/solana-keys.md](docs/solana-keys.md).
 
 ## License
 
