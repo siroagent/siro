@@ -1,0 +1,29 @@
+name: Bug
+description: Something Siro does wrong
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: The request you sent (tool id and input), or the CLI command, and what came back. Leave out keys and seed phrases.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: input
+    id: where
+    attributes:
+      label: Where
+      placeholder: siroagent.com Ask, CLI 0.1.3 on macOS, MCP via siro mcp
+    validations:
+      required: true
+  - type: input
+    id: tx
+    attributes:
+      label: Transaction hash, if a payment was involved

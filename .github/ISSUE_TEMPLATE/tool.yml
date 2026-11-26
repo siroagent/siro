@@ -1,0 +1,17 @@
+name: Tool request
+description: A tool you would like agents to be able to pay for on Siro
+labels: [tool]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What the tool should do
+    validations:
+      required: true
+  - type: input
+    id: price
+    attributes:
+      label: A price per call that would make sense to you
+  - type: markdown
+    attributes:
+      value: If you run the API yourself, you can list it now with Sell a tool and get paid directly over x402.
