@@ -89,6 +89,10 @@ Local development runs the Worker and the site together through the Cloudflare V
 cd cli && npm ci && npm run build && node dist/cli.js --help
 ```
 
+## Roadmap
+
+Planned work and its issues: [ROADMAP.md](ROADMAP.md).
+
 ## Security
 
 Report vulnerabilities privately: see [SECURITY.md](SECURITY.md). The design assumptions and what Siro does and does not protect are in [docs/threat-model.md](docs/threat-model.md).

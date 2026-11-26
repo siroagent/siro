@@ -5,10 +5,23 @@
   "description": "Pay-per-call AI tools for agents over x402: LLMs, image, video, music, market data. USDC/USDG.",
   "version": "1.0.0",
   "websiteUrl": "https://siroagent.com/docs#mcp",
+  "repository": {
+    "url": "https://github.com/siroagent/siro",
+    "source": "github"
+  },
   "icons": [
-    { "src": "https://siroagent.com/icon-512.png", "mimeType": "image/png", "sizes": ["512x512"] }
+    {
+      "src": "https://siroagent.com/icon-512.png",
+      "mimeType": "image/png",
+      "sizes": [
+        "512x512"
+      ]
+    }
   ],
   "remotes": [
-    { "type": "streamable-http", "url": "https://siroagent.com/mcp" }
+    {
+      "type": "streamable-http",
+      "url": "https://siroagent.com/mcp"
+    }
   ]
 }
