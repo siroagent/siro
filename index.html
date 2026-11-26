@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Siro · The price comes first</title>
+  <meta name="description" content="Pay-per-call tools for AI agents over x402. Each tool quotes its price before it runs, and your agent pays from a capped budget only when the result comes back.">
+  <link rel="canonical" href="https://siroagent.com/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Siro">
+  <meta property="og:url" content="https://siroagent.com/">
+  <meta property="og:title" content="Siro · The price comes first">
+  <meta property="og:description" content="x402 pay-per-call tools for AI agents, paid from a capped budget. Every tool quotes its price before it runs; the payment settles only when a result comes back.">
+  <meta property="og:image" content="https://siroagent.com/og.jpg?v=2">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@siro_agent">
+  <meta name="twitter:title" content="Siro · The price comes first">
+  <meta name="twitter:description" content="x402 pay-per-call tools for AI agents, paid from a capped budget. Every tool quotes its price before it runs; the payment settles only when a result comes back.">
+  <meta name="twitter:image" content="https://siroagent.com/og.jpg?v=2">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <meta name="theme-color" content="#f2f3f5">
+</head>
+<body>
+<main id="main">
+
+  <section class="hero" data-quiet-ask aria-labelledby="hero-h">
+    <div class="wrap hero__in">
+      <h1 class="hero__h" id="hero-h">The price comes first.</h1>
+      <div class="hero__sub">
+        <p class="lede">Each tool quotes its price over x402 before it runs. Your agent pays from a capped budget, only when the result comes back.</p>
+        <p class="hero__keys">
+          <a class="key key--ink" id="hero-ask" href="/ask?tool=prediction-read&amp;q=Read%20the%20Polymarket%20odds%20on%20fed%20interest%20rates">Ask Siro</a>
+          <a class="key" id="hero-all" href="/tools">67 tools from $0.001</a>
+        </p>
+      </div>
+
+      <div class="qf face">
+        <div class="qf__zones">
+          <div class="qd display">
+            <label class="qd__tool" for="q-tool">
+              <span>Tool</span>
+              <select id="q-tool" disabled>
+                <option>Prediction Read · $0.02</option>
+              </select>
+            </label>
+            <b class="qd__name" id="q-name" aria-hidden="true">Prediction Read</b>
+            <span class="qd__ms" id="q-ms"></span>
+            <p class="qd__price live-num is-list" id="q-price">$0.02<small>per call</small></p>
+            <p class="qd__from" id="q-from">Price list.<noscript> Live quote needs JavaScript.</noscript></p>
+            <p class="qd__terms" id="q-terms" hidden></p>
+            <div class="qd__state" aria-live="polite">
+              <p class="lamp qd__verdict" id="q-lamp" hidden></p>
+              <p class="qd__src" id="q-src" hidden></p>
+              <button class="key key--sm" type="button" id="q-retry" hidden>Retry</button>
+            </div>
+            <p class="qd__note">Nothing is charged here. You sign in Ask, after your yes.</p>
+          </div>
+
+          <div class="qr">
+            <div class="gauge-wrap" aria-hidden="true"><div class="gauge" id="q-gauge"></div></div>
+            <div class="strip" id="q-strip" aria-hidden="true"></div>
+            <p class="qr__later"><i aria-hidden="true"></i>Sign, Run and Settle: in Ask, after your yes.</p>
+            <div class="qm">
+              <div class="qm__m">
+                <p class="qm__lbl"><span>Per call</span><span id="m-call"><b class="live-num">$0.02</b> of $0.10</span></p>
+                <div class="meter" id="m-call-bar" style="--v:0.2" aria-hidden="true"><i class="ball"></i></div>
+              </div>
+              <div class="qm__m">
+                <p class="qm__lbl"><span>Today</span><span id="m-day"><b class="live-num">$0.02</b> of $1.00</span></p>
+                <div class="meter" id="m-day-bar" style="--v:0.02" aria-hidden="true"><i class="ball"></i></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="qf__foot">
+          <p class="qf__spec" id="q-spec">x402 v2 · <code>POST /v1/prediction-read</code><noscript> · live quote needs JavaScript</noscript></p>
+          <button class="key key--sm" type="button" id="q-curl" hidden>Copy curl</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section home-sec rails2" aria-labelledby="rails-h">
+    <div class="wrap rails2__in">
+      <div class="rails2__text">
+        <h2 id="rails-h">Two rails, one route.</h2>
+        <p class="lede">The mark is the safety rule. One rail is the cap per call, the other the cap per day, and every payment rolls between them. A quote that would cross a rail is refused before anything is signed.</p>
+      </div>
+      <figure class="lead plate">
+        <div class="lead__art">
+          <img src="/img/01-plate-900.webp" srcset="/img/01-plate-900.webp 900w, /img/01-plate-1536.webp 1536w" sizes="(min-width: 1100px) 872px, (min-width: 948px) 900px, (min-width: 760px) calc(100vw - 48px), calc(100vw - 32px)" width="900" height="506" alt="The Siro S milled into a brushed aluminium plate as two grooves, with a chrome ball resting in the upper groove." decoding="async">
+          <svg class="lead__lines" viewBox="0 0 1536 864" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+            <path d="M614 35H1313V100" vector-effect="non-scaling-stroke"/>
+            <path d="M614 564H768" vector-effect="non-scaling-stroke"/>
+            <path d="M614 626H737" vector-effect="non-scaling-stroke"/>
+            <path d="M614 691H730" vector-effect="non-scaling-stroke"/>
+          </svg>
+          <i class="lead__end" aria-hidden="true" style="left:85.48%;top:12.50%"></i>
+          <i class="lead__end" aria-hidden="true" style="left:50.00%;top:65.28%"></i>
+          <i class="lead__end" aria-hidden="true" style="left:47.98%;top:72.45%"></i>
+          <i class="lead__end" aria-hidden="true" style="left:47.53%;top:79.98%"></i>
+          <span class="lead__n" aria-hidden="true" style="top:4.05%">1</span>
+          <span class="lead__n" aria-hidden="true" style="top:65.28%">2</span>
+          <span class="lead__n" aria-hidden="true" style="top:72.45%">3</span>
+          <span class="lead__n" aria-hidden="true" style="top:79.98%">4</span>
+        </div>
+        <figcaption class="lead__cap">
+          <ol class="lead__keys">
+            <li class="lead__key" style="--y:4.05"><b>The ball:</b> one payment</li>
+            <li class="lead__key" style="--y:65.28"><b>This rail:</b> the cap per call</li>
+            <li class="lead__key" style="--y:72.45"><b>The channel:</b> the route, Brief to Settle</li>
+            <li class="lead__key" style="--y:79.98"><b>That rail:</b> the cap per day</li>
+          </ol>
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="section home-sec caps" aria-labelledby="cap-h">
+    <div class="wrap">
+      <div class="caps__head">
+        <h2 id="cap-h">Turn the cap. See what still fits.</h2>
+        <p class="lede">A per-call cap is the most a single payment may cost. Siro checks it on your device before anything is signed.</p>
+      </div>
+      <div class="capf face">
+        <div class="capf__knob">
+          <div class="seat" id="cap-knob">
+            <img id="cap-img" src="/img/03-knob-900.webp" width="900" height="900" alt="" draggable="false" loading="lazy" decoding="async">
+            <svg class="seat__ticks" id="cap-ticks" viewBox="0 0 200 200" aria-hidden="true" focusable="false"></svg>
+          </div>
+          <div class="capf__set">
+            <button class="key capf__step" type="button" id="cap-down" aria-label="Lower the per-call cap" hidden>−</button>
+            <p class="capf__val"><b class="live-num" id="cap-val">$0.10</b><span>a call</span></p>
+            <button class="key capf__step" type="button" id="cap-up" aria-label="Raise the per-call cap" hidden>+</button>
+          </div>
+        </div>
+        <div class="capf__side">
+          <div class="display rulerd">
+            <div class="display__bar"><b>Catalog prices, per call</b><span>log scale · from the catalog</span></div>
+            <div class="ruler" id="ruler"></div>
+            <p class="rulerd__sum" id="cap-sum"><noscript>The knob and the price ruler need JavaScript.</noscript></p>
+          </div>
+          <a class="key capf__budget" id="cap-budget" href="/budget?per-call=0.1">Use this cap in Budget</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section home-sec spec" aria-labelledby="spec-h">
+    <div class="wrap">
+      <h2 class="spec__h" id="spec-h">Asking is free. Paying waits for your yes.</h2>
+      <div class="spec__log">
+        <div class="spec__row">
+          <div class="spec__turn">
+            <p class="spec__who label">You</p>
+            <p class="spec__text" id="spec-brief">Draw a steel ball rolling along an <span class="nowrap">S-shaped</span> groove milled into brushed aluminium, studio light</p>
+          </div>
+          <p class="spec__note small">Chat is free. The agent reads the brief and picks a tool from the catalog.</p>
+        </div>
+        <div class="spec__row">
+          <div class="spec__turn">
+            <p class="spec__who label">Siro</p>
+            <p class="spec__text">Nano Banana 2.1 can draw that: one 1K image, quoted at <span class="spec-price">$0.045</span>. Approve the quote and I will run it.</p>
+          </div>
+          <p class="spec__note small">No tool has run yet, so nothing has been charged.</p>
+        </div>
+        <div class="spec__row">
+          <div class="spec__turn">
+            <p class="spec__who label">Quote</p>
+            <div class="sq face">
+              <i class="sq__logo" aria-hidden="true" style="--logo:url(/logos/gemini.svg)"></i>
+              <p class="sq__tool"><b>Nano Banana 2.1</b><span>Google · <code>/v1/nano-banana-2-1</code></span></p>
+              <p class="sq__price live-num"><span class="spec-price">$0.045</span><small>per call</small></p>
+              <p class="sq__net">USDG on Robinhood Chain</p>
+              <p class="lamp lamp--settled sq__verdict" id="spec-lamp">Within a new wallet's default caps</p>
+              <div class="sq__keys" aria-hidden="true" inert>
+                <span class="sq__key">Decline</span>
+                <span class="sq__key">Approve and pay <span class="spec-price">$0.045</span></span>
+              </div>
+              <p class="sq__spec label">Specimen. These keys are live in Ask.</p>
+            </div>
+          </div>
+          <p class="spec__note small">The price is the tool's own 402 quote. Approve signs that exact amount; over your cap, Siro refuses before signing.</p>
+        </div>
+      </div>
+      <p class="spec__try"><a id="spec-try" href="/ask?tool=nano-banana-2-1&amp;q=Draw%20a%20steel%20ball%20rolling%20along%20an%20S-shaped%20groove%20milled%20into%20brushed%20aluminium%2C%20studio%20light">Try this in Ask</a></p>
+    </div>
+  </section>
+
+  <section class="section home-sec nr" aria-labelledby="nr-h">
+    <div class="wrap">
+      <figure class="nr__fig plate">
+        <img src="/img/06-macro-1000.webp" srcset="/img/06-macro-1000.webp 1000w, /img/06-macro-1536.webp 1536w" sizes="(min-width: 1264px) 1200px, (min-width: 1100px) calc(100vw - 64px), (min-width: 760px) calc(100vw - 48px), calc(100vw - 32px)" width="1000" height="428" alt="Close-up of the chrome ball resting in a groove milled into brushed aluminium." loading="lazy" decoding="async">
+      </figure>
+      <div class="nr__text">
+        <h2 id="nr-h">No result, no charge.</h2>
+        <p class="lede">Siro runs the tool first and settles your payment only when a result comes back. If the tool fails, the signed payment is never settled and nothing moves.</p>
+      </div>
+      <div class="display act" role="region" aria-labelledby="act-h">
+        <div class="display__bar"><b id="act-h">Activity</b><span id="act-src">GET /api/ledger</span></div>
+        <div class="act__body" id="act-body" tabindex="-1">
+          <noscript><p class="act__line">The newest settlements load here with JavaScript.</p></noscript>
+        </div>
+        <button class="key key--sm act__retry" type="button" id="act-retry" hidden>Retry</button>
+      </div>
+      <p class="act__more"><a href="/activity">Every settlement, in Activity</a> · <a href="/activity#proofs">What paid calls returned, shown in full</a></p>
+    </div>
+  </section>
+
+  <section class="section home-sec hold" id="siro" aria-labelledby="hold-h">
+    <div class="wrap">
+      <div class="hold__head">
+        <h2 id="hold-h">Hold $SIRO, pay less.</h2>
+        <p class="lede">A wallet that holds $SIRO on Robinhood Chain is quoted a lower price for every Siro tool, and runs Siro's own data tools free a few times a day. There is no sign-up: the balance is read on-chain when the quote is made and again when the payment is checked.</p>
+      </div>
+      <div class="hold__body">
+        <table class="table hold__tiers">
+          <caption class="sr">$SIRO holder tiers</caption>
+          <thead><tr><th scope="col">The paying wallet holds</th><th scope="col" class="num">Every tool</th><th scope="col" class="num">Free data runs a day</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Under 1,000,000 $SIRO</th><td class="num">List price</td><td class="num">None</td></tr>
+            <tr><th scope="row">1,000,000 $SIRO</th><td class="num">25% off</td><td class="num">10</td></tr>
+            <tr><th scope="row">10,000,000 $SIRO</th><td class="num">50% off</td><td class="num">30</td></tr>
+          </tbody>
+        </table>
+        <form class="hold__check face" id="hold-check" novalidate>
+          <label class="field" for="hold-addr"><span>Check a wallet</span><input id="hold-addr" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="42" placeholder="0x…" aria-describedby="hold-out"></label>
+          <button class="key" type="submit">Check</button>
+          <p class="hold__out small" id="hold-out" role="status">Reads <span class="mono">GET /api/holder/&lt;address&gt;</span>, free.</p>
+        </form>
+      </div>
+      <ul class="hold__how small">
+        <li><b>Discount.</b> Send the paying address in <span class="mono">x-siro-holder</span>; the 402 quote comes back at the holder price, and the payment must come from that same wallet. Ask and the tool pages do this for you.</li>
+        <li><b>Free runs.</b> Gas Now, Wallet Balances, Token Snapshot, Contract Check, New Pools, Stock Tokens and Prediction Markets. The wallet signs a one-day holder pass; no money moves.</li>
+        <li><b>Payments stay in stablecoins.</b> Tools are paid in USDG or USDC as before. $SIRO is never spent or locked: holding it is enough.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section home-sec dev" aria-labelledby="dev-h">
+    <div class="wrap">
+      <div class="dev__head">
+        <h2 id="dev-h">Three ways in. One price list.</h2>
+        <p class="lede">Plain HTTP, the siro CLI and an MCP server all price from the same catalog file, so a tool costs the same wherever your agent calls it.</p>
+      </div>
+      <div class="display dev__d">
+        <div class="dev__ways">
+          <div class="display__bar dev__bar">
+            <div class="dev__tabs" id="dev-tabs" aria-label="Ways in" hidden>
+              <button class="key key--sm" type="button" id="tab-http">HTTP</button>
+              <button class="key key--sm" type="button" id="tab-cli">CLI</button>
+              <button class="key key--sm" type="button" id="tab-mcp">MCP</button>
+            </div>
+            <span>for <code id="dev-id">prediction-read</code></span>
+          </div>
+          <div class="dev__way" id="way-http">
+            <h3 class="dev__way-h">HTTP</h3>
+            <pre class="code dev__code" id="code-http" tabindex="0">curl -i -X POST https://siroagent.com/v1/prediction-read \
+  -H 'content-type: application/json' \
+  -d '{"market":"fed interest rates"}'</pre>
+            <p class="dev__how">The 402 puts the price in the payment-required header. Sign <code>accepts[].amount</code> for one network, send the same request again with a <code>payment-signature</code> header, and the result comes back with a receipt.</p>
+            <button class="key key--sm dev__copy" type="button" data-copy="http" data-what="The curl" hidden>Copy</button>
+          </div>
+          <div class="dev__way" id="way-cli">
+            <h3 class="dev__way-h">CLI</h3>
+            <pre class="code dev__code" id="code-cli" tabindex="0">npm i -g https://siroagent.com/cli/siro.tgz
+siro init
+siro limits --per-payment 0.10 --per-day 1
+siro call prediction-read market='fed interest rates'</pre>
+            <p class="dev__how"><code>siro init</code> makes a key and encrypts it with your password. <code>siro limits</code> sets the caps the CLI checks before it signs anything.</p>
+            <button class="key key--sm dev__copy" type="button" data-copy="cli" data-what="The CLI steps" hidden>Copy</button>
+          </div>
+          <div class="dev__way" id="way-mcp">
+            <h3 class="dev__way-h">MCP</h3>
+            <pre class="code dev__code" id="code-mcp" tabindex="0">{
+  "mcpServers": {
+    "siro": {
+      "command": "siro",
+      "args": [
+        "mcp"
+      ],
+      "env": {
+        "SIRO_PASSWORD": "your wallet password"
+      }
+    }
+  }
+}</pre>
+            <p class="dev__how">For Claude, Cursor or any MCP client. The local server runs on the CLI wallet and pays inside its caps. Remote, with nothing to install: <code>https://siroagent.com/mcp</code> lists the catalog for free, and its <code>siro_call</code> answers with the 402 terms until your client signs.</p>
+            <p class="dev__copies">
+              <button class="key key--sm dev__copy" type="button" data-copy="mcp" data-what="The MCP config" hidden>Copy config</button>
+              <button class="key key--sm dev__copy" type="button" data-copy="remote" data-what="The remote MCP address" hidden>Copy remote address</button>
+            </p>
+          </div>
+        </div>
+        <div class="dev__resp">
+          <div class="display__bar"><b id="resp-h">The response your agent gets</b><span id="resp-src">nothing captured</span></div>
+          <pre class="code dev__code dev__resp-code" id="resp-code" tabindex="0" role="region" aria-labelledby="resp-h">Capturing the live 402 needs JavaScript. The HTTP curl gets the same answer.</pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section--tight home-close" aria-labelledby="close-h">
+    <div class="wrap">
+      <div class="close face">
+        <h2 class="close__h" id="close-h">Start at $0.10 a call and $1.00 a day.</h2>
+        <p class="close__keys">
+          <a class="key" href="/ask">Ask Siro</a>
+          <a class="key" href="/budget">Set a budget</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+</main>
+<script type="module" src="/src/home/main.ts"></script>
+</body>
+</html>

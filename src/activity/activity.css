@@ -1,0 +1,640 @@
+/* Activity. The title band sits on the bench; everything under it is read live, so it is one large
+   graphite display: the readout from /api/stats, the 30-day strip, the filters and the settlements table. */
+
+.act__head {
+  row-gap: 16px;
+  align-items: end;
+  padding: 64px 0 32px;
+}
+.act__head h1 {
+  grid-column: 1 / span 6;
+}
+.act__head .lede {
+  grid-column: 7 / -1;
+}
+.act__nojs {
+  padding: 8px 0 48px;
+}
+
+.act::before {
+  height: min(40%, 200px);
+}
+.act h2,
+.act h3 {
+  color: var(--on-display);
+}
+.act .mono {
+  overflow-wrap: anywhere;
+}
+
+/* A key that is busy reading (base.css draws it dashed and flat) shows the wait cursor. */
+.act .key[aria-disabled="true"] {
+  cursor: progress;
+}
+
+/* Bar: the feed's lamp, its source and when it was read. */
+.act__bar {
+  flex-wrap: wrap;
+  padding-block: 6px;
+}
+.act__name {
+  font-size: 13px;
+  line-height: 24px;
+  letter-spacing: 0;
+}
+.act__feed {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 14px;
+}
+.act__feed .lamp {
+  font-size: 13px;
+}
+.act__feed time {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Readout and the 30-day strip. */
+.act__top {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: 32px 56px;
+  padding: 36px 28px 32px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.act__sum {
+  min-height: 2.5em;
+  max-width: 24em;
+  font-size: clamp(24px, 2.5vw, 36px);
+  line-height: 1.25;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  text-wrap: pretty;
+}
+/* "Reading the totals" and "did not load" report the feed, not a total, so they sit back a step. */
+.act__sum.is-state {
+  color: var(--on-display-2);
+}
+.act__note {
+  margin-top: 14px;
+  color: var(--on-display-2);
+}
+/* Four rows: head, plot, axis, the sentence. Every part sits in the one column, so the sentence can
+   share the plot's row when there is nothing to draw (.is-flat, below). */
+.act__days {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  gap: 10px;
+  margin: 0;
+}
+.act__days > * {
+  grid-column: 1;
+}
+.act__days-head {
+  grid-row: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--on-display-2);
+}
+.act__days-head h3 {
+  font-size: 13px;
+  line-height: 18px;
+  letter-spacing: 0;
+}
+.act__bars {
+  grid-row: 2;
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 88px;
+  border-bottom: 1px solid var(--display-edge);
+}
+.act__bars i {
+  flex: 1 1 0;
+  min-width: 0;
+  height: max(3px, var(--h, 0%));
+  border-radius: 1px 1px 0 0;
+  background: var(--on-display-2);
+}
+.act__bars .is-zero {
+  height: 2px;
+  background: var(--display-edge);
+}
+.act__bars .is-today:not(.is-zero) {
+  background: var(--on-display);
+}
+.act__axis {
+  grid-row: 3;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 16px;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--on-display-2);
+}
+.act__days-sum {
+  grid-row: 4;
+}
+/* No calls to draw (reading, failed, or 30 quiet days): the strip is a flat trace, and the sentence that
+   says why sits in the plot it explains instead of under an empty one. */
+.act__days.is-flat .act__days-sum {
+  grid-row: 2;
+  align-self: center;
+  justify-self: center;
+  max-width: 100%;
+  padding: 0 12px 10px;
+  text-align: center;
+  color: var(--on-display-2);
+}
+
+/* Filters and the payer lookup. */
+.act__filters {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr) minmax(0, 2fr);
+  align-items: start;
+  gap: 16px 20px;
+  padding: 24px 28px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+/* Labels, wells and the select chevron come from base.css (.display .field). */
+.act__filters label {
+  line-height: 18px;
+}
+/* 16px, not smaller: iOS zooms the page into any field set below 16px. The address is set in mono;
+   the hint is an instruction, not an address, so it stays in the text face (and fits a phone). */
+.act__filters input {
+  font-family: var(--mono);
+  font-size: 16px;
+  color-scheme: dark;
+}
+.act__filters input::placeholder {
+  font-family: var(--sans);
+  color: var(--on-display-2);
+  opacity: 1;
+}
+.act__filters input[aria-invalid="true"] {
+  box-shadow:
+    inset 0 1px 3px rgba(0, 0, 0, 0.6),
+    inset 0 0 0 1px var(--refused-lit);
+}
+.act__filters input[aria-invalid="true"]:focus-visible {
+  box-shadow:
+    inset 0 1px 3px rgba(0, 0, 0, 0.6),
+    inset 0 0 0 1px var(--refused-lit),
+    var(--ring-display);
+}
+/* The field is a grid; a fixed track keeps the address well (whose default width is wider than a phone
+   leaves it) from pushing the Search key past the edge the selects end on. */
+.act__lookup {
+  grid-template-columns: minmax(0, 1fr);
+}
+.act__payer-row {
+  display: flex;
+  gap: 8px;
+}
+.act__payer-row input {
+  flex: 1 1 auto;
+  width: auto;
+  min-width: 0;
+}
+.act__payer-row .key {
+  min-height: 44px;
+}
+.act__msg {
+  color: var(--refused-lit);
+}
+/* The alert stays rendered while empty (a hidden live region can miss its announcement); the margin
+   takes back the grid gap it would otherwise add. */
+.act__msg:empty {
+  margin-top: -6px;
+}
+.act__mine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 14px;
+  color: var(--on-display-2);
+}
+
+/* The settlements table. */
+.act__rows {
+  padding: 4px 28px 0;
+}
+.act__scope {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  padding: 18px 0 10px;
+  font-size: 15px;
+}
+.act__table {
+  font-size: 14px;
+}
+.act__table th,
+.act__table td {
+  white-space: nowrap;
+}
+.act__table .act__tool,
+.act__table .act__net {
+  white-space: normal;
+}
+.act__table .act__when {
+  padding-left: 20px;
+  font-variant-numeric: tabular-nums;
+}
+.act__table td.act__when {
+  position: relative;
+}
+.act__when .ball {
+  position: absolute;
+  top: calc(50% - 5px);
+  left: 2px;
+}
+.act__usd {
+  font-size: 15px;
+}
+.act__ms {
+  font-stretch: 100%;
+  font-variant-numeric: tabular-nums;
+}
+.act__ms small {
+  margin-left: 2px;
+  font-size: 12px;
+  font-stretch: 100%;
+  color: var(--on-display-2);
+}
+.act__none {
+  font-size: 13px;
+  font-stretch: 100%;
+  color: var(--on-display-2);
+}
+.act__tool a,
+.act__hash {
+  text-decoration-color: var(--display-edge);
+}
+.act__tool a:hover,
+.act__hash:hover {
+  text-decoration-color: currentColor;
+}
+.act__hash {
+  font: 13px/1.4 var(--mono);
+}
+/* A payer is a button: it narrows the table to that payer. */
+.act__addr {
+  margin: -4px -6px;
+  padding: 4px 6px;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--on-display);
+  font: 13px/1.4 var(--mono);
+  text-decoration: underline dotted var(--on-display-2);
+  text-underline-offset: 3px;
+}
+.act__addr:hover {
+  background: rgba(255, 255, 255, 0.07);
+  text-decoration-style: solid;
+}
+.act__addr:active {
+  background: rgba(255, 255, 255, 0.12);
+}
+.act__k {
+  display: none;
+}
+.act__table.is-payer .c-payer,
+.act__table.is-payer .c-ms {
+  display: none;
+}
+/* The hash column starts a clear step after the right-aligned run time, so the two do not read as one. */
+@media (min-width: 900px) {
+  .act__table th:last-child,
+  .act__table td:last-child {
+    padding-left: 28px;
+  }
+}
+
+/* Loading, empty and error states, and the foot. */
+.act__state {
+  max-width: 44em;
+  padding: 40px 0 48px;
+}
+.act__state p {
+  font-size: 18px;
+  line-height: 28px;
+}
+.act__keys {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+.act__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+  padding: 20px 28px 26px;
+  color: var(--on-display-2);
+}
+.act__foot-start,
+.act__foot-end {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+}
+.act__foot-start p:empty {
+  display: none;
+}
+
+/* Under 900px the seven columns stop fitting, so each row becomes a three-line entry:
+   when and price; tool, network and run time; payer and transaction. The readout and the strip
+   stack at the same width and the strip takes the full display. */
+@media (max-width: 899px) {
+  .act__head {
+    row-gap: 14px;
+    padding: 40px 0 24px;
+  }
+  .act__head h1,
+  .act__head .lede {
+    grid-column: 1 / -1;
+  }
+  .act__top {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  /* Stacked, the readout sits over the strip. At this width "Reading the totals" and the zero sentence
+     are both one line, so nothing is reserved and the source line stays right under the sentence. */
+  .act__sum {
+    min-height: 0;
+  }
+  .act__filters {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .act__lookup {
+    grid-column: 1 / -1;
+  }
+  .act__table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  .act__table,
+  .act__table tbody {
+    display: block;
+  }
+  .act__table tr {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2px 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  /* two zero-height line breaks between the three lines */
+  .act__table tr::before,
+  .act__table tr::after {
+    content: "";
+    flex-basis: 100%;
+  }
+  .act__table td {
+    display: block;
+    height: auto;
+    padding: 0;
+    border: 0;
+  }
+  /* Line one holds only the time and the price, so it never wraps, a past year included. Every line
+     starts at the same edge; the newest row's ball leads its time instead of a gutter on every row. */
+  .act__table .act__when {
+    order: 1;
+    padding-left: 0;
+  }
+  .act__when .ball {
+    position: static;
+    margin-right: 8px;
+    vertical-align: -1px;
+  }
+  .act__usd {
+    order: 2;
+    margin-left: auto;
+  }
+  .act__table tr::before {
+    order: 3;
+  }
+  .act__tool {
+    order: 4;
+    font-size: 16px;
+    font-weight: 600;
+  }
+  .act__net {
+    order: 5;
+  }
+  .act__table .act__ms {
+    order: 6;
+    text-align: left;
+  }
+  .act__table tr::after {
+    order: 7;
+  }
+  .act__payer {
+    order: 8;
+  }
+  .act__tx {
+    order: 9;
+  }
+  .act__k {
+    display: inline;
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--on-display-2);
+  }
+}
+@media (max-width: 899px) and (pointer: coarse) {
+  .act__tool a,
+  .act__hash,
+  .act__addr {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  .act__addr {
+    margin: 0 -6px;
+  }
+}
+@media (max-width: 759px) {
+  .act__top {
+    gap: 28px;
+    padding: 24px 16px;
+  }
+  /* Phones: the sentence takes two lines once the totals arrive, so two are kept for it from the start. */
+  .act__sum {
+    min-height: 60px;
+    font-size: 22px;
+    line-height: 30px;
+  }
+  .act__filters {
+    padding: 20px 16px;
+  }
+  .act__rows {
+    padding: 0 16px;
+  }
+  .act__foot {
+    padding: 16px 16px 20px;
+  }
+  .act__bars {
+    gap: 3px;
+    height: 64px;
+  }
+}
+@media (max-width: 559px) {
+  .act__filters {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Paid results shown in full: the team's own calls, each with what it returned. One column of output
+   bays inside the same graphite display as the ledger, so a result reads as part of the record. */
+.proofs {
+  margin-bottom: 24px;
+}
+.proofs__lede {
+  position: relative;
+  max-width: 62em;
+  margin: 0;
+  padding: 16px 18px 4px;
+  font-size: 14px;
+  color: var(--on-display-2);
+}
+.proofs__list {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+  gap: 14px;
+  margin: 0;
+  padding: 14px 18px 18px;
+  list-style: none;
+}
+.proof {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  background: var(--display-bay);
+  scroll-margin-top: 96px;
+}
+.proof:target {
+  border-color: var(--display-edge);
+}
+.proof__head {
+  padding: 12px 14px 10px;
+}
+.proof__head h3 {
+  margin: 0;
+  font-size: 15px;
+}
+.proof__head h3 a {
+  text-decoration-color: var(--display-edge);
+}
+.proof__paid {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--on-display-2);
+}
+.proof__paid b {
+  color: var(--on-display);
+  font-weight: 600;
+}
+.proof__out {
+  flex: 1;
+  min-width: 0;
+  padding: 0 14px 12px;
+}
+.proof__media {
+  display: block;
+  width: 100%;
+  max-height: 360px;
+  object-fit: contain;
+  border-radius: 3px;
+  background: #000;
+}
+.proof__audio {
+  width: 100%;
+}
+.proof__text {
+  margin: 0;
+  max-height: 260px;
+  overflow: auto;
+  font-size: 14px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.proof__json {
+  margin: 0;
+  max-height: 260px;
+  overflow: auto;
+  font: 12px/1.5 var(--mono);
+  color: var(--on-display);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.proof__facts {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  justify-content: start;
+  gap: 4px 20px;
+  margin: 0;
+  padding: 10px 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 12px;
+}
+.proof__facts dt {
+  color: var(--on-display-2);
+}
+.proof__facts dd {
+  margin: 0;
+  color: var(--on-display);
+}
+.proof__raw {
+  padding: 0 14px 12px;
+  font-size: 13px;
+}
+.proof__raw summary {
+  cursor: pointer;
+  color: var(--on-display-2);
+}
+.proof__raw[open] summary {
+  margin-bottom: 8px;
+}
+@media (max-width: 559px) {
+  .proofs__list {
+    padding-inline: 12px;
+  }
+  .proof__facts {
+    grid-template-columns: 1fr;
+  }
+}
+/* Under each transaction hash in the ledger: the fingerprint of what that call returned. */
+.act__result {
+  display: block;
+  margin-top: 2px;
+  font: 12px/1.4 var(--mono);
+  color: var(--on-display-2);
+}
+.act__result a {
+  color: inherit;
+  text-decoration-color: var(--display-edge);
+}

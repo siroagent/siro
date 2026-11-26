@@ -1,0 +1,207 @@
+/* What a tool call returns, rendered by src/lib/render.ts, plus the small shared controls used on
+   Ask, Tools and Budget (segment keys, network select, swap quote). */
+
+/* Segment keys: a recessed tray holding keys; the chosen one is pressed. */
+.seg {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 6px;
+  background: var(--face-lo);
+  box-shadow: var(--well);
+}
+.seg button {
+  min-height: 34px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: var(--radius);
+  background: transparent;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.seg button[aria-checked="true"],
+.seg button[aria-pressed="true"],
+.seg button[aria-selected="true"] {
+  background: var(--face);
+  color: var(--ink);
+  box-shadow: var(--key);
+}
+.seg--sm {
+  display: flex;
+}
+.seg--sm button {
+  flex: 1;
+  padding: 0 8px;
+}
+.netsel {
+  min-height: 40px;
+  padding: 0 32px 0 12px;
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--paper) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none' stroke='%23565D67' stroke-width='1.5'%3E%3Cpath d='M1 1l4 4 4-4'/%3E%3C/svg%3E") no-repeat right 12px center;
+  box-shadow: var(--well);
+  appearance: none;
+  color: var(--ink);
+  font: 500 14px/1.2 var(--sans);
+  max-width: 100%;
+}
+
+.r-img {
+  width: min(100%, 440px);
+  border-radius: 6px;
+  margin-bottom: 10px;
+  box-shadow: var(--l1);
+}
+.kit {
+  display: grid;
+  grid-template-columns: minmax(0, 220px) 1fr;
+  gap: 16px;
+  align-items: start;
+}
+.post {
+  margin: 0 0 10px;
+  padding: 12px 14px;
+  border-radius: 6px;
+  background: var(--paper);
+  box-shadow: 0 0 0 1px var(--hair);
+  white-space: pre-wrap;
+}
+.post small {
+  display: block;
+  margin-top: 6px;
+  color: var(--label);
+  font-family: var(--mono);
+}
+.tbl {
+  overflow-x: auto;
+}
+.tbl table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.tbl th,
+.tbl td {
+  padding: 8px 10px 8px 0;
+  border-bottom: 1px solid var(--hair);
+  text-align: left;
+  white-space: nowrap;
+}
+.tbl th {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--label);
+  border-bottom-color: var(--edge);
+}
+.up {
+  color: var(--settled);
+}
+.down {
+  color: var(--refused);
+}
+.snap__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+}
+.snap__grid div {
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  background: var(--paper);
+  box-shadow: 0 0 0 1px var(--hair);
+}
+.snap__grid span {
+  display: block;
+  font-size: 12px;
+  color: var(--label);
+}
+.snap__grid b {
+  font-variant-numeric: tabular-nums;
+}
+.raw {
+  margin-top: 10px;
+}
+.raw summary,
+details summary {
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--label);
+}
+.raw pre {
+  margin-top: 8px;
+  max-height: 320px;
+}
+@media (pointer: coarse) {
+  .raw > summary {
+    padding: 11px 0;
+  }
+}
+.r-md {
+  max-height: 360px;
+  overflow: auto;
+  font-size: 15px;
+}
+.odds {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 8px 0 12px;
+}
+.odds span {
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  background: var(--paper);
+  box-shadow: 0 0 0 1px var(--hair);
+  font-size: 14px;
+}
+.odds b {
+  font-weight: 600;
+  font-stretch: 100%;
+  font-variant-numeric: tabular-nums;
+  margin-right: 4px;
+}
+.squote {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.squote div {
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  background: var(--paper);
+  box-shadow: 0 0 0 1px var(--hair);
+}
+.squote span,
+.squote small {
+  font-size: 12px;
+  color: var(--label);
+}
+.squote b {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.paid {
+  color: var(--settled);
+}
+.err {
+  color: var(--refused);
+}
+@media (max-width: 560px) {
+  .squote,
+  .snap__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Focus: the pressed segment's key shadow would otherwise replace the rails. */
+.seg button:focus-visible {
+  box-shadow: var(--ring);
+}
+.seg button:is([aria-checked="true"], [aria-pressed="true"], [aria-selected="true"]):focus-visible {
+  box-shadow: var(--key), var(--ring);
+}

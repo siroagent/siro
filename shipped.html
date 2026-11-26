@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Shipped · Siro</title>
+  <meta name="description" content="What is live on Siro, dated by the day it went live: the tools, the payment networks, siroagent.com and the MCP Registry listing. Then what comes next, without dates.">
+  <link rel="canonical" href="https://siroagent.com/shipped">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://siroagent.com/shipped">
+  <meta property="og:title" content="Shipped · Siro">
+  <meta property="og:description" content="What is live on Siro, dated by the day it went live, and what comes next without dates.">
+  <meta property="og:image" content="https://siroagent.com/og.jpg?v=2">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@siro_agent">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <meta name="theme-color" content="#f2f3f5">
+</head>
+<body>
+<main id="main">
+  <div class="wrap">
+    <header class="ship__head grid">
+      <h1>Shipped</h1>
+      <p class="lede">What is live on Siro, dated by the day it went live. Plans follow, with no dates until they ship.</p>
+    </header>
+
+    <!-- The roles keep it a table for screen readers on phones, where its rows are restyled as blocks. -->
+    <table class="table ship__table ship__table--dated" role="table">
+      <caption class="sr">Live on Siro, oldest first</caption>
+      <thead role="rowgroup">
+        <tr role="row"><th role="columnheader" scope="col" aria-sort="ascending">Date</th><th role="columnheader" scope="col">What went live</th></tr>
+      </thead>
+      <tbody role="rowgroup">
+        <tr role="row">
+          <td role="cell"><time datetime="2026-10-30">30 Oct 2026</time></td>
+          <td role="cell"><p>Siro on a staging host: 35 tools running on Workers AI and Siro's own code, x402 payments on Base and Robinhood Chain, and a public list of every settlement, now called <a href="/activity">Activity</a>.</p></td>
+        </tr>
+        <tr role="row">
+          <td role="cell"><time datetime="2026-11-10">10 Nov 2026</time></td>
+          <td role="cell"><p>Premium models through Replicate: 32 more <a href="/tools">LLM, image, video and audio tools</a>, with the media they generate kept on Siro's own storage. Payments on Solana, Arbitrum and Polygon through the Coinbase CDP facilitator.</p></td>
+        </tr>
+        <tr role="row">
+          <td role="cell"><time datetime="2026-11-10">10 Nov 2026</time></td>
+          <td role="cell"><p>Robinhood Chain (USDG) became the default payment network.</p></td>
+        </tr>
+        <tr role="row">
+          <td role="cell"><time datetime="2026-11-14">14 Nov 2026</time></td>
+          <td role="cell"><p>Siro moved to siroagent.com, and its MCP server was listed in the official MCP Registry as <code class="inline">com.siroagent/siro</code>. Setup is in <a href="/docs#mcp">Docs</a>.</p></td>
+        </tr>
+        <tr role="row">
+          <td role="cell"><time datetime="2026-11-14">14 Nov 2026</time></td>
+          <td role="cell"><p>A new design, and new names for the pages: <a href="/ask">Ask</a>, <a href="/tools">Tools</a>, <a href="/budget">Budget</a> and <a href="/activity">Activity</a>.</p></td>
+        </tr>
+        <tr role="row">
+          <td role="cell"><time datetime="2026-11-16">16 Nov 2026</time></td>
+          <td role="cell"><p id="sell-a-tool"><a href="/sell">Sell a tool</a>: list your own API at a price per call. Buyers pay your address directly, and a payment settles only when your API returns a result.</p></td>
+        </tr>
+        <tr role="row">
+          <td role="cell"><time datetime="2026-11-27">27 Nov 2026</time></td>
+          <td role="cell"><p id="private-results">Private results. Payments stay public; inputs and text results are not stored, generated media is kept 7 days, and the wallet that paid can delete a result sooner with one signature. See <a href="/privacy">Privacy</a>.</p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="rails ship__rails" aria-hidden="true"></div>
+
+    <section class="ship__next" aria-labelledby="next-h">
+      <h2 id="next-h">Next</h2>
+      <p>No dates here. An item moves up to the table above, with its date, once it is live.</p>
+      <table class="table ship__table">
+        <caption class="sr">Planned, without dates</caption>
+        <thead>
+          <tr><th scope="col">When</th><th scope="col">What</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="ship__later">Later</td>
+            <td><b>Streaming results</b><p>Text from LLM tools arrives as it is written, not all at once.</p></td>
+          </tr>
+          <tr>
+            <td class="ship__later">Later</td>
+            <td><b>More networks</b><p>More chains and stablecoins to pay with.</p></td>
+          </tr>
+          <tr>
+            <td class="ship__later">Later</td>
+            <td><b>Chained tool calls</b><p>Several tools run one after another as one paid call.</p></td>
+          </tr>
+          <tr>
+            <td class="ship__later">Later</td>
+            <td><b>Team budgets</b><p>One budget a team shares, with its own caps.</p></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </div>
+</main>
+<script type="module" src="/src/shipped/main.ts"></script>
+</body>
+</html>

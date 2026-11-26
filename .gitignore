@@ -1,0 +1,26 @@
+node_modules
+dist
+.wrangler
+.dev.vars
+.env.production.local
+*.log
+
+# MCP Registry signing key (not a wallet)
+mcp-registry/key.pem
+mcp-registry/bin/
+marketing/.vo/
+_assets-src/
+
+# Not part of the public repo: marketing kit, internal notes and launch tooling
+x-kit/
+docs/siro-*.md
+scripts/
+tools/fill_after_launch.py
+tools/shoot.mjs
+public/cli/*.tgz
+cli/node_modules
+cli/dist
+.DS_Store
+.harness.mjs
+.usage.cjs
+coverage/

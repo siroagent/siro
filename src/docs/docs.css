@@ -1,0 +1,764 @@
+/* Docs: a sticky index, a 64ch reading column on the bench and a graphite panel that runs a real
+   check for the section in view. Below 1180px each section carries its check inline, collapsed. */
+
+/* ---- Grid: one column on phones, index + text from 760, index + text + panel from 1180 ---- */
+.docs__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  padding-top: 20px;
+}
+.docs__text {
+  min-width: 0;
+  max-width: 64ch;
+}
+@media (min-width: 760px) {
+  .docs__grid {
+    grid-template-columns: 168px minmax(0, 1fr);
+    column-gap: 40px;
+    padding-top: 56px;
+  }
+}
+@media (min-width: 1180px) {
+  .docs__grid {
+    grid-template-columns: 176px minmax(0, 64ch) 312px;
+    justify-content: space-between;
+    column-gap: 32px;
+  }
+}
+@media (min-width: 1320px) {
+  .docs__grid {
+    grid-template-columns: 200px minmax(0, 64ch) 340px;
+    column-gap: 48px;
+  }
+}
+
+/* ---- Index ---- */
+.docs__index {
+  min-width: 0;
+}
+@media (min-width: 760px) {
+  .docs__index {
+    position: sticky;
+    top: calc(var(--rail-h) + 26px);
+    max-height: calc(100vh - var(--rail-h) - 52px);
+    overflow-y: auto;
+    /* room for the focus rails, which would otherwise be clipped by the scroll box */
+    margin: -6px;
+    padding: 6px;
+  }
+}
+.toc > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 32px;
+  list-style: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--label);
+}
+.toc > summary::-webkit-details-marker {
+  display: none;
+}
+.toc__state {
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.toc > summary:hover .toc__state {
+  color: var(--ink);
+  text-decoration-thickness: 2px;
+}
+.toc__state::after {
+  content: "Show";
+}
+.toc[open] .toc__state::after {
+  content: "Hide";
+}
+/* Beside the text the index is always open (main.ts keeps it so): the summary is its title, not a
+   switch, because hiding the list would only leave an empty column. */
+@media (min-width: 760px) {
+  .toc > summary {
+    cursor: default;
+    pointer-events: none;
+  }
+  .toc__state {
+    display: none;
+  }
+}
+.toc ol {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  border-left: 1px solid var(--hair);
+}
+.toc a {
+  position: relative;
+  display: block;
+  padding: 6px 4px 6px 14px;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ink-2);
+  text-decoration: none;
+  text-wrap: balance;
+}
+.toc a:hover {
+  color: var(--ink);
+  text-decoration: underline;
+}
+/* The section in view gets the double rail, the mark Siro uses for a boundary. */
+.toc a[aria-current="location"] {
+  color: var(--ink);
+  font-weight: 600;
+}
+.toc a[aria-current="location"]::before {
+  content: "";
+  position: absolute;
+  left: -1px;
+  top: 6px;
+  bottom: 6px;
+  width: 4px;
+  border-left: 1px solid var(--ink);
+  border-right: 1px solid var(--ink);
+}
+@media (max-width: 759px) {
+  .docs__index {
+    margin-bottom: 4px;
+    border-top: 1px solid var(--hair);
+    border-bottom: 1px solid var(--hair);
+  }
+  .toc > summary {
+    min-height: 48px;
+    font-size: 15px;
+    color: var(--ink);
+  }
+  .toc__state {
+    font-size: 14px;
+    color: var(--ink-2);
+  }
+  .toc ol {
+    columns: 2;
+    column-gap: 16px;
+    margin: 0 0 8px;
+    border-left: 0;
+  }
+  .toc li {
+    break-inside: avoid;
+  }
+  .toc a {
+    padding: 11px 4px 11px 0;
+    line-height: 22px;
+  }
+  .toc a[aria-current="location"]::before {
+    display: none;
+  }
+}
+
+/* ---- Sections on the bench ---- */
+.doc {
+  position: relative;
+  padding: 64px 0;
+  border-top: 1px solid var(--hair);
+}
+.doc:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+.doc > * + * {
+  margin-top: 16px;
+}
+.doc > h3 {
+  margin-top: 40px;
+}
+.doc > .lede {
+  margin-top: 20px;
+}
+.doc > .code-box,
+.doc > .spec,
+.doc > .nets,
+.doc > .doc__figure,
+.doc > .table,
+.doc > .check-inline,
+.doc > .steps {
+  margin-top: 24px;
+}
+/* Thirteen reference sections: headings step down from the global H2 (same 28px floor) so the text leads. */
+.doc h2 {
+  font-size: clamp(28px, 2.4vw, 34px);
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+}
+.doc h3 {
+  font-size: 19px;
+  line-height: 26px;
+  letter-spacing: -0.005em;
+}
+.doc code {
+  overflow-wrap: break-word;
+}
+/* Inline code stays whole: a header or a flag split at its hyphen reads as two words. The long
+   samples live in code boxes, so the widest span left fits a 360px phone; narrower screens may break. */
+.doc code.inline {
+  white-space: nowrap;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+@media (max-width: 359px) {
+  .doc code.inline {
+    white-space: normal;
+  }
+}
+/* Direct children only: the inline checks inside a section keep the panel's tighter lists. */
+.doc > ol {
+  margin-bottom: 0;
+  padding-left: 1.4em;
+}
+.doc > ol > li + li {
+  margin-top: 12px;
+}
+.steps li::marker {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 759px) {
+  .doc {
+    padding: 44px 0;
+  }
+  .doc:first-child {
+    padding-top: 28px;
+  }
+}
+
+/* Focus-only link from a section to its check in the panel (desktop keyboard use). */
+.to-live {
+  display: none;
+}
+@media (min-width: 1180px) {
+  .to-live {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 5;
+    padding: 10px 14px;
+    border-radius: var(--radius);
+    background: var(--paper);
+    box-shadow: var(--l3);
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .to-live:not(:focus) {
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    clip-path: inset(50%);
+  }
+  .to-live:focus-visible {
+    box-shadow:
+      0 0 0 2px var(--bench),
+      0 0 0 3px var(--ink),
+      0 0 0 5px var(--bench),
+      0 0 0 6px var(--ink),
+      var(--l3);
+  }
+}
+
+/* ---- Spec lists: a term and its meaning, one hairline per row ---- */
+.spec {
+  margin: 0;
+  border-top: 1px solid var(--hair);
+}
+.spec > div {
+  display: grid;
+  grid-template-columns: minmax(0, 11em) minmax(0, 1fr);
+  gap: 4px 20px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--hair);
+}
+.spec--wide > div {
+  grid-template-columns: minmax(0, 16em) minmax(0, 1fr);
+}
+/* A list that ends its section leaves the closing line to the next section's divider, so the two
+   hairlines never frame an empty band. */
+.doc > .spec:last-child > div:last-child {
+  border-bottom: 0;
+}
+.spec dt {
+  font-weight: 500;
+  overflow-wrap: break-word;
+}
+.spec dt code {
+  font-size: 14px;
+}
+.spec dd {
+  margin: 0;
+  color: var(--ink-2);
+}
+@media (max-width: 759px) {
+  .spec > div,
+  .spec--wide > div {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---- Networks: one block per network, addresses in full ---- */
+.nets {
+  border-top: 1px solid var(--hair);
+}
+.net {
+  padding: 16px 0 18px;
+  border-bottom: 1px solid var(--hair);
+}
+.net h3 {
+  margin: 0;
+  font-size: 18px;
+  line-height: 24px;
+}
+.net h3 small {
+  margin-left: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--label);
+}
+.net p {
+  margin-top: 4px;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-2);
+}
+.net dl {
+  display: grid;
+  /* one label width for all five networks, so their values line up down the list */
+  grid-template-columns: 5em minmax(0, 1fr);
+  gap: 4px 16px;
+  margin: 10px 0 0;
+  font-size: 14px;
+  line-height: 21px;
+}
+.net dt {
+  color: var(--label);
+}
+.net dd {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.net code {
+  font-size: 13px;
+}
+
+/* ---- Code: a labelled, recessed display with a Copy key ---- */
+.code-box {
+  margin: 0;
+}
+.code-box > .display__bar {
+  padding: 8px 8px 8px 14px;
+}
+.code-box__end {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+/* Lines stay whole (a wrapped shell line reads like two commands); long ones scroll inside the box. */
+.code-box pre.code {
+  position: relative;
+  margin: 0;
+  padding: 14px 16px 18px;
+  overflow-x: auto;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  font-size: 13.5px;
+  line-height: 1.7;
+  white-space: pre;
+  word-break: normal;
+  overflow-wrap: normal;
+}
+.code-box pre.code:focus-visible {
+  box-shadow:
+    inset 0 0 0 1px var(--on-display),
+    inset 0 0 0 3px var(--display),
+    inset 0 0 0 4px var(--on-display);
+}
+/* A box that scrolls sideways fades out at the edge it continues past (main.ts sets data-more), so a
+   cut line reads as "more this way" instead of clipped. Keyboard focus drops the fade: rails stay whole. */
+.code-box pre.code[data-more="right"] {
+  -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 32px), transparent);
+  mask-image: linear-gradient(90deg, #000 calc(100% - 32px), transparent);
+}
+.code-box pre.code[data-more="left"] {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 32px);
+  mask-image: linear-gradient(90deg, transparent, #000 32px);
+}
+.code-box pre.code[data-more="both"] {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 32px, #000 calc(100% - 32px), transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 32px, #000 calc(100% - 32px), transparent);
+}
+.code-box pre.code:focus-visible {
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+/* ---- The discovery render, baked onto the bench ---- */
+.doc__figure {
+  margin: 0;
+}
+.doc__figure img {
+  width: 100%;
+  max-width: 900px;
+}
+.doc__figure figcaption {
+  margin-top: 10px;
+}
+
+/* ---- Catalog table ---- */
+.cat caption {
+  caption-side: top;
+  padding-bottom: 12px;
+  text-align: left;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--label);
+}
+/* Two-line rows (name, then endpoint) on a tight leading, so 67 tools read as one dense table. */
+.cat td {
+  padding-top: 9px;
+  padding-bottom: 9px;
+  line-height: 22px;
+}
+.cat th:last-child,
+.cat td:last-child {
+  padding-right: 0;
+}
+.cat td a {
+  font-weight: 600;
+  text-decoration: none;
+}
+.cat td a:hover {
+  text-decoration: underline;
+}
+.cat__ep {
+  display: block;
+  margin-top: 1px;
+  font-size: 12.5px;
+  line-height: 18px;
+  color: var(--label);
+  overflow-wrap: break-word;
+}
+@media (max-width: 759px) {
+  /* the rail scrolls away on phones, so the header sticks to the very top */
+  .cat th {
+    top: 0;
+  }
+}
+
+/* ---- Live checks: the desktop panel and the inline details share one look ---- */
+.docs__live {
+  display: none;
+}
+@media (min-width: 1180px) {
+  .docs__live {
+    display: block;
+    position: sticky;
+    top: calc(var(--rail-h) + 32px);
+    max-height: calc(100vh - var(--rail-h) - 64px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .check-inline {
+    display: none;
+  }
+}
+/* The panel is too narrow for name, source and time on one line, so the bar always stacks them: it
+   keeps one height whether or not an answer (and its time) is in. */
+.docs__live > .display__bar {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2px;
+  padding-top: 9px;
+  padding-bottom: 9px;
+  line-height: 18px;
+}
+.check__bar-src {
+  font: 12px/18px var(--mono);
+  overflow-wrap: anywhere;
+}
+.check__for {
+  padding: 10px 14px 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--on-display-2);
+  text-wrap: pretty;
+}
+.check__for a {
+  font-weight: 600;
+}
+.check__for a:hover {
+  text-decoration-thickness: 2px;
+}
+
+.check-inline > summary {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  padding: 0 14px;
+  list-style: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--on-display-2);
+}
+.check-inline > summary::-webkit-details-marker {
+  display: none;
+}
+.check-inline > summary b {
+  font-weight: 600;
+  color: var(--on-display);
+}
+.check-inline > summary:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+/* Inset rails: the display clips anything drawn outside its edge. */
+.check-inline > summary:focus-visible {
+  box-shadow:
+    inset 0 0 0 1px var(--on-display),
+    inset 0 0 0 3px var(--display),
+    inset 0 0 0 4px var(--on-display);
+}
+.check-inline[open] > summary {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.check__state {
+  font-size: 13px;
+  color: var(--on-display);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.check__state::after {
+  content: "Show";
+}
+.check-inline[open] .check__state::after {
+  content: "Hide";
+}
+.check__src {
+  padding: 12px 14px 0;
+  font: 12px/18px var(--mono);
+  color: var(--on-display-2);
+}
+
+.check__out {
+  position: relative;
+  display: grid;
+  gap: 12px;
+  padding: 14px 14px 18px;
+  font-size: 14px;
+  line-height: 21px;
+}
+/* Focus parks here while a check loads; the display clips rails drawn outside, so these sit inside. */
+.check__out:focus-visible {
+  box-shadow:
+    inset 0 0 0 1px var(--on-display),
+    inset 0 0 0 3px var(--display),
+    inset 0 0 0 4px var(--on-display);
+}
+.check__out p,
+.check__out dl,
+.check__out ul,
+.check__out ol,
+.check__out table {
+  margin: 0;
+}
+.check__out code {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  overflow-wrap: anywhere;
+}
+.check__result {
+  display: grid;
+  gap: 12px;
+}
+.check__result:empty {
+  display: none;
+}
+.check__big {
+  font-size: 40px;
+  line-height: 1;
+  color: var(--on-display);
+}
+.check__note,
+.check__label,
+.check__wait {
+  font-size: 13px;
+  line-height: 19px;
+  color: var(--on-display-2);
+}
+
+.check__rows > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 7px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.check__rows dt {
+  flex: none;
+  color: var(--on-display-2);
+}
+.check__rows dd {
+  min-width: 0;
+  margin: 0;
+  text-align: right;
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+
+.check__list,
+.check__nets,
+.check__svc,
+.check__tools {
+  padding: 0;
+  list-style: none;
+}
+.check__list li,
+.check__nets li {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 7px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.check__list li code {
+  min-width: 0;
+  margin-right: auto;
+}
+.check__nets li {
+  justify-content: space-between;
+}
+.check__nets small,
+.check__table small {
+  margin-left: 6px;
+  font-size: 12px;
+  color: var(--on-display-2);
+}
+.check__svc li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 12px;
+  padding: 9px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.check__svc code {
+  grid-column: 1 / -1;
+  color: var(--on-display-2);
+}
+.check__tools li {
+  display: grid;
+  gap: 2px;
+  padding: 7px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.check__tools span {
+  font-size: 13px;
+  color: var(--on-display-2);
+}
+
+.check__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  line-height: 18px;
+}
+.check__table th {
+  padding: 6px 8px 6px 0;
+  border-bottom: 1px solid var(--display-edge);
+  text-align: left;
+  font-weight: 500;
+  color: var(--on-display-2);
+}
+.check__table td {
+  padding: 7px 8px 7px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.check__table .num {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.check__table th:last-child,
+.check__table td:last-child {
+  padding-right: 0;
+}
+
+.check__raw > summary {
+  display: flex;
+  align-items: center;
+  min-height: 36px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--on-display);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.check__raw > summary:hover {
+  text-decoration-thickness: 2px;
+}
+.check__raw pre.code {
+  max-height: 260px;
+  margin-top: 8px;
+  padding: 12px;
+  overflow: auto;
+  background: var(--display-bay);
+  box-shadow: inset 0 0 0 1px var(--display-edge);
+  font-size: 12px;
+  line-height: 1.6;
+  white-space: pre;
+  word-break: normal;
+}
+
+.check__seg,
+.check__keys {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.check__form {
+  display: grid;
+  gap: 10px;
+}
+/* The raw JSON box keeps its inset edge under the focus rails. */
+.check__raw pre.code:focus-visible {
+  box-shadow: inset 0 0 0 1px var(--display-edge), var(--ring-display);
+}
+
+/* Fingers get 44px on the controls that are smaller for a mouse (the phone index is already 44px and up). */
+@media (pointer: coarse) {
+  .check__raw > summary {
+    min-height: 44px;
+  }
+  /* A catalog row opens its tool from anywhere in the row, not just the 16px name. */
+  .cat tbody tr {
+    position: relative;
+  }
+  .cat td a::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+}
+@media (pointer: coarse) and (min-width: 760px) {
+  .toc a {
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+}

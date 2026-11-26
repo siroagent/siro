@@ -1,0 +1,884 @@
+@import "@fontsource-variable/inter/opsz.css";
+@import "@fontsource/atkinson-hyperlegible-mono/latin-400.css";
+@import "@fontsource/atkinson-hyperlegible-mono/latin-600.css";
+
+/* Siro "Instrument" (see DESIGN.md). A light silver bench, raised aluminium faceplates, recessed
+   graphite displays, low square keys and one chrome ball. Depth comes from material and light:
+   every shadow below names the elevation it stands for. Colour only ever reports a state. */
+:root {
+  --bench: #f2f3f5;
+  --paper: #ffffff;
+  --plate: #eceef1;
+  --face-hi: #eef0f3;
+  --face-lo: #e1e4e8;
+  --face-mid: #e8eaee;
+  --hair: #c9ced4;
+  --edge: #727a84;
+  --ink: #101215;
+  --ink-2: #383d44;
+  --label: #565d67;
+
+  --display: #141619;
+  --display-bay: #1b1e22;
+  --on-display: #e9ecef;
+  --on-display-2: #9ea6af;
+  --display-edge: #737b85;
+
+  --settled: #146a44;
+  --awaiting: #855600;
+  --refused: #ae3328;
+  --settled-lit: #4cc38a;
+  --awaiting-lit: #e5b23a;
+  --refused-lit: #ff8a7a;
+
+  /* Elevation: L-1 recessed, L0 bench (no shadow), L1 raised, key, L2 rail over content, L3 dialogs. */
+  --l-1: inset 0 2px 8px rgba(0, 0, 0, 0.55), inset 0 0 0 1px rgba(0, 0, 0, 0.7), 0 1px 0 rgba(255, 255, 255, 0.7);
+  --l1: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 0 0 1px rgba(16, 20, 26, 0.07), 0 1px 2px rgba(16, 20, 26, 0.08), 0 12px 28px -16px rgba(16, 20, 26, 0.28);
+  --key: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 1px 1px rgba(16, 20, 26, 0.16), 0 2px 6px -2px rgba(16, 20, 26, 0.2);
+  --key-down: inset 0 1px 3px rgba(16, 20, 26, 0.3);
+  --l2: 0 10px 30px -18px rgba(16, 20, 26, 0.4);
+  --l3: 0 8px 20px rgba(16, 20, 26, 0.14), 0 32px 80px -24px rgba(16, 20, 26, 0.45);
+  --well: inset 0 1px 3px rgba(16, 20, 26, 0.22), inset 0 0 0 1px rgba(16, 20, 26, 0.12), 0 1px 0 rgba(255, 255, 255, 0.8);
+  --scrim: rgba(16, 20, 26, 0.32);
+  /* Focus: the double rail. Two 1px lines, 2px apart; graphite on light surfaces, light on displays. */
+  --ring: 0 0 0 2px var(--bench), 0 0 0 3px var(--ink), 0 0 0 5px var(--bench), 0 0 0 6px var(--ink);
+  --ring-display: 0 0 0 2px var(--display), 0 0 0 3px var(--on-display), 0 0 0 5px var(--display), 0 0 0 6px var(--on-display);
+  --well-display: inset 0 1px 3px rgba(0, 0, 0, 0.6), inset 0 0 0 1px var(--display-edge);
+
+  /* Brushed aluminium: a narrow specular band where the top edge catches the light, then the satin fall-off. */
+  --face: linear-gradient(180deg, #f7f8fa 0, var(--face-hi) 14px, var(--face-mid) 55%, var(--face-lo) 100%);
+  /* A display sits in a thin machined bezel: a dark seam inside a light outer lip. */
+  --bezel: 0 0 0 1px #b8bec6, 0 0 0 2px rgba(255, 255, 255, 0.85);
+  --key-ink: linear-gradient(180deg, #2b2f35, #17191c);
+
+  /* Apple's own SF Pro wherever it is the system face (Mac, iPhone, iPad), Inter with its optical-size axis elsewhere. */
+  --sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter Variable", "Helvetica Neue", Arial, sans-serif;
+  --mono: "Atkinson Hyperlegible Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --max: 1320px;
+  --gutter: 24px;
+  --margin: 32px;
+  --rail-h: 60px;
+  --dock-h: 0px;
+  --radius: 4px;
+  color-scheme: light;
+}
+@media (max-width: 1099px) {
+  :root {
+    --margin: 24px;
+  }
+}
+@media (max-width: 759px) {
+  :root {
+    --margin: 16px;
+    --dock-h: calc(56px + env(safe-area-inset-bottom, 0px));
+  }
+  /* the phone header scrolls away, so anchor jumps only need a little air; the dock covers the bottom */
+  html {
+    scroll-padding-top: 16px;
+    scroll-padding-bottom: calc(var(--dock-h) + 16px);
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-padding-top: calc(var(--rail-h) + 16px);
+}
+body {
+  margin: 0;
+  background: var(--bench);
+  color: var(--ink);
+  font: 400 17px/28px var(--sans);
+  font-stretch: 100%;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  padding-bottom: var(--dock-h);
+}
+@media (max-width: 759px) {
+  body {
+    font-size: 16px;
+    line-height: 26px;
+  }
+}
+a {
+  color: inherit;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+a:hover {
+  text-decoration-thickness: 2px;
+}
+a:active {
+  color: var(--ink-2);
+}
+::placeholder {
+  color: var(--label);
+  opacity: 1;
+}
+.display ::placeholder {
+  color: var(--on-display-2);
+}
+img,
+svg,
+canvas,
+video {
+  display: block;
+  max-width: 100%;
+}
+img,
+video {
+  height: auto;
+}
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+button {
+  cursor: pointer;
+}
+[hidden] {
+  display: none !important;
+}
+::selection {
+  background: var(--ink);
+  color: var(--bench);
+}
+/* Focus: the double rail. Components that set their own shadow restate it at the end of this file. */
+:focus-visible {
+  outline: none;
+  box-shadow: var(--ring);
+}
+.display :focus-visible,
+.on-display:focus-visible {
+  box-shadow: var(--ring-display);
+}
+label[for] {
+  cursor: pointer;
+}
+/* The rail is drawn by script (shell.ts). Until it mounts, its height is held so the page does not jump. */
+html:not([data-page]) body::before {
+  content: "";
+  display: block;
+  height: var(--rail-h);
+}
+@media (max-width: 759px) {
+  html:not([data-page]) body::before {
+    height: 52px;
+  }
+}
+.skip {
+  position: absolute;
+  left: 8px;
+  top: -60px;
+  z-index: 100;
+  padding: 10px 14px;
+  background: var(--paper);
+  border-radius: var(--radius);
+  box-shadow: var(--l3);
+  text-decoration: none;
+}
+.skip:focus {
+  top: 8px;
+}
+
+/* ---- Layout ---- */
+.wrap {
+  width: 100%;
+  max-width: calc(var(--max) + 2 * var(--margin));
+  margin: 0 auto;
+  padding: 0 var(--margin);
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--gutter);
+}
+.section {
+  padding: 112px 0;
+}
+.section--tight {
+  padding: 72px 0;
+}
+@media (max-width: 1099px) {
+  .section {
+    padding: 72px 0;
+  }
+  .section--tight {
+    padding: 48px 0;
+  }
+}
+@media (max-width: 759px) {
+  .section {
+    padding: 48px 0;
+  }
+  .section--tight {
+    padding: 32px 0;
+  }
+}
+
+/* ---- Type ---- */
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  font-family: var(--sans);
+  font-weight: 600;
+  color: var(--ink);
+  text-wrap: balance;
+}
+h1,
+.h1 {
+  font-size: clamp(40px, 5vw, 72px);
+  line-height: 1;
+  letter-spacing: -0.035em;
+}
+h2,
+.h2 {
+  font-size: clamp(28px, 3.2vw, 44px);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+}
+h3,
+.h3 {
+  font-size: 22px;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+p {
+  margin: 0;
+}
+.lede {
+  font-size: 19px;
+  line-height: 30px;
+  color: var(--ink-2);
+  max-width: 34em;
+}
+@media (max-width: 759px) {
+  .lede {
+    font-size: 17px;
+    line-height: 27px;
+  }
+}
+.label {
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 500;
+  color: var(--label);
+}
+.muted {
+  color: var(--label);
+}
+.small {
+  font-size: 14px;
+  line-height: 21px;
+}
+.mono,
+code,
+kbd,
+samp {
+  font-family: var(--mono);
+  font-size: 0.9em;
+}
+/* Live numbers: tabular figures, semibold and tight, so a price reads as one solid unit. */
+.num,
+.live-num {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+.live-num {
+  font-stretch: 100%;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+.live-num small {
+  font-stretch: 100%;
+  font-weight: 500;
+  font-size: max(12px, 0.42em);
+  white-space: nowrap;
+  letter-spacing: 0;
+  margin-left: 0.35em;
+}
+code.inline,
+.code-inline {
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: var(--paper);
+  box-shadow: var(--well);
+  font-size: 0.86em;
+  /* a chip that wraps keeps closed edges on both lines */
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* ---- Surfaces ---- */
+.face {
+  position: relative;
+  background: var(--face);
+  border-radius: 6px;
+  box-shadow: var(--l1);
+}
+.plate {
+  background: var(--plate);
+  border-radius: 6px;
+  box-shadow: var(--l1);
+}
+.paper {
+  background: var(--paper);
+  border-radius: 6px;
+  box-shadow: 0 0 0 1px rgba(16, 20, 26, 0.06);
+}
+/* A recessed graphite display. The bar names what is shown and where it came from. */
+.display {
+  position: relative;
+  background: var(--display);
+  color: var(--on-display);
+  border-radius: 6px;
+  box-shadow: var(--l-1), var(--bezel);
+  /* clip, not hidden: a hidden overflow makes the display a scroll box, and sticky table heads inside it
+     would then stick to the display instead of the page. */
+  overflow: hidden;
+  overflow: clip;
+}
+.display::before {
+  /* the faint glass sheen on the top edge */
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 40%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent);
+  pointer-events: none;
+}
+.display__bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 36px;
+  padding: 0 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 13px;
+  color: var(--on-display-2);
+}
+.display__bar b {
+  color: var(--on-display);
+  font-weight: 600;
+}
+.display a {
+  color: var(--on-display);
+}
+.display .muted,
+.display .label {
+  color: var(--on-display-2);
+}
+
+/* ---- Keys (buttons). .btn is the same key, kept for markup shared with older views. ---- */
+.key,
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--face);
+  box-shadow: var(--key);
+  color: var(--ink);
+  font: 600 15px/1 var(--sans);
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  transition:
+    transform 0.08s ease,
+    box-shadow 0.08s ease,
+    background 0.15s ease;
+}
+.key:hover,
+.btn:hover {
+  background: linear-gradient(180deg, #f5f6f8, var(--face-lo));
+}
+.key:active,
+.btn:active,
+.key[aria-pressed="true"],
+.key[aria-selected="true"],
+.key.is-down {
+  transform: translateY(1px);
+  box-shadow: var(--key-down);
+  background: var(--face-lo);
+}
+.key--ink,
+.btn--ink {
+  background: var(--key-ink);
+  color: #f5f6f8;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 1px 1px rgba(16, 20, 26, 0.3),
+    0 2px 6px -2px rgba(16, 20, 26, 0.35);
+}
+.key--ink:hover,
+.btn--ink:hover {
+  background: linear-gradient(180deg, #34383f, #1c1f23);
+}
+.key--ink:active,
+.btn--ink:active {
+  background: #17191c;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+.key--sm,
+.btn--sm {
+  min-height: 34px;
+  padding: 0 12px;
+  font-size: 14px;
+}
+@media (pointer: coarse) {
+  .key,
+  .btn {
+    min-height: 44px;
+  }
+  .key--sm,
+  .btn--sm {
+    min-height: 44px;
+  }
+}
+.key[disabled],
+.btn[disabled],
+.key[aria-disabled="true"] {
+  cursor: not-allowed;
+  transform: none;
+  background: transparent;
+  color: var(--label);
+  box-shadow: none;
+  outline: 1px dashed var(--edge);
+  outline-offset: -1px;
+}
+.display .key:not(.key--ink) {
+  background: linear-gradient(180deg, #2a2e34, #202328);
+  color: var(--on-display);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 1px 1px rgba(0, 0, 0, 0.5);
+}
+.display .key:not(.key--ink):not(:active, [aria-pressed="true"], [aria-selected="true"], [disabled], [aria-disabled="true"]):hover {
+  filter: brightness(1.18);
+}
+.display .key:not(.key--ink):active,
+.display .key[aria-pressed="true"],
+.display .key[aria-selected="true"] {
+  background: #181a1e;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.7);
+}
+.display .key[disabled],
+.display .key[aria-disabled="true"],
+.display .key:is([disabled], [aria-disabled="true"]):active {
+  transform: none;
+  background: transparent;
+  color: var(--on-display-2);
+  box-shadow: none;
+  outline: 1px dashed var(--display-edge);
+  outline-offset: -1px;
+}
+.arrow {
+  transition: transform 0.15s ease;
+}
+
+/* ---- Fields: recessed wells with a visible label above ---- */
+.field {
+  display: grid;
+  gap: 6px;
+}
+.field > span:first-child,
+.field > label,
+.field > .label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--label);
+}
+.display .field > span:first-child,
+.display .field > label,
+.display .field > .label {
+  color: var(--on-display-2);
+}
+.well,
+.field input,
+.field select,
+.field textarea,
+input.well,
+select.well,
+textarea.well {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--paper);
+  box-shadow: var(--well);
+  font-size: 16px;
+  line-height: 22px;
+}
+.field textarea,
+textarea.well {
+  resize: vertical;
+}
+.field select:hover,
+select.well:hover {
+  box-shadow: var(--well), inset 0 0 0 1px var(--edge);
+}
+.display select:hover {
+  box-shadow: var(--well-display), inset 0 0 0 1px var(--on-display-2);
+}
+.field input[type="number"],
+.num-field {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.display .well,
+.display select,
+.display input,
+.display textarea {
+  background-color: var(--display-bay);
+  color: var(--on-display);
+  box-shadow: var(--well-display);
+}
+.display select {
+  appearance: none;
+  color-scheme: dark;
+  padding-right: 36px;
+  background: var(--display-bay) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none' stroke='%239EA6AF' stroke-width='1.5'%3E%3Cpath d='M1 1l4 4 4-4'/%3E%3C/svg%3E") no-repeat right 14px center;
+  cursor: pointer;
+}
+
+/* ---- Lamps: an 8px square and a word, never colour alone ---- */
+.lamp {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+.lamp::before {
+  content: "";
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 1px;
+  background: var(--edge);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15);
+}
+/* A lamp whose words wrap keeps its square on the first line. */
+@supports (margin-top: 1lh) {
+  .lamp {
+    align-items: flex-start;
+  }
+  .lamp::before {
+    margin-top: calc((1lh - 8px) / 2);
+  }
+}
+.lamp--settled {
+  color: var(--settled);
+}
+.lamp--settled::before {
+  background: var(--settled);
+}
+.lamp--awaiting {
+  color: var(--awaiting);
+}
+.lamp--awaiting::before {
+  background: var(--awaiting);
+}
+.lamp--refused {
+  color: var(--refused);
+}
+.lamp--refused::before {
+  background: var(--refused);
+}
+.display .lamp--settled {
+  color: var(--settled-lit);
+}
+.display .lamp--settled::before {
+  background: var(--settled-lit);
+  box-shadow: 0 0 0 1px rgba(76, 195, 138, 0.25);
+}
+.display .lamp--awaiting {
+  color: var(--awaiting-lit);
+}
+.display .lamp--awaiting::before {
+  background: var(--awaiting-lit);
+}
+.display .lamp--refused {
+  color: var(--refused-lit);
+}
+.display .lamp--refused::before {
+  background: var(--refused-lit);
+}
+
+/* ---- The chrome ball (small, CSS). The large one is an SVG from shell.ts ballSvg(). ---- */
+.ball {
+  display: inline-block;
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 28%, #fff 0 14%, transparent 22%),
+    linear-gradient(180deg, #f4f5f7 0%, #c9ccd1 46%, #5d6168 52%, #a7abb1 78%, #e6e8eb 100%);
+  box-shadow:
+    0 1px 2px rgba(16, 20, 26, 0.35),
+    inset -1px -1px 1px rgba(255, 255, 255, 0.5);
+}
+
+/* ---- Meter: two rails and the ball at the value ---- */
+.meter {
+  position: relative;
+  height: 10px;
+}
+.meter::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 2px;
+  height: 4px;
+  border-top: 1px solid var(--edge);
+  border-bottom: 1px solid var(--edge);
+}
+.meter .ball {
+  position: absolute;
+  top: -1px;
+  left: clamp(0px, calc(var(--v, 0) * 100% - 5px), calc(100% - 10px));
+}
+.display .meter::before {
+  border-color: var(--display-edge);
+}
+
+/* ---- Tables ---- */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+.table th {
+  text-align: left;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--label);
+  padding: 10px 12px 10px 0;
+}
+/* Column heads stick under the rail and end in the double rail. The rails are background lines, so they
+   run unbroken across columns and move with the sticky head; a page that sets position: static or
+   only background-color keeps them. */
+.table thead th {
+  position: sticky;
+  top: var(--rail-h);
+  z-index: 1;
+  padding-bottom: 14px;
+  background-color: var(--bench);
+  background-image: linear-gradient(var(--edge), var(--edge)), linear-gradient(var(--edge), var(--edge));
+  background-size: 100% 1px;
+  background-position:
+    0 100%,
+    0 calc(100% - 3px);
+  background-repeat: no-repeat;
+}
+@media (max-width: 759px) {
+  /* the phone header scrolls away, so heads stick to the top edge */
+  .table thead th {
+    top: 0;
+  }
+}
+.table tbody th {
+  font-size: inherit;
+  color: var(--ink);
+  font-weight: 600;
+}
+.table td,
+.table tbody th {
+  padding: 10px 12px 10px 0;
+  border-bottom: 1px solid var(--hair);
+  vertical-align: middle;
+  height: 44px;
+}
+.table .num {
+  text-align: right;
+}
+.table th button {
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+}
+.display .table thead th {
+  background-color: var(--display);
+  background-image: linear-gradient(var(--display-edge), var(--display-edge)), linear-gradient(var(--display-edge), var(--display-edge));
+  color: var(--on-display-2);
+}
+.display .table tbody th {
+  color: var(--on-display);
+}
+.display .table td,
+.display .table tbody th {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* ---- Tags (kept for shared markup) and the old .card, now a raised plate ---- */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 8px;
+  border-radius: 3px;
+  background: var(--paper);
+  box-shadow: 0 0 0 1px var(--hair);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.tag--ink {
+  background: var(--display);
+  color: var(--on-display);
+  box-shadow: none;
+}
+.card {
+  position: relative;
+  background: var(--face);
+  border-radius: 6px;
+  box-shadow: var(--l1);
+}
+a.card {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* ---- Rails as dividers: two parallel lines always mean a boundary ---- */
+.rails {
+  height: 5px;
+  border-top: 1px solid var(--edge);
+  border-bottom: 1px solid var(--edge);
+}
+.hair {
+  height: 0;
+  border-top: 1px solid var(--hair);
+}
+
+/* ---- Code ---- */
+pre.code {
+  margin: 0;
+  padding: 16px 18px;
+  background: var(--display);
+  color: var(--on-display);
+  border-radius: 6px;
+  box-shadow: var(--l-1);
+  font: 14px/1.7 var(--mono);
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+pre.code .c {
+  color: var(--on-display-2);
+}
+pre.code .s {
+  color: #c9e8d7;
+}
+pre.code .k {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* ---- Dialogs, sheets, toast (L3) ---- */
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: var(--scrim);
+}
+.dialog {
+  position: fixed;
+  z-index: 81;
+  left: 50%;
+  top: 12vh;
+  transform: translateX(-50%);
+  width: min(640px, calc(100vw - 32px));
+  max-height: 76vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+  border-radius: 8px;
+  box-shadow: var(--l3);
+  overflow: hidden;
+}
+@media (max-width: 759px) {
+  .dialog {
+    top: auto;
+    bottom: 0;
+    transform: none;
+    left: 0;
+    width: 100%;
+    max-height: 86vh;
+    border-radius: 10px 10px 0 0;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(24px + var(--dock-h));
+  transform: translateX(-50%);
+  z-index: 90;
+  max-width: calc(100vw - 32px);
+  padding: 12px 16px;
+  border-radius: 6px;
+  background: var(--display);
+  color: var(--on-display);
+  box-shadow: var(--l3);
+  font-size: 14px;
+}
+
+/* ---- Focus, restated last. Keys, wells and fields above set their own box-shadow at the same or a
+   higher specificity than :focus-visible, so the rails are drawn again here, keeping any recess. ---- */
+.key:focus-visible,
+.btn:focus-visible,
+.skip:focus-visible,
+.key[disabled]:focus-visible,
+.key[aria-disabled="true"]:focus-visible,
+pre.code:focus-visible {
+  box-shadow: var(--ring);
+}
+.well:focus-visible,
+input.well:focus-visible,
+select.well:focus-visible,
+textarea.well:focus-visible,
+.field :is(input, select, textarea):focus-visible {
+  box-shadow: var(--well), var(--ring);
+}
+.display .key:focus-visible,
+.display .key[aria-disabled="true"]:focus-visible,
+.display pre.code:focus-visible {
+  box-shadow: var(--ring-display);
+}
+.display .well:focus-visible,
+.display :is(input, select, textarea):focus-visible {
+  box-shadow: var(--well-display), var(--ring-display);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.001ms !important;
+    animation-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "siro",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-09-01",
+  "assets": {
+    "binding": "ASSETS",
+    "not_found_handling": "404-page",
+    "run_worker_first": true
+  },
+  "routes": [
+    { "pattern": "siroagent.com", "custom_domain": true },
+    // www and the old staging host answer with a 301 to siroagent.com (worker/index.ts).
+    { "pattern": "www.siroagent.com", "custom_domain": true },
+    { "pattern": "siro.pawww.sbs", "custom_domain": true }
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "siro",
+      "database_id": "95ce40ae-1110-4fa5-abe6-2a9b1297542e",
+      "migrations_dir": "migrations"
+    }
+  ],
+  // Generated media copied from Replicate, which deletes its own outputs after an hour.
+  "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "siro-media" }],
+  "ai": { "binding": "AI", "remote": true },
+  "vars": {
+    // Origins allowed to use the free agent endpoint. Local dev overrides this in .dev.vars.
+    "ALLOWED_ORIGINS": "https://siroagent.com",
+    // x402 payTo on EVM chains: Siro's own treasury.
+    // Empty = paid calls answer 503.
+    "TREASURY": "0xb2291782DF6E6eF830aC5fBF203e7f81180F89b9",
+    // Solana USDC payTo (base58). Empty = Solana is not offered. Offered only once its USDC token account exists.
+    "SOLANA_TREASURY": "97wP7Wk3Cctbi6WAWgV29NcBpbUBc34BFYDeXmMe6LFa",
+    "FACILITATOR_URL": "https://facilitator.heyelsa.build",
+    // Public half of mcp-registry/key.pem: proves to the official MCP Registry that we own siroagent.com.
+    "MCP_REGISTRY_PUBKEY": "iK6LjlXUlE1v/rR3DbsxLwVpXFeqrTMsV7rQOi+I8Cw="
+  },
+  "limits": { "cpu_ms": 60000 },
+  "observability": { "enabled": true }
+}

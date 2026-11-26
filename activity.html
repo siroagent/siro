@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Activity · Siro</title>
+  <meta name="description" content="Every paid call Siro has settled: tool, network, payer, price and transaction hash, read live from the settlements table.">
+  <link rel="canonical" href="https://siroagent.com/activity">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://siroagent.com/activity">
+  <meta property="og:title" content="Activity · Siro">
+  <meta property="og:description" content="Every paid call Siro has settled: tool, network, payer, price and transaction hash, read live from the settlements table.">
+  <meta property="og:image" content="https://siroagent.com/og.jpg?v=2">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@siro_agent">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <meta name="theme-color" content="#f2f3f5">
+  <noscript><style>#act-deck,#proofs{display:none}</style></noscript>
+</head>
+<body>
+<main id="main">
+  <div class="wrap">
+    <header class="act__head grid">
+      <h1>Activity</h1>
+      <p class="lede">Each row is one paid call that returned a result, with the transfer that paid for it. A call that fails is never settled, so it never appears here. Nothing is hidden: calls the Siro team pays for to test a tool show here like any other.</p>
+    </header>
+
+    <noscript><p class="act__nojs">This page reads the settlements table live and needs JavaScript. The same rows are at <a href="/api/ledger?limit=500">/api/ledger</a> as JSON, with totals, and paid results shown in full are at <a href="/api/proofs">/api/proofs</a>.</p></noscript>
+
+    <section class="display act proofs" id="proofs" aria-labelledby="proofs-name" hidden>
+      <div class="display__bar act__bar">
+        <h2 class="act__name" id="proofs-name">Paid results, shown in full</h2>
+        <p class="act__feed"><span class="mono">/api/proofs</span></p>
+      </div>
+      <p class="proofs__lede">Calls the Siro team paid for from its own wallet, with exactly what each one returned. Every other payer's result stays private: the ledger keeps only its sha256, so the payer can check that what they received is what was recorded. As JSON: <a href="/api/proofs">/api/proofs</a>, or one result at /api/proofs/&lt;tx&gt;.</p>
+      <ol class="proofs__list" id="proofs-list"></ol>
+    </section>
+
+    <section class="display act" id="act-deck" aria-labelledby="act-name">
+      <div class="display__bar act__bar">
+        <h2 class="act__name" id="act-name" tabindex="-1">Settlements</h2>
+        <p class="act__feed"><span class="lamp lamp--awaiting" id="act-lamp">Reading</span><span><span class="mono" id="act-src">/api/ledger</span> <time id="act-read"></time></span></p>
+      </div>
+
+      <div class="act__top">
+        <div class="act__readout">
+          <p class="act__sum" id="act-sum">Reading the totals</p>
+          <p class="act__note small" id="act-sum-note"></p>
+        </div>
+        <figure class="act__days is-flat" id="act-days">
+          <figcaption class="act__days-head"><h3>Paid calls per day, last 30 days (UTC)</h3><span id="act-peak"></span></figcaption>
+          <div class="act__bars" id="act-bars" aria-hidden="true"></div>
+          <div class="act__axis" aria-hidden="true"><span id="act-from"></span><span id="act-to"></span></div>
+          <p class="act__days-sum small" id="act-days-sum">Reading the last 30 days</p>
+        </figure>
+      </div>
+
+      <form class="act__filters" id="act-filters" role="search" aria-label="Filter settlements" novalidate>
+        <div class="field">
+          <label for="f-net">Network</label>
+          <select id="f-net"><option value="">All networks</option></select>
+        </div>
+        <div class="field">
+          <label for="f-tool">Tool</label>
+          <select id="f-tool"><option value="">All tools</option></select>
+        </div>
+        <div class="field act__lookup">
+          <label for="f-payer">Payer address</label>
+          <div class="act__payer-row">
+            <input id="f-payer" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="64" placeholder="0x… or a Solana address" aria-describedby="f-payer-msg">
+            <button class="key" type="submit">Search</button>
+          </div>
+          <p class="act__msg small" id="f-payer-msg" role="alert"></p>
+          <p class="act__mine small" id="f-mine" hidden></p>
+        </div>
+      </form>
+
+      <div class="act__rows" id="act-rows-wrap" aria-busy="true">
+        <div class="act__scope" id="act-scope" hidden>
+          <p id="act-scope-text" tabindex="-1"></p>
+          <button class="key key--sm" type="button" data-act="all-payers">Show all payers</button>
+        </div>
+        <table class="table act__table" id="act-table" role="table" hidden>
+          <caption class="sr">Settlements, newest first</caption>
+          <thead role="rowgroup">
+            <tr role="row">
+              <th role="columnheader" scope="col" class="act__when" aria-sort="descending">When (UTC)</th>
+              <th role="columnheader" scope="col">Tool</th>
+              <th role="columnheader" scope="col">Network</th>
+              <th role="columnheader" scope="col" class="c-payer">Payer</th>
+              <th role="columnheader" scope="col" class="num">USD</th>
+              <th role="columnheader" scope="col" class="num c-ms">Run time</th>
+              <th role="columnheader" scope="col">Transaction</th>
+            </tr>
+          </thead>
+          <tbody role="rowgroup" id="act-rows"></tbody>
+        </table>
+        <div class="act__state" id="act-state"><p>Reading the settlements table</p></div>
+      </div>
+
+      <div class="act__foot">
+        <div class="act__foot-start">
+          <p class="small" id="act-count" tabindex="-1"></p>
+          <button class="key key--sm" type="button" id="act-older" hidden>Older rows</button>
+        </div>
+        <div class="act__foot-end">
+          <p class="small" id="act-poll" tabindex="-1">Refreshes every 20 s while this tab is in view.</p>
+          <button class="key key--sm" type="button" id="act-retry" hidden>Retry now</button>
+        </div>
+      </div>
+      <p class="sr" id="act-live" role="status" aria-live="polite"></p>
+    </section>
+  </div>
+</main>
+<script type="module" src="/src/activity/main.ts"></script>
+</body>
+</html>

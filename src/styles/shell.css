@@ -1,0 +1,605 @@
+/* The shared frame: aluminium rail, More menu, search well, phone dock, footer strip, search dialog. */
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ---- Rail: a full-width aluminium bar fixed to the top, double rail along its lower edge ---- */
+.rail {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  height: var(--rail-h);
+  background: var(--face);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 0 0 transparent;
+  transition: box-shadow 0.2s ease;
+}
+.rail::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 4px;
+  border-top: 1px solid var(--hair);
+  border-bottom: 1px solid var(--edge);
+}
+.rail.is-over {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    var(--l2);
+}
+.rail__in {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  height: 100%;
+}
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex: none;
+  text-decoration: none;
+  color: var(--ink);
+}
+/* The S is engraved into the metal: dark fill with a light lip under it. */
+.brand__mark {
+  display: inline-block;
+  width: 18px;
+  height: 24px;
+  color: #2a2e34;
+  filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.85));
+}
+.brand__mark svg {
+  width: 100%;
+  height: 100%;
+}
+.brand__word {
+  font-size: 21px;
+  font-weight: 650;
+  letter-spacing: -0.035em;
+}
+.rail__keys {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 8px;
+}
+.rail__key {
+  position: relative;
+  font-weight: 600;
+}
+.rail__key.is-on:not(.key--ink) {
+  transform: translateY(1px);
+  box-shadow: var(--key-down);
+  background: var(--face-lo);
+}
+.rail__key .ball {
+  width: 7px;
+  height: 7px;
+}
+.more {
+  position: relative;
+  display: none;
+}
+.more__menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  z-index: 60;
+  width: 300px;
+  padding: 6px;
+  background: var(--paper);
+  border-radius: 6px;
+  box-shadow: var(--l3);
+}
+.more__menu a {
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  text-decoration: none;
+  font-weight: 600;
+}
+.more__menu a:hover,
+.more__menu a:focus-visible {
+  background: var(--bench);
+}
+.more__menu a[aria-current="page"] {
+  background: var(--face-lo);
+}
+.more__menu small {
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 18px;
+  color: var(--label);
+}
+.rail__end {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+/* A recessed well; it opens the Search dialog. */
+.search-well {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 200px;
+  min-height: 36px;
+  padding: 0 8px 0 12px;
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--bench);
+  box-shadow: var(--well);
+  color: var(--label);
+  font-size: 14px;
+  text-align: left;
+}
+.search-well:hover {
+  color: var(--ink);
+  background: #f7f8f9;
+}
+.search-well:active {
+  transform: translateY(1px);
+  box-shadow: var(--key-down);
+}
+.search-well kbd {
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: var(--face);
+  box-shadow: var(--key);
+  font: 600 12px var(--sans);
+  color: var(--ink-2);
+}
+.icon-key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius);
+  color: var(--ink);
+  background: var(--face);
+  box-shadow: var(--key);
+}
+.icon-key:hover {
+  background: linear-gradient(180deg, #f5f6f8, var(--face-lo));
+}
+.brand:hover .brand__word {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+.brand:active {
+  transform: translateY(1px);
+}
+.icon-key:active {
+  transform: translateY(1px);
+  box-shadow: var(--key-down);
+}
+.icon-key svg {
+  width: 15px;
+  height: 15px;
+}
+
+/* 760-1099: Ask, Tools, Budget and More; the rest folds into More. */
+@media (max-width: 1099px) {
+  .rail__keys .rail__key:nth-of-type(4),
+  .rail__keys .rail__key:nth-of-type(5) {
+    display: none;
+  }
+  .more {
+    display: block;
+  }
+  .search-well {
+    width: auto;
+  }
+}
+
+/* <760: a thin header (S + Search) that scrolls away, and a bottom dock for the destinations. */
+@media (max-width: 759px) {
+  .rail {
+    position: relative;
+    height: 52px;
+  }
+  .rail__keys,
+  .rail__end .icon-key {
+    display: none;
+  }
+  .search-well span {
+    display: inline;
+  }
+  .search-well kbd {
+    display: none;
+  }
+}
+
+/* ---- Dock (phones only) ---- */
+.dock {
+  display: none;
+}
+@media (max-width: 759px) {
+  .dock {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 50;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 4px;
+    height: var(--dock-h);
+    padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px));
+    background: var(--face);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.95),
+      0 -1px 0 var(--edge),
+      0 -10px 30px -18px rgba(16, 20, 26, 0.4);
+  }
+  .dock__key {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    min-height: 44px;
+    border: 0;
+    border-radius: var(--radius);
+    background: transparent;
+    color: var(--ink-2);
+    font: 600 11px/1 var(--sans);
+    text-decoration: none;
+  }
+  .dock__key:hover {
+    color: var(--ink);
+  }
+  .dock__key:active {
+    transform: translateY(1px);
+    box-shadow: var(--key-down);
+    background: var(--face-lo);
+  }
+  .dock__key--ink:active {
+    background: #17191c;
+    color: #f5f6f8;
+  }
+  .dock__key svg {
+    width: 20px;
+    height: 20px;
+  }
+  .dock__key[aria-current="page"] {
+    background: var(--face-lo);
+    box-shadow: var(--key-down);
+    color: var(--ink);
+  }
+  .dock__key--ink {
+    background: var(--key-ink);
+    color: #f5f6f8;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  }
+  .dock__key--ink[aria-current="page"] {
+    background: #17191c;
+    color: #f5f6f8;
+  }
+}
+
+/* ---- Token strip: the official $SIRO contract under the rail, graphite like the displays ---- */
+.tok {
+  background: linear-gradient(180deg, var(--display-bay), var(--display));
+  color: var(--on-display);
+  font-size: 14px;
+}
+.tok__in {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 16px;
+  min-height: 44px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+.tok__name b {
+  font-weight: 700;
+}
+.tok__label {
+  color: var(--on-display-2);
+}
+/* The address and its copy icon are one button: a click anywhere on it copies the CA. */
+.tok__ca {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 32px;
+  padding: 0 8px 0 10px;
+  margin-left: -10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--on-display);
+  font: inherit;
+  cursor: pointer;
+}
+.tok__ca code {
+  font-size: 13.5px;
+  letter-spacing: 0.01em;
+}
+.tok__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--display-edge);
+  border-radius: 6px;
+  color: var(--on-display);
+}
+.tok__ca:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+.tok__ca:hover .tok__icon {
+  border-color: var(--on-display-2);
+}
+.tok__ca:active {
+  transform: translateY(1px);
+}
+.tok__ca:focus-visible {
+  outline: none;
+  box-shadow: var(--ring-display);
+}
+.tok__ca-short {
+  display: none;
+}
+@media (max-width: 759px) {
+  .tok__label {
+    display: none;
+  }
+  .tok__in {
+    flex-wrap: nowrap;
+    justify-content: space-between;
+  }
+}
+@media (max-width: 479px) {
+  .tok__chain {
+    display: none;
+  }
+}
+@media (max-width: 759px) {
+  .tok__ca-full {
+    display: none;
+  }
+  .tok__ca-short {
+    display: inline;
+  }
+}
+@media (pointer: coarse) {
+  .tok__ca {
+    min-height: 44px;
+  }
+}
+
+/* ---- Footer: one aluminium strip ---- */
+.foot {
+  padding: 72px 0 32px;
+}
+.foot__plate {
+  display: grid;
+  /* the sentence keeps a readable measure; the links wrap before they squeeze it */
+  grid-template-columns: minmax(18em, 1fr) minmax(0, auto);
+  gap: 18px 32px;
+  padding: 24px 28px;
+}
+.foot__id {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-weight: 500;
+}
+.foot__links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px 28px;
+  font-size: 15px;
+}
+.foot__links p {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 14px;
+}
+.foot__links a {
+  text-decoration: none;
+  font-weight: 500;
+}
+.foot__links a:hover {
+  text-decoration: underline;
+}
+/* The official X mark alone, inside a 44px target; hover darkens it, press sinks it 1px. */
+.foot__links p:has(.foot__x) {
+  align-self: center;
+}
+.foot__x {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin: -13px;
+  color: var(--ink-2);
+}
+.foot__x:hover {
+  color: var(--ink);
+}
+.foot__x:active {
+  transform: translateY(1px);
+}
+.foot__x svg {
+  width: 18px;
+  height: 18px;
+}
+.foot__token {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--hair);
+}
+.foot__ca {
+  overflow-wrap: anywhere;
+  color: var(--ink);
+}
+.foot__copy {
+  min-height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--hair);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+}
+.foot__copy:hover {
+  border-color: var(--ink-2);
+}
+@media (pointer: coarse) {
+  .foot__copy {
+    min-height: 44px;
+  }
+}
+.foot__status {
+  grid-column: 1 / -1;
+  padding-top: 14px;
+  border-top: 1px solid var(--hair);
+}
+.foot__legal {
+  margin-top: 16px;
+  padding: 0 4px;
+}
+@media (max-width: 1099px) {
+  .foot__plate {
+    grid-template-columns: 1fr;
+  }
+  .foot__links {
+    justify-content: flex-start;
+  }
+}
+
+/* ---- Search dialog ---- */
+.search__top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px 8px;
+  padding: 12px 14px 14px;
+  border-bottom: 1px solid var(--hair);
+}
+.search__label {
+  grid-column: 1 / -1;
+}
+.search__list {
+  list-style: none;
+  margin: 0;
+  padding: 6px;
+  overflow-y: auto;
+}
+.search__list a {
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  text-decoration: none;
+}
+.search__list a span {
+  font-size: 13px;
+  color: var(--label);
+}
+.search__list li[aria-selected="true"] a {
+  background: var(--bench);
+  box-shadow: inset 3px 0 0 var(--ink);
+}
+.search__none {
+  padding: 16px 12px;
+  color: var(--label);
+}
+.search__hint {
+  padding: 10px 16px;
+  border-top: 1px solid var(--hair);
+}
+
+/* ---- Menu sheet (phone) ---- */
+.menu-sheet__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--hair);
+}
+.menu-sheet nav {
+  display: grid;
+  padding: 6px;
+  overflow-y: auto;
+}
+.menu-sheet nav a {
+  display: grid;
+  gap: 2px;
+  padding: 12px;
+  border-radius: var(--radius);
+  text-decoration: none;
+}
+.menu-sheet nav a span {
+  font-size: 13px;
+  color: var(--label);
+}
+.menu-sheet__search {
+  margin: 6px 16px 16px;
+}
+
+/* ---- Fingers: 44px targets in the header and footer (the phone header is 52px tall) ---- */
+@media (pointer: coarse), (max-width: 759px) {
+  .search-well {
+    min-height: 44px;
+  }
+}
+@media (pointer: coarse) {
+  .dock,
+  .rail__keys {
+    gap: 8px;
+  }
+  .icon-key {
+    width: 44px;
+    height: 44px;
+  }
+  .brand {
+    min-height: 44px;
+  }
+  .foot__links,
+  .foot__links p {
+    row-gap: 0;
+  }
+  .foot__links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+}
+
+/* ---- Focus, restated last: the rail, well and dock set their own shadows above ---- */
+.search-well:focus-visible {
+  box-shadow: var(--well), var(--ring);
+}
+.icon-key:focus-visible,
+.rail__key.is-on:focus-visible,
+.dock__key:focus-visible,
+.brand:focus-visible {
+  box-shadow: var(--ring);
+}

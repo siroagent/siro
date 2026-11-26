@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Budget · agent wallet and caps · Siro</title>
+  <meta name="description" content="One agent key made in this browser, three caps (per call, per day, per swap) and five networks: USDG on Robinhood Chain or USDC on Base, Solana, Arbitrum and Polygon. Siro checks every payment against the caps before it signs.">
+  <link rel="canonical" href="https://siroagent.com/budget">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://siroagent.com/budget">
+  <meta property="og:title" content="Budget · agent wallet and caps · Siro">
+  <meta property="og:description" content="One agent key made in this browser, three caps (per call, per day, per swap) and five networks: USDG on Robinhood Chain or USDC on Base, Solana, Arbitrum and Polygon. Siro checks every payment against the caps before it signs.">
+  <meta property="og:image" content="https://siroagent.com/og.jpg?v=2">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@siro_agent">
+  <meta name="theme-color" content="#f2f3f5">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="preload" as="image" type="image/webp" href="/img/03-knob-900.webp" fetchpriority="high">
+</head>
+<body>
+<main id="main" class="bd">
+  <header class="wrap bd-head">
+    <h1 tabindex="-1">Budget</h1>
+    <p class="lede">One key, three caps, five networks. Siro checks every payment against your caps before it signs.</p>
+  </header>
+  <div id="budget" class="wrap" aria-busy="true">
+    <noscript><p class="lede">Budget runs in your browser: the key and the caps live in this browser's storage, so this page needs JavaScript.</p></noscript>
+  </div>
+</main>
+<script type="module" src="/src/budget/main.ts"></script>
+</body>
+</html>

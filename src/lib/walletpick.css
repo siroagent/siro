@@ -1,0 +1,108 @@
+/* Wallet picker: a paper dialog (L3) with one row per installed wallet, its own icon and name. On a phone it
+   sits at the bottom as a sheet, like the other dialogs. */
+.wpick {
+  width: min(420px, calc(100vw - 32px));
+  max-height: 80vh;
+  margin: 14vh auto auto;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: var(--l3);
+}
+.wpick::backdrop {
+  background: var(--scrim);
+}
+.wpick__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 10px 0 18px;
+}
+.wpick__head h2 {
+  margin: 0;
+  font-size: 18px;
+}
+.wpick__x {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--ink-2);
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+}
+.wpick__x:hover {
+  background: var(--plate);
+}
+.wpick__why,
+.wpick__note,
+.wpick__none {
+  margin: 4px 18px 0;
+  font-size: 14px;
+  color: var(--ink-2);
+}
+.wpick__note {
+  margin: 0 18px 18px;
+  font-size: 13px;
+  color: var(--label);
+}
+.wpick__none {
+  margin-bottom: 20px;
+}
+.wpick__list {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 14px 18px;
+  list-style: none;
+}
+.wpick__wallet {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 52px;
+  padding: 10px 14px;
+  border: 1px solid var(--hair);
+  border-radius: 6px;
+  background: var(--bench);
+  color: var(--ink);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+.wpick__wallet:hover {
+  border-color: var(--edge);
+  background: var(--face-hi);
+}
+.wpick__wallet:focus-visible,
+.wpick__x:focus-visible {
+  outline: none;
+  box-shadow: var(--ring);
+}
+.wpick__wallet img,
+.wpick__blank {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+}
+.wpick__blank {
+  background: var(--plate);
+  border: 1px solid var(--hair);
+}
+@media (max-width: 759px) {
+  .wpick {
+    width: 100%;
+    max-width: none;
+    margin: auto 0 0;
+    border-radius: 10px 10px 0 0;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}

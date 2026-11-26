@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Not found · Siro</title>
+  <meta name="description" content="This page is off the route. Search Siro's pages and tools, or ask Siro for what you came to do.">
+  <meta name="robots" content="noindex">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Not found · Siro">
+  <meta property="og:description" content="This page is off the route. Search Siro's pages and tools, or ask Siro for what you came to do.">
+  <meta property="og:image" content="https://siroagent.com/og.jpg?v=2">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@siro_agent">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <meta name="theme-color" content="#f2f3f5">
+  <style>
+    /* The S engraved in an aluminium faceplate, the ball at rest where the route starts. Drawn here,
+       not rendered, because the S is always cut into metal, never floating.
+       main.lost, not .lost: the shared stylesheet loads after this block, and its .wrap padding
+       would otherwise win at equal specificity and drop the vertical padding. */
+    main.lost {
+      align-items: center;
+      row-gap: 40px;
+      padding-block: 72px 96px;
+    }
+    .lost__text {
+      grid-column: 1 / span 6;
+      display: grid;
+      justify-items: start;
+      gap: 24px;
+    }
+    /* A long path breaks anywhere; each piece keeps its own well instead of one well cut open. */
+    .lost__text code {
+      overflow-wrap: anywhere;
+      -webkit-box-decoration-break: clone;
+      box-decoration-break: clone;
+    }
+    .lost__keys {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .lost__more a {
+      font-weight: 500;
+    }
+    /* A link on its own line, not inside a sentence, so it gets the 44px touch height of a key. */
+    @media (pointer: coarse) {
+      .lost__more a {
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+      }
+    }
+    .lost__art {
+      grid-column: 8 / -1;
+      justify-self: center;
+      display: grid;
+      place-items: center;
+      width: 100%;
+      max-width: 480px;
+      aspect-ratio: 1;
+      border-radius: 6px;
+      background: var(--face);
+      box-shadow: var(--l1);
+    }
+    .lost__s {
+      position: relative;
+      width: 42%;
+      aspect-ratio: 741 / 980;
+    }
+    /* Engraved: a dark cut with a light lip under it, like the S in the rail. */
+    .lost__s > svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+      fill: #2a2e34;
+      filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.9));
+    }
+    /* At rest at the entry, the first station of the route; a touch wider than the lane. */
+    .lost__ball {
+      position: absolute;
+      left: 94.47%;
+      top: 10.05%;
+      width: 7.6%;
+      min-width: 11px;
+      transform: translate(-50%, -50%);
+    }
+    .lost__ball svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    @media (max-width: 899px) {
+      main.lost {
+        padding-block: 48px 64px;
+      }
+      .lost__text,
+      .lost__art {
+        grid-column: 1 / -1;
+      }
+      .lost__art {
+        max-width: min(72vw, 400px);
+      }
+    }
+  </style>
+</head>
+<body>
+<main id="main" class="wrap grid lost">
+  <div class="lost__text">
+    <h1>This page is off the route.</h1>
+    <p class="lede"><span id="lost-what">Nothing lives at this address.</span> Search Siro's pages and <span id="lost-tools">tools</span>, or ask Siro for what you came to do.</p>
+    <div class="lost__keys">
+      <button class="key" type="button" id="lost-search" hidden>Search pages and tools</button>
+      <a class="key" href="/ask">Ask Siro</a>
+    </div>
+    <p class="lost__more"><a href="/tools">See every tool and its price</a></p>
+  </div>
+  <div class="lost__art" aria-hidden="true">
+    <div class="lost__s">
+      <svg viewBox="0 0 741 980" focusable="false"><path fill-rule="evenodd" d="M729 121 328 121 312 123 283 129 261 136 229 151 209 164 194 176 177 193 162 213 149 237 141 259 137 282 137 309 141 330 146 345 154 361 165 377 180 393 200 409 219 421 243 433 270 444 320 461 355 471 428 495 454 502 505 519 552 540 582 559 598 572 620 595 636 618 648 643 657 675 660 698 660 721 656 751 649 775 637 801 623 822 610 837 594 852 571 869 550 881 522 893 483 904 443 909 1 909 0 911 0 978 1 980 439 980 487 975 531 965 573 950 598 938 617 927 643 909 657 897 685 868 709 833 726 797 731 782 737 756 741 717 739 673 731 633 715 592 700 566 689 551 663 522 639 502 615 486 581 468 555 457 524 446 344 389 293 370 264 356 240 339 226 322 220 310 218 302 217 279 225 254 236 238 249 225 268 212 292 202 315 197 324 196 415 196 416 195 730 194 730 122Z M730 1 329 0 278 6 248 13 223 21 194 33 168 46 141 63 117 81 102 94 76 121 61 140 47 161 30 193 19 221 12 246 8 270 7 294 6 295 7 324 9 340 13 360 20 383 34 415 44 432 59 453 89 485 112 504 141 523 176 541 232 562 242 564 294 581 393 610 445 627 484 645 500 656 517 673 521 679 527 692 529 700 530 717 527 734 521 748 514 758 504 768 483 781 461 788 440 791 1 792 0 793 0 864 1 865 426 865 427 864 451 863 490 855 508 849 526 841 554 824 575 805 590 785 598 770 607 742 610 721 610 696 604 664 595 643 580 621 569 609 548 592 525 578 502 567 458 551 393 532 250 486 230 477 225 476 200 464 166 443 146 427 128 408 111 384 99 360 90 330 87 306 87 286 90 262 97 236 109 208 124 184 139 165 163 141 182 126 215 106 239 95 277 83 303 78 323 77 324 76 729 76 730 75Z"/></svg>
+      <span class="lost__ball"><svg class="ball-svg" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+      <defs>
+      <linearGradient id="lost-body" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fbfbfc"/><stop offset=".44" stop-color="#cfd2d6"/>
+      <stop offset=".5" stop-color="#4f545b"/><stop offset=".62" stop-color="#7d838a"/><stop offset="1" stop-color="#dfe2e6"/>
+      </linearGradient>
+      <radialGradient id="lost-spec" cx=".32" cy=".26" r=".22"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+      <radialGradient id="lost-rim" cx=".74" cy=".8" r=".3"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+      </defs>
+      <ellipse cx="13" cy="21.6" rx="7" ry="1.6" fill="rgba(16,20,26,.22)"/>
+      <circle cx="12" cy="12" r="9" fill="url(#lost-body)"/>
+      <circle cx="12" cy="12" r="9" fill="url(#lost-rim)"/>
+      <circle cx="12" cy="12" r="9" fill="url(#lost-spec)"/>
+      <circle cx="12" cy="12" r="8.6" fill="none" stroke="rgba(16,20,26,.35)" stroke-width=".8"/>
+      </svg></span>
+    </div>
+  </div>
+</main>
+<script type="module" src="/src/notfound.ts"></script>
+</body>
+</html>

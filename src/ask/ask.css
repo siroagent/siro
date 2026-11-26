@@ -1,0 +1,1228 @@
+/* Ask: the operator layout (DESIGN.md, Other pages). The app is pinned to the visible viewport, so
+   the bar stays on top and the composer sits above a phone keyboard; the transcript and the
+   instrument column scroll inside it. No dock and no footer on this page. */
+html[data-page="ask"] {
+  --dock-h: 0px;
+  --bar-h: 48px;
+}
+html[data-page="ask"] body {
+  overflow: hidden;
+}
+html[data-page="ask"] .toast {
+  top: calc(var(--app-top, 0px) + var(--bar-h) + 12px);
+  bottom: auto;
+}
+
+/* Each part names its row: the cap strip is display: none from 960px, and an auto-placed main would
+   then fall into the auto row and leave the 1fr row empty under the composer. The column is
+   minmax(0, 1fr) so a long chat title shrinks instead of widening the whole app. */
+.ask {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: var(--app-top, 0px);
+  height: var(--app-h, 100dvh);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: var(--bar-h) auto auto minmax(0, 1fr);
+}
+.ask > .abar {
+  grid-row: 1;
+}
+.ask > .tok {
+  grid-row: 2;
+}
+.ask > .capstrip {
+  grid-row: 3;
+}
+.ask > .ask__main {
+  grid-row: 4;
+}
+
+/* ---- App bar: the site rail cut down to 48px, same metal and double rail ---- */
+.abar {
+  position: relative;
+  z-index: 3;
+  background: var(--face);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  transition: box-shadow 0.2s ease;
+}
+.abar::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 4px;
+  border-top: 1px solid var(--hair);
+  border-bottom: 1px solid var(--edge);
+  pointer-events: none;
+}
+.abar.is-over {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    var(--l2);
+}
+.abar__in {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 100%;
+  max-width: calc(var(--max) + 2 * var(--margin));
+  margin: 0 auto;
+  padding: 0 max(var(--margin), env(safe-area-inset-right)) 3px max(var(--margin), env(safe-area-inset-left));
+}
+/* The nav landmark groups the home and Budget links; its keys stay items of the bar's row. */
+.abar__nav {
+  display: contents;
+}
+.abar__home {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 32px;
+  /* as tall as the bar's keys, so its focus rails fit under the top edge of the window */
+  height: 34px;
+  margin-left: -6px;
+  border-radius: var(--radius);
+}
+.abar__home .brand__mark {
+  width: 15px;
+  height: 20px;
+}
+.abar__title {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin-left: 6px;
+  font-size: 15px;
+  line-height: 20px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-wrap: nowrap;
+}
+.abar__pay {
+  display: none;
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 340px;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ink-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.abar__pay b {
+  font-weight: 600;
+  color: var(--ink);
+}
+.abar .key,
+.abar .search-well {
+  position: relative;
+  flex: none;
+}
+.abar .search-well {
+  width: auto;
+  min-height: 34px;
+}
+/* The site rail drops the word "Search" below 1100px to fit five keys; this bar has the room. */
+.abar__search span {
+  display: inline;
+}
+/* Touch screens: the bar's keys and well sit at 40px so the 48px bar keeps a margin above its rails;
+   an invisible extension brings every hit area in the bar to 44px. */
+@media (pointer: coarse) {
+  .abar :is(.key--sm, .search-well) {
+    min-height: 40px;
+  }
+  .abar :is(.key--sm, .search-well)::before,
+  .abar__home::before {
+    content: "";
+    position: absolute;
+    inset: -2px 0;
+  }
+  .abar__home {
+    position: relative;
+    height: 40px;
+  }
+  .abar__home::before {
+    inset: -2px -6px;
+  }
+}
+@media (min-width: 960px) {
+  .abar__pay {
+    display: block;
+  }
+}
+@media (max-width: 479px) {
+  /* No room for the title next to four keys: it stays for screen readers, the drawer shows it. */
+  .abar__title {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+  .abar__search {
+    margin-left: auto;
+  }
+}
+
+/* ---- Cap strip: the instrument column folded into one recessed line (below 960px) ---- */
+.capstrip {
+  display: none;
+}
+@media (max-width: 959px) {
+  .capstrip {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-height: 44px;
+    margin: 0;
+    padding: 0 max(var(--margin), env(safe-area-inset-right)) 0 max(var(--margin), env(safe-area-inset-left));
+    border: 0;
+    border-radius: 0;
+    background: var(--display);
+    color: var(--on-display);
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.5);
+    font: 500 14px/20px var(--sans);
+    text-align: left;
+  }
+  .capstrip:hover {
+    background: var(--display-bay);
+  }
+  .capstrip:focus-visible {
+    box-shadow:
+      inset 0 0 0 2px var(--display),
+      inset 0 0 0 3px var(--on-display),
+      inset 0 0 0 5px var(--display),
+      inset 0 0 0 6px var(--on-display);
+  }
+}
+.capstrip__who {
+  flex: 1 1 auto;
+  min-width: 0;
+  color: var(--on-display-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.capstrip__who b {
+  color: var(--on-display);
+  font-weight: 600;
+}
+.capstrip__today {
+  flex: none;
+  font-variant-numeric: tabular-nums;
+}
+.capstrip__meter {
+  display: block;
+  flex: none;
+  width: 56px;
+}
+.capstrip .meter::before {
+  border-color: var(--display-edge);
+}
+@media (max-width: 419px) {
+  .capstrip__meter {
+    display: none;
+  }
+}
+
+/* ---- Main: transcript on the bench, instrument column on the right from 960px ---- */
+.ask__main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-height: 0;
+  width: 100%;
+  max-width: calc(var(--max) + 2 * var(--margin));
+  margin: 0 auto;
+  padding: 0 max(var(--margin), env(safe-area-inset-right)) 0 max(var(--margin), env(safe-area-inset-left));
+}
+@media (min-width: 960px) {
+  .ask__main {
+    grid-template-columns: minmax(0, 1fr) 320px;
+    column-gap: var(--gutter);
+  }
+}
+.convo {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  min-width: 0;
+  min-height: 0;
+}
+/* The scroller clips what crosses its edge, so it reaches 8px into the page margin: room for the
+   focus ring of a row or key that spans the full width. */
+.log {
+  container: log / inline-size;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  margin: 0 -8px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 28px 8px 16px;
+}
+.log__in {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+}
+@media (max-width: 759px) {
+  .log {
+    padding: 16px 8px 8px;
+  }
+}
+
+/* ---- Messages: no bubbles; role and UTC time sit in a left gutter ---- */
+.msg {
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr);
+  column-gap: 20px;
+  padding: 12px 0;
+}
+.msg--user:not(:first-child) {
+  margin-top: 8px;
+  padding-top: 20px;
+  border-top: 1px solid var(--hair);
+}
+.msg__gut {
+  display: grid;
+  align-content: start;
+  gap: 2px;
+  padding-top: 4px;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--label);
+}
+.msg__gut b {
+  font-weight: 600;
+  color: var(--ink-2);
+}
+.msg__gut time {
+  font-variant-numeric: tabular-nums;
+}
+/* An older stamp ("11 Nov, 20:13 UTC") is too wide for the gutter: the day takes its own line. */
+.msg__day {
+  display: block;
+}
+.msg__comma {
+  display: none;
+}
+.msg__body {
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+.msg__body > p:not(.msg__text),
+.msg__body li,
+.quote__note {
+  text-wrap: pretty;
+}
+.msg__body > * + * {
+  margin-top: 10px;
+}
+.msg__body ul,
+.msg__body ol {
+  margin-bottom: 0;
+  padding-left: 22px;
+}
+.msg__body li + li {
+  margin-top: 4px;
+}
+.msg__text {
+  white-space: pre-wrap;
+  font-weight: 500;
+}
+.msg__aside {
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--label);
+}
+.msg__keys {
+  display: flex;
+  gap: 8px;
+}
+.result {
+  min-width: 0;
+}
+.result > * + * {
+  margin-top: 10px;
+}
+.legacy {
+  padding: 12px 14px;
+  border-radius: 6px;
+  box-shadow: inset 0 0 0 1px var(--hair);
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
+.legacy > * + * {
+  margin-top: 6px;
+}
+.legacy .card {
+  background: none;
+  box-shadow: none;
+}
+.legacy .q__top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+@media (max-width: 559px) {
+  .msg {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 4px;
+  }
+  .msg__gut {
+    display: flex;
+    gap: 8px;
+    padding-top: 0;
+  }
+  .msg__day,
+  .msg__comma {
+    display: inline;
+  }
+}
+
+/* ---- Quote strip: a faceplate that changes in place ---- */
+.quote {
+  padding: 16px 18px 14px;
+}
+.quote__top {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 14px;
+}
+.quote__top--bare {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+.quote__logo {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius);
+  background: var(--paper);
+  box-shadow:
+    0 0 0 1px var(--hair),
+    inset 0 1px 2px rgba(16, 20, 26, 0.08);
+}
+.quote__logo img {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
+.quote__id {
+  min-width: 0;
+}
+.quote__name {
+  font-size: 18px;
+  line-height: 24px;
+  letter-spacing: -0.01em;
+  text-wrap: pretty;
+}
+.quote__meta {
+  margin-top: 2px;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--label);
+  overflow-wrap: anywhere;
+}
+.quote__meta code {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+}
+.quote__price {
+  text-align: right;
+}
+.quote__price .live-num {
+  display: block;
+  font-size: 32px;
+  line-height: 1;
+}
+.quote__price .live-num small {
+  font-size: 13px;
+}
+.quote__src {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--label);
+}
+.quote__desc {
+  margin-top: 12px;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-2);
+}
+/* The request itself sits in a recessed slip: the exact input the tool will get. */
+.quote__input {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 4px 14px;
+  margin: 14px 0 0;
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  background: var(--paper);
+  box-shadow: var(--well);
+  font-size: 14px;
+  line-height: 20px;
+}
+.quote__input dt {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: var(--label);
+}
+.quote__input dd {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+.quote__swap {
+  margin-top: 14px;
+}
+.quote__foot {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--hair);
+}
+.quote__net {
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--label);
+}
+.quote__status {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  font-size: 14px;
+  line-height: 21px;
+  border-radius: 2px;
+}
+.quote__status .lamp {
+  align-items: baseline;
+  line-height: 21px;
+}
+.quote__status .lamp::before {
+  transform: translateY(-1px);
+}
+.quote__note {
+  color: var(--ink-2);
+}
+.quote__addr {
+  padding: 6px 8px;
+  border-radius: 3px;
+  background: var(--paper);
+  box-shadow: var(--well);
+  font-family: var(--mono);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.quote__fix {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 2px;
+}
+.quote__tx {
+  font-family: var(--mono);
+  font-size: 13px;
+}
+@media (pointer: coarse) {
+  .quote__tx {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+}
+.quote__keys {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+/* Strips where nothing was paid (declined, failed) flatten; open, running and settled ones stay raised. */
+.quote[data-state="declined"],
+.quote[data-state="failed"] {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--hair);
+}
+@media (max-width: 559px) {
+  .quote {
+    padding: 14px;
+  }
+  .quote__top {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .quote__top--bare {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .quote__price {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-top: 12px;
+    text-align: left;
+  }
+  .quote__price .live-num {
+    font-size: 28px;
+  }
+  .quote__src {
+    margin-top: 0;
+  }
+  .quote__keys {
+    justify-content: stretch;
+  }
+  .quote__keys .key {
+    flex: 1 1 auto;
+  }
+}
+
+/* ---- Empty state ----
+   It takes the transcript's 720px column, so the heading, the briefs and the message box share one
+   left and one right edge. Render 02 stands beside the heading as a narrow upright plate once the
+   column has 600px; sizes follow the column (the "brief" container), not the window. */
+.empty {
+  container: brief / inline-size;
+  width: 100%;
+  max-width: 720px;
+  margin: auto;
+  padding: 8px 0 24px;
+}
+.empty__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: center;
+  column-gap: 32px;
+}
+.empty__h {
+  font-size: clamp(30px, 3.4vw, 46px);
+  line-height: 1.05;
+  letter-spacing: -0.022em;
+}
+.empty__lede {
+  margin-top: 16px;
+  text-wrap: pretty;
+}
+.empty__label {
+  margin-top: 32px;
+  max-width: 36em;
+}
+.briefs {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  border-top: 1px solid var(--hair);
+}
+.brief {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 4px 20px;
+  width: 100%;
+  min-height: 52px;
+  padding: 13px 10px;
+  border: 0;
+  border-bottom: 1px solid var(--hair);
+  border-radius: 0;
+  background: transparent;
+  color: var(--ink);
+  font: 400 16px/24px var(--sans);
+  text-align: left;
+}
+.brief:hover {
+  background: var(--paper);
+}
+.brief:active {
+  background: var(--face-lo);
+}
+.brief__text {
+  text-wrap: pretty;
+}
+.brief__text .nowrap {
+  white-space: nowrap;
+}
+.brief__tool {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--label);
+  white-space: nowrap;
+}
+.brief__price {
+  margin-left: 4px;
+  font-weight: 600;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+/* Under 460px the tool and price drop under the brief instead of squeezing it. */
+@container brief (max-width: 459px) {
+  .brief {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 12px 4px;
+  }
+  .brief__tool {
+    white-space: normal;
+  }
+}
+/* The S engraved into a small upright faceplate: a dark cut with a light lip, the ball at rest where a
+   brief enters the lane (the home gauge's Brief station). No render, so nothing floats. */
+.empty__art {
+  display: none;
+  position: relative;
+  width: clamp(112px, 20cqi, 148px);
+  aspect-ratio: 3 / 4;
+}
+/* The S's own 741 x 980 box, so the ball can sit at the mark's coordinates. */
+.empty__lane {
+  position: absolute;
+  top: 50%;
+  left: 20%;
+  width: 60%;
+  aspect-ratio: 741 / 980;
+  transform: translateY(-50%);
+}
+.empty__s {
+  position: absolute;
+  inset: 0;
+  color: #2a2e34;
+  filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.9));
+}
+.empty__s svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+/* At rest on the Brief station (700, 98.5), a touch wider than the lane as on the home gauge. */
+.empty__ball {
+  position: absolute;
+  left: calc(100% * 700 / 741);
+  top: calc(100% * 98.5 / 980);
+  width: 11%;
+  min-width: 11px;
+  transform: translate(-50%, -50%);
+}
+.empty__ball svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+@container brief (min-width: 600px) {
+  .empty__head {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .empty__art {
+    display: block;
+  }
+}
+@media (max-width: 759px) {
+  /* Phones open the empty state at its heading, not centred in the scroller. */
+  .empty {
+    margin: 0 auto;
+    padding-top: 12px;
+  }
+  .empty__label {
+    margin-top: 24px;
+  }
+}
+
+/* ---- Composer: sticks to the bottom of the transcript column ---- */
+.composer {
+  border-top: 1px solid var(--hair);
+  background: var(--bench);
+}
+.composer__in {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 10px 0 max(12px, env(safe-area-inset-bottom));
+}
+.composer__tool {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  margin-bottom: 8px;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ink-2);
+}
+.composer__tool b {
+  color: var(--ink);
+  font-weight: 600;
+}
+/* Phones: the note wraps beside its key instead of pushing the key onto a row of its own. */
+@media (max-width: 559px) {
+  .composer__tool {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .composer__tool > span {
+    text-wrap: pretty;
+  }
+}
+.composer__label {
+  display: block;
+  margin-bottom: 6px;
+}
+.composer__row {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+textarea.composer__msg {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 48px;
+  max-height: 200px;
+  padding: 13px 14px;
+  line-height: 22px;
+  resize: none;
+  overflow-y: auto;
+}
+.composer__send {
+  min-height: 48px;
+  padding: 0 20px;
+}
+.composer__hint {
+  margin-top: 6px;
+}
+@media (pointer: coarse) {
+  .composer__keys {
+    display: none;
+  }
+}
+
+/* ---- Instrument column: graphite display inside an aluminium plate ---- */
+.instr {
+  display: none;
+}
+@media (min-width: 960px) {
+  .instr {
+    display: block;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 24px 0;
+  }
+}
+.instr__plate {
+  padding: 8px;
+}
+.instr__sec {
+  min-width: 0;
+  margin: 0;
+  padding: 14px 16px 16px;
+  border: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+.display__bar + .instr__sec {
+  border-top: 0;
+}
+.instr__h {
+  display: block;
+  margin: 0 0 8px;
+  padding: 0;
+  font: 500 13px/18px var(--sans);
+  color: var(--on-display-2);
+}
+/* A legend normally sits on the fieldset's edge; floated, it is an ordinary label line. */
+legend.instr__h {
+  float: left;
+  width: 100%;
+}
+legend.instr__h + * {
+  clear: both;
+}
+.instr__note {
+  margin-top: 8px;
+  font-size: 13px;
+  line-height: 19px;
+  color: var(--on-display-2);
+}
+.instr__who {
+  margin-top: 10px;
+}
+.instr__who .instr__note {
+  margin-top: 2px;
+}
+.instr__addr {
+  font-family: var(--mono);
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--on-display);
+}
+.instr__key {
+  margin-top: 4px;
+}
+.instr__who .instr__key + .instr__note {
+  margin-top: 8px;
+}
+.instr__today {
+  font-size: 30px;
+  line-height: 1;
+}
+.instr__today small {
+  font-size: 14px;
+}
+.instr__meter {
+  margin: 14px 0 0;
+}
+.instr__auto {
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--on-display-2);
+}
+.instr__auto b {
+  color: var(--on-display);
+  font-weight: 600;
+}
+.instr__link {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 14px;
+  font-weight: 500;
+}
+@media (pointer: coarse) {
+  .instr__link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    margin-top: 0;
+  }
+}
+
+/* Pays with: native radios set as segment keys in a recessed tray. */
+.paywith {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 6px;
+  background: var(--display-bay);
+  box-shadow:
+    inset 0 1px 3px rgba(0, 0, 0, 0.6),
+    inset 0 0 0 1px var(--display-edge);
+}
+.paywith label {
+  position: relative;
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 0 10px;
+  border-radius: 3px;
+  color: var(--on-display-2);
+  font: 500 14px/1 var(--sans);
+  cursor: pointer;
+  user-select: none;
+}
+.paywith input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.paywith label:hover {
+  color: var(--on-display);
+}
+.paywith label:has(input:checked) {
+  background: linear-gradient(180deg, #2a2e34, #202328);
+  color: var(--on-display);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 1px 1px rgba(0, 0, 0, 0.5);
+}
+.paywith label:has(input:focus-visible) {
+  box-shadow:
+    0 0 0 2px var(--display),
+    0 0 0 3px var(--on-display),
+    0 0 0 5px var(--display),
+    0 0 0 6px var(--on-display);
+}
+.paywith input:focus-visible {
+  box-shadow: none;
+}
+@media (pointer: coarse) {
+  .paywith label {
+    min-height: 44px;
+  }
+}
+.display .instr__net {
+  width: 100%;
+  min-height: 40px;
+  padding: 0 34px 0 12px;
+  border: 0;
+  border-radius: var(--radius);
+  appearance: none;
+  background: var(--display-bay) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none' stroke='%239EA6AF' stroke-width='1.5'%3E%3Cpath d='M1 1l4 4 4-4'/%3E%3C/svg%3E") no-repeat right 12px center;
+  color: var(--on-display);
+  font: 500 16px/1.2 var(--sans);
+  cursor: pointer;
+}
+@media (pointer: coarse) {
+  .display .instr__net {
+    min-height: 44px;
+  }
+}
+
+/* Last payments from this browser; the ball marks the newest. */
+.paylog {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.paylog li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 12px;
+  padding: 9px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+.paylog li:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+.paylog__what {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  color: var(--on-display);
+}
+.paylog__what span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.paylog__what .ball {
+  width: 8px;
+  height: 8px;
+}
+.paylog__usd {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.paylog__meta {
+  grid-column: 1 / -1;
+  font-size: 13px;
+  line-height: 19px;
+  color: var(--on-display-2);
+}
+.paylog__meta time {
+  font-variant-numeric: tabular-nums;
+}
+.paylog__meta a {
+  font-family: var(--mono);
+  font-size: 12px;
+}
+/* The hash link is one short line; on touch screens its hit area grows to 44px without moving the row. */
+@media (pointer: coarse) {
+  .paylog__meta a {
+    position: relative;
+  }
+  .paylog__meta a::after {
+    content: "";
+    position: absolute;
+    inset: -14px -4px;
+  }
+}
+.paylog__none {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--on-display-2);
+}
+
+/* ---- Drawer (chats, from the left) and sheet (payments, phones and tablets): white plates at L3 ---- */
+.drawer,
+.sheet {
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: var(--l3);
+}
+.drawer::backdrop,
+.sheet::backdrop {
+  background: var(--scrim);
+}
+.drawer {
+  inset: 0 auto 0 0;
+  width: min(360px, 88vw);
+  height: 100%;
+}
+.drawer__in,
+.sheet__in {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.drawer__top,
+.sheet__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 56px;
+  padding: 8px 12px 8px 16px;
+  border-bottom: 1px solid var(--hair);
+}
+.drawer__h,
+.sheet__h {
+  font-size: 17px;
+  line-height: 22px;
+}
+.drawer__new {
+  margin: 14px 16px 0;
+}
+.drawer__note {
+  padding: 8px 16px 6px;
+}
+.drawer__list {
+  flex: 1;
+  margin: 0;
+  padding: 0 8px calc(16px + env(safe-area-inset-bottom));
+  overflow-y: auto;
+  list-style: none;
+}
+.drawer__list button {
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+}
+.drawer__list button:hover {
+  background: var(--bench);
+}
+.drawer__list button[aria-current="true"] {
+  background: var(--face-lo);
+  box-shadow: var(--key-down);
+}
+/* The pressed look above replaces the focus rails, and the drawer opens with focus on this chat. */
+.drawer__list button[aria-current="true"]:focus-visible {
+  box-shadow: var(--key-down), var(--ring);
+}
+.drawer__t {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-size: 15px;
+  line-height: 20px;
+  font-weight: 600;
+}
+.drawer__t span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.drawer__t .ball {
+  width: 7px;
+  height: 7px;
+}
+.drawer__m {
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--label);
+  font-variant-numeric: tabular-nums;
+}
+.drawer__none {
+  padding: 12px;
+  font-size: 14px;
+  color: var(--label);
+}
+.sheet {
+  inset: auto 0 0 0;
+  width: 100%;
+  max-height: 88dvh;
+  border-radius: 10px 10px 0 0;
+}
+.sheet__in {
+  max-height: 88dvh;
+}
+.sheet__body {
+  overflow-y: auto;
+  padding: 12px 12px calc(16px + env(safe-area-inset-bottom));
+}
+@media (min-width: 760px) {
+  .sheet {
+    inset: 0 0 0 auto;
+    width: 380px;
+    height: 100%;
+    max-height: none;
+    border-radius: 0;
+  }
+  .sheet__in {
+    max-height: none;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .drawer[open] {
+    animation: ask-from-left 0.16s ease-out;
+  }
+  .sheet[open] {
+    animation: ask-from-below 0.16s ease-out;
+  }
+}
+@media (prefers-reduced-motion: no-preference) and (min-width: 760px) {
+  .sheet[open] {
+    animation-name: ask-from-right;
+  }
+}
+@keyframes ask-from-left {
+  from {
+    transform: translateX(-100%);
+  }
+}
+@keyframes ask-from-below {
+  from {
+    transform: translateY(100%);
+  }
+}
+@keyframes ask-from-right {
+  from {
+    transform: translateX(100%);
+  }
+}
+
+.noscript {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+  z-index: 10;
+  padding: 12px 16px;
+  border-radius: 6px;
+  background: var(--paper);
+  box-shadow: var(--l3);
+}

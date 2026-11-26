@@ -1,0 +1,506 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Docs · Siro</title>
+  <meta name="description" content="How Siro's pay-per-call tools work over x402 v2: the 402 quote, signing, networks, errors and charges, the CLI, the SDK and the MCP server.">
+  <link rel="canonical" href="https://siroagent.com/docs">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://siroagent.com/docs">
+  <meta property="og:title" content="Docs · Siro">
+  <meta property="og:description" content="Every Siro tool is one POST. Read the price in the 402, sign it, get the result. HTTP, CLI, SDK and MCP.">
+  <meta property="og:image" content="https://siroagent.com/og.jpg?v=2">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@siro_agent">
+  <meta name="twitter:title" content="Docs · Siro">
+  <meta name="twitter:description" content="Every Siro tool is one POST. Read the price in the 402, sign it, get the result. HTTP, CLI, SDK and MCP.">
+  <meta name="twitter:image" content="https://siroagent.com/og.jpg?v=2">
+  <meta name="theme-color" content="#f2f3f5">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+</head>
+<body>
+<main id="main" class="docs">
+  <div class="wrap docs__grid">
+
+    <nav class="docs__index" aria-label="On this page">
+      <details class="toc" data-toc>
+        <summary><span>On this page</span><span class="toc__state" aria-hidden="true"></span></summary>
+        <ol>
+          <li><a href="#overview">Overview</a></li>
+          <li><a href="#quickstart">Quickstart</a></li>
+          <li><a href="#x402">How x402 pays for a call</a></li>
+          <li><a href="#networks">Networks and assets</a></li>
+          <li><a href="#endpoints">Endpoints</a></li>
+          <li><a href="#errors">Errors and charges</a></li>
+          <li><a href="#wallet">The agent wallet</a></li>
+          <li><a href="#cli">CLI</a></li>
+          <li><a href="#mcp">MCP server</a></li>
+          <li><a href="#sdk">SDK</a></li>
+          <li><a href="#discovery">Paying x402 services outside Siro</a></li>
+          <li><a href="#swaps">Swaps</a></li>
+          <li><a href="#catalog">Catalog JSON</a></li>
+        </ol>
+      </details>
+    </nav>
+
+    <article class="docs__text">
+
+      <section id="overview" class="doc" data-check="catalog">
+        <h1>Every tool is one POST.</h1>
+        <p class="lede">Each of Siro's <span data-count>67</span> tools is an HTTP endpoint that charges per call with <a href="https://www.x402.org" target="_blank" rel="noopener noreferrer">x402</a> v2. There are no accounts and no API keys: an unpaid request gets the price, a signed one gets the result.</p>
+        <a class="to-live" href="#live" data-to-live>Go to the live check for Overview</a>
+        <details class="check check-inline display" data-check="catalog">
+          <summary><span><b>Live check</b> · catalog count</span><span class="check__state" aria-hidden="true"></span></summary>
+          <p class="check__src" data-check-src>GET /v1/resources</p>
+          <div class="check__out" data-check-out tabindex="-1"><p>This check runs from your browser against siroagent.com and never signs a payment.</p><noscript><p>It needs JavaScript.</p></noscript></div>
+          <p class="sr" aria-live="polite" data-check-say></p>
+        </details>
+        <dl class="spec">
+          <div><dt>Base URL</dt><dd><code class="inline">https://siroagent.com</code></dd></div>
+          <div><dt>Catalog</dt><dd><code class="inline">GET /v1/resources</code>, free JSON</dd></div>
+          <div><dt>Call a tool</dt><dd><code class="inline">POST /v1/&lt;id&gt;</code> with a JSON body. Without a payment it answers 402 with the price.</dd></div>
+          <div><dt>Pay in</dt><dd>USDG on Robinhood Chain, or USDC on Base, Solana, Arbitrum or Polygon</dd></div>
+          <div><dt>Call from</dt><dd>Plain HTTP, the <a href="#cli">CLI</a>, the <a href="#sdk">SDK</a> or <a href="#mcp">MCP</a></dd></div>
+        </dl>
+        <p>To try a tool before writing code, open it in <a href="/tools">Tools</a> or ask for it in <a href="/ask">Ask</a>. Both show the price before anything is signed.</p>
+      </section>
+
+      <section id="quickstart" class="doc" data-check="unpaid">
+        <h2>Quickstart</h2>
+        <a class="to-live" href="#live" data-to-live>Go to the live check for Quickstart</a>
+        <details class="check check-inline display" data-check="unpaid">
+          <summary><span><b>Live check</b> · unpaid request</span><span class="check__state" aria-hidden="true"></span></summary>
+          <p class="check__src" data-check-src>POST /v1/gas-now</p>
+          <div class="check__out" data-check-out tabindex="-1"><p>This check runs from your browser against siroagent.com and never signs a payment.</p><noscript><p>It needs JavaScript.</p></noscript></div>
+          <p class="sr" aria-live="polite" data-check-say></p>
+        </details>
+        <p>Ask for the price first. A request without a payment costs nothing and comes back as a 402 with the quote:</p>
+        <figure class="code-box display">
+          <figcaption class="display__bar"><b id="code-ask">Ask for a price</b><span class="code-box__end"><span>Shell</span><button class="key key--sm" type="button" id="copy-ask" data-copy aria-labelledby="copy-ask code-ask">Copy</button></span></figcaption>
+<pre class="code" tabindex="0" role="group" aria-labelledby="code-ask"><code>curl -i https://siroagent.com/v1/gas-now \
+  -H <span class="s">'content-type: application/json'</span> \
+  -d <span class="s">'{"network":"robinhood"}'</span></code></pre>
+        </figure>
+        <p>Here is the whole protocol by hand, for Node 20 or later with viem. Use a fresh key that holds only what the agent should spend.</p>
+        <figure class="code-box display">
+          <figcaption class="display__bar"><b id="code-quickstart">quickstart.mjs</b><span class="code-box__end"><span>JavaScript</span><button class="key key--sm" type="button" id="copy-quickstart" data-copy aria-labelledby="copy-quickstart code-quickstart">Copy</button></span></figcaption>
+<pre class="code" tabindex="0" role="group" aria-labelledby="code-quickstart"><code><span class="c">// npm i viem</span>
+<span class="k">import</span> { privateKeyToAccount } <span class="k">from</span> <span class="s">"viem/accounts"</span>;
+
+<span class="k">const</span> account = privateKeyToAccount(process.env.AGENT_KEY);
+<span class="k">const</span> CHAIN_ID = {
+  <span class="s">"eip155:4663"</span>: 4663, <span class="s">"eip155:8453"</span>: 8453,
+  <span class="s">"eip155:42161"</span>: 42161, <span class="s">"eip155:137"</span>: 137,
+};
+<span class="k">const</span> AUTH_TYPES = {
+  TransferWithAuthorization: [
+    { name: <span class="s">"from"</span>, type: <span class="s">"address"</span> },
+    { name: <span class="s">"to"</span>, type: <span class="s">"address"</span> },
+    { name: <span class="s">"value"</span>, type: <span class="s">"uint256"</span> },
+    { name: <span class="s">"validAfter"</span>, type: <span class="s">"uint256"</span> },
+    { name: <span class="s">"validBefore"</span>, type: <span class="s">"uint256"</span> },
+    { name: <span class="s">"nonce"</span>, type: <span class="s">"bytes32"</span> },
+  ],
+};
+
+<span class="k">async function</span> call(id, body, network = <span class="s">"eip155:4663"</span>) {
+  <span class="k">const</span> url = <span class="s">`https://siroagent.com/v1/${id}`</span>;
+  <span class="k">const</span> init = {
+    method: <span class="s">"POST"</span>,
+    headers: { <span class="s">"content-type"</span>: <span class="s">"application/json"</span> },
+    body: JSON.stringify(body),
+  };
+  <span class="k">let</span> res = <span class="k">await</span> fetch(url, init);
+  <span class="k">if</span> (res.status !== 402) <span class="k">return</span> res.json();
+
+  <span class="k">const</span> quote = <span class="k">await</span> res.json();
+  <span class="c">// A bad input still gets a quote, with inputError. Never sign it.</span>
+  <span class="k">if</span> (quote.inputError) <span class="k">throw new</span> Error(quote.inputError.message);
+  <span class="k">const</span> req = quote.accepts.find((r) =&gt; r.network === network);
+  <span class="k">if</span> (!req) <span class="k">throw new</span> Error(<span class="s">`${network} is not quoting right now`</span>);
+
+  <span class="k">const</span> nonce = <span class="s">"0x"</span> + Buffer.from(
+    crypto.getRandomValues(<span class="k">new</span> Uint8Array(32))).toString(<span class="s">"hex"</span>);
+  <span class="k">const</span> validBefore =
+    BigInt(Math.floor(Date.now() / 1000) + req.maxTimeoutSeconds);
+  <span class="k">const</span> authorization = {
+    from: account.address, to: req.payTo, value: req.amount,
+    validAfter: <span class="s">"0"</span>, validBefore: String(validBefore), nonce,
+  };
+  <span class="k">const</span> signature = <span class="k">await</span> account.signTypedData({
+    domain: {
+      name: req.extra.name, version: req.extra.version,
+      chainId: CHAIN_ID[network], verifyingContract: req.asset,
+    },
+    types: AUTH_TYPES,
+    primaryType: <span class="s">"TransferWithAuthorization"</span>,
+    message: { ...authorization, value: BigInt(req.amount),
+      validAfter: 0n, validBefore },
+  });
+
+  <span class="k">const</span> payment = {
+    x402Version: 2, resource: quote.resource, accepted: req,
+    payload: { signature, authorization },
+  };
+  init.headers[<span class="s">"PAYMENT-SIGNATURE"</span>] =
+    Buffer.from(JSON.stringify(payment)).toString(<span class="s">"base64"</span>);
+  res = <span class="k">await</span> fetch(url, init);
+  <span class="k">return</span> res.json(); <span class="c">// { resource, result, receipt } or an error</span>
+}
+
+<span class="k">const</span> out = <span class="k">await</span> call(<span class="s">"gas-now"</span>, { network: <span class="s">"robinhood"</span> });
+console.log(out.result, out.receipt?.tx);</code></pre>
+        </figure>
+        <p>The <a href="#cli">CLI</a> and the <a href="#sdk">SDK</a> do the same, check your caps before they sign, and can pay on Solana too.</p>
+      </section>
+
+      <section id="x402" class="doc" data-check="unpaid">
+        <h2>How x402 pays for a call</h2>
+        <a class="to-live" href="#live" data-to-live>Go to the live check for How x402 pays for a call</a>
+        <details class="check check-inline display" data-check="unpaid">
+          <summary><span><b>Live check</b> · unpaid request</span><span class="check__state" aria-hidden="true"></span></summary>
+          <p class="check__src" data-check-src>POST /v1/gas-now</p>
+          <div class="check__out" data-check-out tabindex="-1"><p>This check runs from your browser against siroagent.com and never signs a payment.</p><noscript><p>It needs JavaScript.</p></noscript></div>
+          <p class="sr" aria-live="polite" data-check-say></p>
+        </details>
+        <ol class="steps">
+          <li><b>You ask.</b> Send <code class="inline">POST /v1/&lt;id&gt;</code> with your JSON input and no payment. A tool that is switched on answers <code class="inline">402 Payment Required</code> with a quote. If the input is wrong, the quote also carries <code class="inline">inputError</code>, and a client should stop there.</li>
+          <li><b>Siro quotes.</b> The body, and the same JSON base64-encoded in the <code class="inline">PAYMENT-REQUIRED</code> header, lists <code class="inline">accepts</code>: one entry for each network that can be paid right now. Each has <code class="inline">scheme: "exact"</code>, <code class="inline">network</code> as CAIP-2, <code class="inline">amount</code> in 6-decimal base units, <code class="inline">asset</code>, <code class="inline">payTo</code>, <code class="inline">maxTimeoutSeconds</code> (120, or 300 for tools that run for minutes) and <code class="inline">extra</code>: the token's EIP-712 name and version, or the facilitator's <code class="inline">feePayer</code> on Solana.</li>
+          <li><b>You sign.</b> On an EVM chain, sign an EIP-3009 <code class="inline">TransferWithAuthorization</code> for exactly <code class="inline">amount</code> to <code class="inline">payTo</code>; signing costs no gas. On Solana, sign a USDC transfer with the quote's <code class="inline">feePayer</code> as fee payer. Send the x402 v2 payload base64-encoded in <code class="inline">PAYMENT-SIGNATURE</code> (the older <code class="inline">X-PAYMENT</code> header also works), with the entry you picked in <code class="inline">accepted</code>. An EVM payment that names no network is taken as Robinhood Chain.</li>
+          <li><b>The tool runs, then the money moves.</b> The facilitator verifies the signature, the tool runs, and the transfer settles only once the result is ready. The response carries <code class="inline">result</code>, a <code class="inline">receipt</code> with <code class="inline">network</code>, <code class="inline">asset</code>, <code class="inline">amountUsd</code>, <code class="inline">payer</code>, <code class="inline">tx</code>, <code class="inline">ms</code> and <code class="inline">resultSha256</code> (the sha256 of <code class="inline">JSON.stringify(result)</code>, which <a href="/activity">Activity</a> lists next to the payment so you can check the result you got is the one recorded), and a base64 <code class="inline">PAYMENT-RESPONSE</code> header with the transaction hash. One signed authorization pays for one call.</li>
+        </ol>
+      </section>
+
+      <section id="networks" class="doc" data-check="networks">
+        <h2>Networks and assets</h2>
+        <a class="to-live" href="#live" data-to-live>Go to the live check for Networks and assets</a>
+        <details class="check check-inline display" data-check="networks">
+          <summary><span><b>Live check</b> · networks quoting</span><span class="check__state" aria-hidden="true"></span></summary>
+          <p class="check__src" data-check-src>GET /v1/resources/gas-now</p>
+          <div class="check__out" data-check-out tabindex="-1"><p>This check runs from your browser against siroagent.com and never signs a payment.</p><noscript><p>It needs JavaScript.</p></noscript></div>
+          <p class="sr" aria-live="polite" data-check-say></p>
+        </details>
+        <p>Every asset has 6 decimals, so a $0.005 call is <code class="inline">amount: "5000"</code> on any network. You pay no gas on any of them: the facilitator pays it (Coinbase CDP on Base, Solana, Arbitrum and Polygon).</p>
+        <div class="nets">
+          <div class="net">
+            <h3>Robinhood Chain <small>USDG</small></h3>
+            <p>The default in Ask, Budget, the CLI and the SDK.</p>
+            <dl>
+              <dt>CAIP-2</dt><dd><code>eip155:4663</code></dd>
+              <dt>Token</dt><dd><code>0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168</code></dd>
+              <dt>EIP-712</dt><dd><code>"Global Dollar"</code>, version <code>"1"</code></dd>
+            </dl>
+          </div>
+          <div class="net">
+            <h3>Base <small>USDC</small></h3>
+            <dl>
+              <dt>CAIP-2</dt><dd><code>eip155:8453</code></dd>
+              <dt>Token</dt><dd><code>0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913</code></dd>
+              <dt>EIP-712</dt><dd><code>"USD Coin"</code>, version <code>"2"</code></dd>
+            </dl>
+          </div>
+          <div class="net">
+            <h3>Solana <small>USDC</small></h3>
+            <dl>
+              <dt>CAIP-2</dt><dd><code>solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp</code></dd>
+              <dt>Mint</dt><dd><code>EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v</code></dd>
+              <dt>Fee payer</dt><dd><code>extra.feePayer</code> in each quote</dd>
+            </dl>
+          </div>
+          <div class="net">
+            <h3>Arbitrum <small>USDC</small></h3>
+            <dl>
+              <dt>CAIP-2</dt><dd><code>eip155:42161</code></dd>
+              <dt>Token</dt><dd><code>0xaf88d065e77c8cC2239327C5EDb3A432268e5831</code></dd>
+              <dt>EIP-712</dt><dd><code>"USD Coin"</code>, version <code>"2"</code></dd>
+            </dl>
+          </div>
+          <div class="net">
+            <h3>Polygon <small>USDC</small></h3>
+            <dl>
+              <dt>CAIP-2</dt><dd><code>eip155:137</code></dd>
+              <dt>Token</dt><dd><code>0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359</code></dd>
+              <dt>EIP-712</dt><dd><code>"USD Coin"</code>, version <code>"2"</code></dd>
+            </dl>
+          </div>
+        </div>
+        <p>The 402 lists only the networks that can be paid right now, with Base first because many x402 clients take the first entry. Ask, Budget, the CLI and the SDK still pay on Robinhood Chain unless you pick another.</p>
+        <p>Tools that run for minutes (video and the longer music tracks) are quoted on the EVM chains only, with a 300-second window. The <a href="#catalog">catalog</a> marks each one. A signed Solana transaction expires in about a minute, before a render would finish.</p>
+        <p>On Solana the payment payload is <code class="inline">{ transaction }</code>: a v0 transaction with SetComputeUnitLimit, SetComputeUnitPrice, a USDC TransferChecked and a Memo, signed by you, with the quote's <code class="inline">extra.feePayer</code> as fee payer and its signature slot left empty for the facilitator. The fee payer can change from one quote to the next, so read it from each one.</p>
+      </section>
+
+      <section id="endpoints" class="doc" data-check="stats">
+        <h2>Endpoints</h2>
+        <a class="to-live" href="#live" data-to-live>Go to the live check for Endpoints</a>
+        <details class="check check-inline display" data-check="stats">
+          <summary><span><b>Live check</b> · live totals</span><span class="check__state" aria-hidden="true"></span></summary>
+          <p class="check__src" data-check-src>GET /api/stats</p>
+          <div class="check__out" data-check-out tabindex="-1"><p>This check runs from your browser against siroagent.com and never signs a payment.</p><noscript><p>It needs JavaScript.</p></noscript></div>
+          <p class="sr" aria-live="polite" data-check-say></p>
+        </details>
+        <p>Base URL <code class="inline">https://siroagent.com</code>. Every <code class="inline">/v1</code> route allows cross-origin calls and exposes the <code class="inline">PAYMENT-REQUIRED</code> and <code class="inline">PAYMENT-RESPONSE</code> headers.</p>
+        <dl class="spec spec--wide">
+          <div><dt><code>GET /v1/resources</code></dt><dd>Every tool: id, name, category, price, input fields, what it returns, the networks it is quoted on and whether it is live. Free.</dd></div>
+          <div><dt><code>GET /v1/resources/:id</code></dt><dd>One tool, same fields. Free.</dd></div>
+          <div><dt><code>POST /v1/:id</code></dt><dd>Run a tool. It answers 402 with a quote until a payment is attached.</dd></div>
+          <div><dt><code>GET /v1/payments?payer=</code></dt><dd>Settled payments for one 0x or Solana address, newest first, up to 200. Free.</dd></div>
+          <div><dt><code>GET /api/stats</code></dt><dd>Live totals: tools listed, networks quoting, paid calls, volume, payers and the last settlement. Free.</dd></div>
+          <div><dt><code>GET /api/ledger</code></dt><dd>Settlements newest first (50 by default, <code class="inline">?limit=</code> up to 500), the totals for the whole table, and 30 days of daily totals: the data behind <a href="/activity">Activity</a>. Each row carries its transaction and a <code class="inline">result</code> with the sha256, size and kind of what the call returned. Add <code class="inline">?before=</code> with a Unix time to page back. Free.</dd></div>
+          <div><dt><code>GET /api/holder/&lt;address&gt;</code></dt><dd>The wallet's $SIRO balance on Robinhood Chain, its tier (1,000,000 $SIRO: 25% off every tool and 10 free data runs a day; 10,000,000: 50% off and 30), and the free runs left today. To pay the holder price, send <code class="inline">x-siro-holder: &lt;address&gt;</code> with the call; the 402 quote then carries the lower amount and a <code class="inline">holder</code> block, and the payment must come from that address. For a free run of a data tool, send <code class="inline">x-siro-pass: &lt;address&gt;.&lt;expires&gt;.&lt;signature&gt;</code>, a personal_sign of <code class="inline">Siro holder pass\nAddress: &lt;lowercase address&gt;\nExpires: &lt;unix seconds&gt;</code>, valid up to 24 hours. Free.</dd></div>
+          <div><dt><code>GET /api/proofs</code></dt><dd>Calls paid by a Siro team wallet, each with the full result it returned; <code class="inline">/api/proofs/&lt;tx&gt;</code> for one. sha256 of <code class="inline">JSON.stringify(result)</code> equals the row's <code class="inline">resultSha</code>. Free.</dd></div>
+          <div><dt><code>GET /api/discover?q=</code></dt><dd>Third-party x402 services from the x402 Bazaar index, payable ones first. <code class="inline">limit</code> goes up to 20, and one IP address can search 120 times an hour. Free.</dd></div>
+          <div><dt><code>GET /api/tokens?network=</code></dt><dd>The tokens your agent can swap on <code class="inline">robinhood</code> or <code class="inline">base</code>, with every Robinhood stock token. Free.</dd></div>
+          <div><dt><code>POST /mcp</code></dt><dd>The remote MCP server. See <a href="#mcp">MCP server</a>.</dd></div>
+        </dl>
+      </section>
+
+      <section id="errors" class="doc" data-check="badInput">
+        <h2>Errors and charges</h2>
+        <a class="to-live" href="#live" data-to-live>Go to the live check for Errors and charges</a>
+        <details class="check check-inline display" data-check="badInput">
+          <summary><span><b>Live check</b> · bad input</span><span class="check__state" aria-hidden="true"></span></summary>
+          <p class="check__src" data-check-src>POST /v1/gas-now</p>
+          <div class="check__out" data-check-out tabindex="-1"><p>This check runs from your browser against siroagent.com and never signs a payment.</p><noscript><p>It needs JavaScript.</p></noscript></div>
+          <p class="sr" aria-live="polite" data-check-say></p>
+        </details>
+        <p>There are no refunds, because a call that fails is never settled. The tool runs after the facilitator verifies your signature and before the transfer settles. If the tool, the model or the link you gave fails, the authorization is never executed and its nonce is released, so you can sign again.</p>
+        <p>Input errors are caught before any payment is verified. Without a payment, a bad input still gets the 402 quote, with the problem in <code class="inline">inputError</code>; Siro's own clients stop there and sign nothing. With a payment attached, the input error comes back with its HTTP status and nothing is charged.</p>
+        <p>One case returns the result before the money has landed. When the transfer was broadcast but is not confirmed yet, you get the result and a receipt with <code class="inline">status: "pending"</code> and the transaction hash. The transfer is already on its way, so the result is not held back.</p>
+        <p>Tool and input errors come back with their HTTP status and the first body below. Payment errors are a 402 with the second.</p>
+        <figure class="code-box display">
+          <figcaption class="display__bar"><b id="code-errors">Error bodies</b><span class="code-box__end"><span>JSON</span><button class="key key--sm" type="button" id="copy-errors" data-copy aria-labelledby="copy-errors code-errors">Copy</button></span></figcaption>
+<pre class="code" tabindex="0" role="group" aria-labelledby="code-errors"><code>{<span class="s">"error"</span>:{<span class="s">"code"</span>:<span class="s">"…"</span>,<span class="s">"message"</span>:<span class="s">"…"</span>}}
+{<span class="s">"x402Version"</span>:2,<span class="s">"error"</span>:<span class="s">"…"</span>,<span class="s">"code"</span>:<span class="s">"…"</span>,<span class="s">"accepts"</span>:[]}</code></pre>
+        </figure>
+        <dl class="spec spec--wide">
+          <div><dt>400 <code>missing_field</code>, <code>invalid_field</code>, <code>invalid_url</code>, <code>invalid_network</code>, <code>invalid_address</code>, <code>invalid_body</code>, <code>invalid_json</code></dt><dd>Your input. Never charged.</dd></div>
+          <div><dt>413 <code>field_too_long</code>, <code>body_too_large</code>, <code>too_large</code></dt><dd>Too long or too big. Never charged.</dd></div>
+          <div><dt>404 <code>not_found</code></dt><dd>No tool with that id.</dd></div>
+          <div><dt>402 <code>invalid_payment</code></dt><dd>The payment header could not be read, or it does not match the quote: amount, payTo, network or asset.</dd></div>
+          <div><dt>402 <code>verify_invalid</code></dt><dd>The facilitator refused the signature (balance, amount or expiry) or could not be reached.</dd></div>
+          <div><dt>402 <code>nonce_used</code></dt><dd>That authorization was already used. Sign a new one.</dd></div>
+          <div><dt>402 <code>settle_failed</code></dt><dd>The transfer did not go through after the tool ran. You get no result and pay nothing, and the nonce is released.</dd></div>
+          <div><dt>404 <code>market_not_found</code>, <code>stock_not_found</code>, <code>not_a_contract</code></dt><dd>Nothing was found for that input. Not charged.</dd></div>
+          <div><dt>422 <code>fetch_failed</code>, <code>not_an_image</code>, <code>model_refused</code></dt><dd>The link or the prompt could not be used. Not charged.</dd></div>
+          <div><dt>429 <code>model_busy</code></dt><dd>The model is at capacity. Retry in a few seconds. Not charged.</dd></div>
+          <div><dt>502 <code>model_failed</code>, <code>empty_answer</code>, <code>no_price</code>, <code>resource_failed</code>, <code>*_unavailable</code></dt><dd>Something upstream failed. Not charged.</dd></div>
+          <div><dt>503 <code>payments_not_configured</code>, <code>not_live</code></dt><dd>Payments, or this tool, are not switched on. Not charged.</dd></div>
+          <div><dt>504 <code>render_timeout</code></dt><dd>The model took too long and the job was cancelled. Not charged.</dd></div>
+        </dl>
+      </section>
+
+      <section id="privacy" class="doc">
+        <h2>What Siro keeps</h2>
+        <p>Every payment is public: the tool, network, payer, amount, transaction hash and the result's <code class="inline">resultSha256</code> are on <a href="/activity">Activity</a>, as the transfer is on-chain. Your input and text or data results are not stored. Generated images, video and audio are served from <code class="inline">/media/</code> for 7 days, then refused and deleted; the result carries <code class="inline">expiresAt</code>.</p>
+        <p>The wallet that paid can delete a stored file sooner. Sign <code class="inline">Delete my Siro result\nTransaction: &lt;tx in lower case&gt;</code> and send <code class="inline">POST /v1/results/&lt;tx&gt;/forget</code> with <code class="inline">{"signature":"…"}</code>. The payment row and its sha256 stay. The full list is on <a href="/privacy">Privacy</a>.</p>
+      </section>
+
+      <section id="wallet" class="doc" data-check="browser">
+        <h2>The agent wallet</h2>
+        <a class="to-live" href="#live" data-to-live>Go to the live check for The agent wallet</a>
+        <details class="check check-inline display" data-check="browser">
+          <summary><span><b>Live check</b> · this browser</span><span class="check__state" aria-hidden="true"></span></summary>
+          <p class="check__src" data-check-src>localStorage</p>
+          <div class="check__out" data-check-out tabindex="-1"><p>This check reads this browser's storage and never shows the key.</p><noscript><p>It needs JavaScript.</p></noscript></div>
+          <p class="sr" aria-live="polite" data-check-say></p>
+        </details>
+        <p><a href="/budget">Budget</a> makes a key in your browser and keeps it in this browser's localStorage, unencrypted. Anyone who can open this browser profile can read it. Export a backup there, and keep only a small balance on it.</p>
+        <p>Siro's servers never receive the key: the browser signs each payment itself and sends only the signed authorization. Before it signs, it checks the price against your caps, per payment and per day, with EVM and Solana spending counted together. Swaps have their own per-swap cap. A new wallet starts at $0.10 per payment, $1.00 per day and $25.00 per swap, with autopay off, so Ask waits for your yes on every payment.</p>
+        <p>The same key has a Solana address, derived from it, so one backup covers both. A connected wallet such as MetaMask or Rabby can pay instead; it asks in its own window every time and pays on the EVM chains only.</p>
+        <p>The <a href="#cli">CLI</a> works differently: it encrypts its key with your password, using scrypt and AES-256-GCM, in <code class="inline">~/.siro/keystore.json</code>.</p>
+        <p>Siro keeps these entries in this browser's localStorage:</p>
+        <dl class="spec">
+          <div><dt><code>siro.agent.key</code></dt><dd>The private key, as plain hex text.</dd></div>
+          <div><dt><code>siro.agent.limits</code></dt><dd>Your caps and the autopay switch.</dd></div>
+          <div><dt><code>siro.agent.log</code></dt><dd>The last 500 payments and swaps made in this browser. The daily cap counts from it.</dd></div>
+          <div><dt><code>siro.network</code></dt><dd>The payment network you picked last in Ask or Tools. Robinhood Chain until you pick another.</dd></div>
+        </dl>
+      </section>
+
+      <section id="cli" class="doc" data-check="package">
+        <h2>CLI</h2>
+        <a class="to-live" href="#live" data-to-live>Go to the live check for CLI</a>
+        <details class="check check-inline display" data-check="package">
+          <summary><span><b>Live check</b> · the package</span><span class="check__state" aria-hidden="true"></span></summary>
+          <p class="check__src" data-check-src>GET /cli/siro.tgz</p>
+          <div class="check__out" data-check-out tabindex="-1"><p>This check runs from your browser against siroagent.com and never signs a payment.</p><noscript><p>It needs JavaScript.</p></noscript></div>
+          <p class="sr" aria-live="polite" data-check-say></p>
+        </details>
+        <p>The <code class="inline">siro</code> command keeps the agent key on your machine, encrypted with your password, and checks the same caps before it signs anything.</p>
+        <figure class="code-box display">
+          <figcaption class="display__bar"><b id="code-cli">Install and first calls</b><span class="code-box__end"><span>Shell</span><button class="key key--sm" type="button" id="copy-cli" data-copy aria-labelledby="copy-cli code-cli">Copy</button></span></figcaption>
+<pre class="code" tabindex="0" role="group" aria-labelledby="code-cli"><code><span class="c"># Node 20 or later</span>
+npm i -g https://siroagent.com/cli/siro.tgz
+
+<span class="c"># A new wallet, encrypted. It prints the addresses to fund.</span>
+siro init
+siro limits --per-payment 0.1 --per-day 1 --per-swap 25
+siro balance
+
+siro resources stock
+siro call prediction-markets query=<span class="s">"fed rates"</span>
+siro call stock-signal symbol=TSLA
+siro call flux-2-dev prompt=<span class="s">"a chrome ball on brushed aluminium"</span> --out tile.png
+siro discover weather          <span class="c"># third-party x402 services</span>
+siro pay <span class="s">"$URL"</span> city=Jakarta   <span class="c"># a URL that discover printed</span>
+siro swap 0.01 ETH USDG        <span class="c"># KyberSwap; needs some ETH for gas</span>
+siro holder                    <span class="c"># $SIRO held: holder discount, free data runs left</span>
+siro history</code></pre>
+        </figure>
+        <p>Every payment and swap asks for confirmation unless you add <code class="inline">--yes</code>; the caps apply either way. <code class="inline">--network base</code>, <code class="inline">solana</code>, <code class="inline">arbitrum</code> or <code class="inline">polygon</code> pays in USDC on that network instead of USDG on Robinhood Chain. Swaps run on <code class="inline">robinhood</code> or <code class="inline">base</code>. Set <code class="inline">SIRO_PASSWORD</code> for scripts and for <code class="inline">siro mcp</code>.</p>
+        <p>The wallet also has a Solana address, derived from the same key. <code class="inline">siro export-key --solana</code> prints that key in the form Phantom and Solflare import. Files live in <code class="inline">~/.siro</code>, or wherever <code class="inline">SIRO_HOME</code> points: <code class="inline">keystore.json</code>, <code class="inline">config.json</code> for caps and network, and <code class="inline">spend.jsonl</code> for history.</p>
+      </section>
+
+      <section id="mcp" class="doc" data-check="mcp">
+        <h2>MCP server</h2>
+        <a class="to-live" href="#live" data-to-live>Go to the live check for MCP server</a>
+        <details class="check check-inline display" data-check="mcp">
+          <summary><span><b>Live check</b> · MCP tools</span><span class="check__state" aria-hidden="true"></span></summary>
+          <p class="check__src" data-check-src>POST /mcp tools/list</p>
+          <div class="check__out" data-check-out tabindex="-1"><p>This check runs from your browser against siroagent.com and never signs a payment.</p><noscript><p>It needs JavaScript.</p></noscript></div>
+          <p class="sr" aria-live="polite" data-check-say></p>
+        </details>
+        <h3>Remote, nothing to install</h3>
+        <p><code class="inline">https://siroagent.com/mcp</code> speaks Streamable HTTP with JSON responses and needs no key. Browsing is free: <code class="inline">siro_resources</code>, <code class="inline">siro_resource_schema</code>, <code class="inline">siro_discover</code> and <code class="inline">siro_tokens</code>. <code class="inline">siro_call</code> runs a paid tool when <code class="inline">params._meta["x402/payment"]</code> carries a signed x402 payment. Without one it returns <code class="inline">isError</code> with the payment requirements to sign, and a paid call returns its receipt in <code class="inline">_meta["x402/payment-response"]</code>. The server is listed in the official MCP Registry as <code class="inline">com.siroagent/siro</code>.</p>
+        <p>In Claude Code, add it with one command:</p>
+        <figure class="code-box display">
+          <figcaption class="display__bar"><b id="code-mcp-add">Add to Claude Code</b><span class="code-box__end"><span>Shell</span><button class="key key--sm" type="button" id="copy-mcp-add" data-copy aria-labelledby="copy-mcp-add code-mcp-add">Copy</button></span></figcaption>
+<pre class="code" tabindex="0" role="group" aria-labelledby="code-mcp-add"><code>claude mcp add --transport http \
+  siro https://siroagent.com/mcp</code></pre>
+        </figure>
+        <p>From any shell, list its tools:</p>
+        <figure class="code-box display">
+          <figcaption class="display__bar"><b id="code-mcp-list">List the tools</b><span class="code-box__end"><span>Shell</span><button class="key key--sm" type="button" id="copy-mcp-list" data-copy aria-labelledby="copy-mcp-list code-mcp-list">Copy</button></span></figcaption>
+<pre class="code" tabindex="0" role="group" aria-labelledby="code-mcp-list"><code>curl https://siroagent.com/mcp \
+  -H <span class="s">'content-type: application/json'</span> \
+  -H <span class="s">'accept: application/json, text/event-stream'</span> \
+  -d <span class="s">'{"jsonrpc":"2.0","id":1,"method":"tools/list"}'</span></code></pre>
+        </figure>
+        <h3>Local, with your wallet</h3>
+        <p><code class="inline">siro mcp</code> runs a server over stdio with the CLI's encrypted wallet and pays on its own inside your caps. Add it to Claude Desktop, Cursor or any client that starts a command:</p>
+        <figure class="code-box display">
+          <figcaption class="display__bar"><b id="code-mcp-config">MCP client config</b><span class="code-box__end"><span>JSON</span><button class="key key--sm" type="button" id="copy-mcp-config" data-copy aria-labelledby="copy-mcp-config code-mcp-config">Copy</button></span></figcaption>
+<pre class="code" tabindex="0" role="group" aria-labelledby="code-mcp-config"><code>{
+  <span class="s">"mcpServers"</span>: {
+    <span class="s">"siro"</span>: {
+      <span class="s">"command"</span>: <span class="s">"siro"</span>,
+      <span class="s">"args"</span>: [<span class="s">"mcp"</span>],
+      <span class="s">"env"</span>: { <span class="s">"SIRO_PASSWORD"</span>: <span class="s">"your wallet password"</span> }
+    }
+  }
+}</code></pre>
+        </figure>
+        <p>The password sits in that config file as plain text, so keep the wallet's balance small. The local server has these tools:</p>
+        <dl class="spec">
+          <div><dt><code>siro_wallet</code></dt><dd>Address, balances on every payment network, caps and today's spend.</dd></div>
+          <div><dt><code>siro_resources</code></dt><dd>The catalog with prices and input fields.</dd></div>
+          <div><dt><code>siro_call</code></dt><dd>Run a tool and pay it, within the caps. A wallet holding $SIRO pays the holder price, and Siro's own data tools run free while its daily holder allowance lasts.</dd></div>
+          <div><dt><code>siro_holder</code></dt><dd>The wallet's $SIRO balance, holder tier and free runs left today.</dd></div>
+          <div><dt><code>siro_discover</code></dt><dd>Search third-party x402 services.</dd></div>
+          <div><dt><code>siro_pay</code></dt><dd>Call any x402 URL and pay it, within the caps.</dd></div>
+          <div><dt><code>siro_swap_quote</code></dt><dd>The best KyberSwap route for a trade.</dd></div>
+          <div><dt><code>siro_swap</code></dt><dd>Run a swap. Off until you run <code class="inline">siro limits --mcp-swaps on</code>, then capped per swap.</dd></div>
+          <div><dt><code>siro_history</code></dt><dd>Recent payments and swaps.</dd></div>
+        </dl>
+      </section>
+
+      <section id="sdk" class="doc" data-check="package">
+        <h2>SDK</h2>
+        <a class="to-live" href="#live" data-to-live>Go to the live check for SDK</a>
+        <details class="check check-inline display" data-check="package">
+          <summary><span><b>Live check</b> · the package</span><span class="check__state" aria-hidden="true"></span></summary>
+          <p class="check__src" data-check-src>GET /cli/siro.tgz</p>
+          <div class="check__out" data-check-out tabindex="-1"><p>This check runs from your browser against siroagent.com and never signs a payment.</p><noscript><p>It needs JavaScript.</p></noscript></div>
+          <p class="sr" aria-live="polite" data-check-say></p>
+        </details>
+        <p>The package that installs the CLI is also an SDK. Its npm name is <code class="inline">siroagent</code>.</p>
+        <figure class="code-box display">
+          <figcaption class="display__bar"><b id="code-sdk">agent.mjs</b><span class="code-box__end"><span>JavaScript</span><button class="key key--sm" type="button" id="copy-sdk" data-copy aria-labelledby="copy-sdk code-sdk">Copy</button></span></figcaption>
+<pre class="code" tabindex="0" role="group" aria-labelledby="code-sdk"><code><span class="c">// npm i https://siroagent.com/cli/siro.tgz</span>
+<span class="k">import</span> { Siro } <span class="k">from</span> <span class="s">"siroagent"</span>;
+
+<span class="k">const</span> siro = <span class="k">new</span> Siro({
+  privateKey: process.env.AGENT_KEY,
+  limits: { perPayment: 0.05, perDay: 2 },
+});
+
+<span class="k">const</span> { result, receipt } =
+  <span class="k">await</span> siro.call(<span class="s">"stock-signal"</span>, { symbol: <span class="s">"TSLA"</span> });
+console.log(result, receipt?.tx);
+
+<span class="k">const</span> services = <span class="k">await</span> siro.discover(<span class="s">"token price"</span>);
+<span class="k">const</span> svc = services.find((s) =&gt; s.payable);
+<span class="k">if</span> (svc) {
+  <span class="k">const</span> input = svc.input ?? {};
+  <span class="k">await</span> siro.pay(svc.url, { method: svc.method, input });
+}
+
+<span class="k">const</span> quote = <span class="k">await</span> siro.swapQuote(<span class="s">"ETH"</span>, <span class="s">"USDG"</span>, <span class="s">"0.01"</span>);
+<span class="k">await</span> siro.swap(quote);</code></pre>
+        </figure>
+        <p>Pass <code class="inline">approve: (a) =&gt; boolean</code> to confirm each payment or swap yourself, and <code class="inline">ledger</code> to keep spending across restarts for the daily cap; without it, spending is kept in memory. <code class="inline">x402fetch(url, init, { signer })</code> pays any x402 v1 or v2 endpoint directly.</p>
+      </section>
+
+      <section id="discovery" class="doc" data-check="discover">
+        <h2>Paying x402 services outside Siro</h2>
+        <a class="to-live" href="#live" data-to-live>Go to the live check for Paying x402 services outside Siro</a>
+        <details class="check check-inline display" data-check="discover">
+          <summary><span><b>Live check</b> · x402 index search</span><span class="check__state" aria-hidden="true"></span></summary>
+          <p class="check__src" data-check-src>GET /api/discover</p>
+          <div class="check__out" data-check-out tabindex="-1"><p>This check runs from your browser against siroagent.com and never signs a payment.</p><noscript><p>It needs JavaScript.</p></noscript></div>
+          <p class="sr" aria-live="polite" data-check-say></p>
+        </details>
+        <figure class="doc__figure">
+          <img src="/img/04-scale-900.webp" srcset="/img/04-scale-900.webp 900w, /img/04-scale-1536.webp 1536w" sizes="(min-width: 760px) 640px, calc(100vw - 32px)" width="900" height="600" alt="A brushed aluminium scale with a milled groove and tick marks, a chrome ball resting at one mark." loading="lazy" decoding="async">
+          <figcaption class="label">Your agent can also pay x402 services outside Siro.</figcaption>
+        </figure>
+        <p>Beyond its own catalog, Siro searches the open x402 Bazaar index, run by Coinbase CDP, and pays any service that takes the <code class="inline">exact</code> scheme in USDG on Robinhood Chain or USDC on Base, Solana, Arbitrum or Polygon. Ask does this when no Siro tool fits: it finds a service, fills in its input and shows you the price before paying.</p>
+        <p>Their owners run these services, not Siro, so their answers, prices and refund rules are theirs. In the browser, calls go through a narrow relay, <code class="inline">POST /api/relay</code>, that forwards only to services discovery returned and never sees your key. The CLI, the SDK and the MCP server call them directly.</p>
+      </section>
+
+      <section id="swaps" class="doc" data-check="tokens">
+        <h2>Swaps</h2>
+        <a class="to-live" href="#live" data-to-live>Go to the live check for Swaps</a>
+        <details class="check check-inline display" data-check="tokens">
+          <summary><span><b>Live check</b> · swappable tokens</span><span class="check__state" aria-hidden="true"></span></summary>
+          <p class="check__src" data-check-src>GET /api/tokens</p>
+          <div class="check__out" data-check-out tabindex="-1"><p>This check runs from your browser against siroagent.com and never signs a payment.</p><noscript><p>It needs JavaScript.</p></noscript></div>
+          <p class="sr" aria-live="polite" data-check-say></p>
+        </details>
+        <p>Swaps route through the KyberSwap aggregator on Robinhood Chain and Base, Robinhood stock tokens included. The quote and the transaction are built on your device and sent from your wallet: an approval for the exact amount when one is needed, then the swap, with 1% maximum slippage by default. A swap needs a little ETH for gas. Siro adds no fee.</p>
+        <p>Ask always asks before it sends a swap, the CLI asks unless you add <code class="inline">--yes</code>, and the local MCP server swaps only after <code class="inline">siro limits --mcp-swaps on</code>. A swap from an agent wallet (Budget, the CLI, the SDK or the local MCP server) is held to the per-swap cap, $25.00 for a new wallet. A connected wallet asks in its own window instead.</p>
+      </section>
+
+      <section id="catalog" class="doc" data-check="rows">
+        <h2>Catalog JSON</h2>
+        <a class="to-live" href="#live" data-to-live>Go to the live check for Catalog JSON</a>
+        <details class="check check-inline display" data-check="rows">
+          <summary><span><b>Live check</b> · catalog rows</span><span class="check__state" aria-hidden="true"></span></summary>
+          <p class="check__src" data-check-src>GET /v1/resources</p>
+          <div class="check__out" data-check-out tabindex="-1"><p>This check runs from your browser against siroagent.com and never signs a payment.</p><noscript><p>It needs JavaScript.</p></noscript></div>
+          <p class="sr" aria-live="polite" data-check-say></p>
+        </details>
+        <p><a href="/v1/resources"><code class="inline">GET /v1/resources</code></a> returns <code class="inline">{ data, count }</code>. Each entry has the tool's <code class="inline">id</code>, its <code class="inline">price</code> in USD as a decimal string, its <code class="inline">input</code> fields, <code class="inline">returns</code>, the <code class="inline">networks</code> it is quoted on and <code class="inline">live</code>. A price is fixed per call and is the same number of base units on every network.</p>
+        <table class="table cat">
+          <caption><span data-count>67</span> tools in the catalog this page was built with. Prices are per call, and each name opens its spec sheet in Tools.</caption>
+          <thead><tr><th scope="col">Tool and endpoint</th><th scope="col" class="num">Price</th><th scope="col">Runs in</th></tr></thead>
+          <tbody id="cat"><tr><td colspan="3">This list is drawn by JavaScript. The same data is at <a href="/v1/resources">/v1/resources</a>.</td></tr></tbody>
+        </table>
+      </section>
+
+    </article>
+
+    <aside class="docs__live display check" id="live" aria-label="Live checks" tabindex="-1">
+      <div class="display__bar"><b data-check-name>Live checks</b><span class="check__bar-src" data-check-src>siroagent.com</span></div>
+      <div class="check__out" data-check-out tabindex="-1"><p>Each section has a live check. It runs from your browser against siroagent.com and never signs a payment.</p><noscript><p>Live checks need JavaScript.</p></noscript></div>
+      <p class="check__for" data-check-for hidden>For the section in view: <a href="#overview" data-check-back>Overview</a></p>
+      <p class="sr" aria-live="polite" data-check-say></p>
+    </aside>
+
+  </div>
+</main>
+<script type="module" src="/src/docs/main.ts"></script>
+</body>
+</html>

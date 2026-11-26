@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en" data-page="ask">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+  <title>Ask · Siro</title>
+  <meta name="description" content="Tell Siro's agent what you need. Chatting is free. When a task needs a paid tool, it quotes the price first and pays from your capped Budget or your own wallet only after your yes.">
+  <link rel="canonical" href="https://siroagent.com/ask">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://siroagent.com/ask">
+  <meta property="og:title" content="Ask · Siro">
+  <meta property="og:description" content="Chatting is free. When a task needs a paid tool, Siro quotes the price over x402 and waits for your yes.">
+  <meta property="og:image" content="https://siroagent.com/og.jpg?v=2">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@siro_agent">
+  <meta name="twitter:title" content="Ask · Siro">
+  <meta name="twitter:description" content="Chatting is free. When a task needs a paid tool, Siro quotes the price over x402 and waits for your yes.">
+  <meta name="twitter:image" content="https://siroagent.com/og.jpg?v=2">
+  <meta name="theme-color" content="#f2f3f5">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+</head>
+<body>
+<a class="skip" href="#msg">Skip to the message box</a>
+
+<div class="ask" id="ask">
+  <header class="abar" id="abar">
+    <div class="abar__in">
+      <nav class="abar__nav" aria-label="Main">
+      <a class="abar__home" href="/" aria-label="Siro home"><span class="brand__mark" id="mark"></span></a>
+      <button class="key key--sm" id="chats-key" type="button" aria-haspopup="dialog" aria-controls="drawer" aria-expanded="false">Chats</button>
+      <h1 class="abar__title" id="chat-title">New chat</h1>
+      <p class="abar__pay" id="bar-pay"></p>
+      <button class="search-well abar__search" id="search-key" type="button" aria-label="Search pages and tools"><span>Search</span><kbd id="search-kbd">⌘K</kbd></button>
+      <a class="key key--sm" href="/budget">Budget</a>
+      </nav>
+    </div>
+  </header>
+
+  <button class="capstrip" id="capstrip" type="button" aria-haspopup="dialog" aria-controls="sheet" aria-expanded="false">
+    <span class="capstrip__who" id="cap-who">Budget</span>
+    <span class="capstrip__today" id="cap-today"></span>
+    <span class="meter capstrip__meter" id="cap-meter" aria-hidden="true"><i class="ball"></i></span>
+    <span class="sr">Open payment settings</span>
+  </button>
+
+  <main class="ask__main" id="main">
+    <section class="convo" aria-labelledby="chat-title">
+      <h2 class="sr">Conversation</h2>
+      <div class="log" id="log">
+        <div class="empty" id="empty">
+          <div class="empty__head">
+            <div>
+              <h2 class="empty__h">What should your agent get done?</h2>
+              <p class="lede empty__lede">Siro answers for free. When a task needs a paid tool, it quotes the price and waits for your yes.</p>
+            </div>
+            <div class="empty__art face" aria-hidden="true"><span class="empty__lane"><span class="empty__s" id="empty-s"></span><span class="empty__ball" id="empty-ball"></span></span></div>
+          </div>
+          <p class="label empty__label" id="briefs-label">Example briefs. Each names the tool Siro would quote and its price per call from the price list. Picking one fills the message box; nothing is sent.</p>
+          <ul class="briefs" id="briefs" aria-labelledby="briefs-label"></ul>
+        </div>
+        <div class="log__in" id="log-in"></div>
+      </div>
+
+      <form class="composer" id="composer" autocomplete="off">
+        <div class="composer__in">
+          <p class="composer__tool" id="tool-note" hidden></p>
+          <label class="label composer__label" for="msg">Message to Siro</label>
+          <div class="composer__row">
+            <textarea class="well composer__msg" id="msg" name="msg" rows="1" maxlength="6000" placeholder="Describe the task" enterkeyhint="send" aria-describedby="composer-hint"></textarea>
+            <button class="key key--ink composer__send" id="send" type="submit" disabled>Send</button>
+          </div>
+          <p class="composer__hint label" id="composer-hint"><span class="composer__keys">Enter sends, Shift+Enter adds a line. </span><span id="composer-state">Chatting is free. Nothing is paid until you approve a quote.</span></p>
+        </div>
+      </form>
+    </section>
+
+    <aside class="instr" id="instr" aria-labelledby="instr-h">
+      <h2 class="sr" id="instr-h">Payments</h2>
+      <div class="instr__plate face">
+        <div class="display instr__display" id="instr-display">
+          <div class="display__bar"><b aria-hidden="true">Payments</b><span id="instr-src">this browser</span></div>
+          <fieldset class="instr__sec">
+            <legend class="instr__h">Pays with</legend>
+            <div class="paywith">
+              <label><input type="radio" name="payer" value="agent">Budget</label>
+              <label><input type="radio" name="payer" value="connected">My wallet</label>
+            </div>
+            <div class="instr__who" id="payer-who" tabindex="-1"></div>
+          </fieldset>
+          <div class="instr__sec">
+            <label class="instr__h" for="net">Network</label>
+            <select class="instr__net" id="net"></select>
+            <p class="instr__note" id="net-note">Checking which networks quote now.</p>
+          </div>
+          <div class="instr__sec">
+            <h3 class="instr__h">Today</h3>
+            <p class="instr__today live-num" id="today-num"></p>
+            <div class="meter instr__meter" id="today-meter" aria-hidden="true"><i class="ball"></i></div>
+            <p class="instr__note" id="caps-line"></p>
+          </div>
+          <div class="instr__sec">
+            <h3 class="instr__h">Autopay</h3>
+            <p class="instr__auto" id="autopay-line"></p>
+            <a class="instr__link" href="/budget#caps">Change it in Budget</a>
+          </div>
+          <div class="instr__sec">
+            <h3 class="instr__h">Last 5 payments</h3>
+            <ol class="paylog" id="paylog"></ol>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </main>
+</div>
+
+<dialog class="drawer" id="drawer" aria-labelledby="drawer-h">
+  <div class="drawer__in">
+    <div class="drawer__top">
+      <h2 class="drawer__h" id="drawer-h">Chats</h2>
+      <button class="key key--sm" type="button" data-close-drawer>Close</button>
+    </div>
+    <button class="key drawer__new" id="new-chat" type="button">New chat</button>
+    <p class="label drawer__note">Saved in this browser only.</p>
+    <ul class="drawer__list" id="chat-list"></ul>
+  </div>
+</dialog>
+
+<dialog class="sheet" id="sheet" aria-labelledby="sheet-h">
+  <div class="sheet__in">
+    <div class="sheet__top">
+      <h2 class="sheet__h" id="sheet-h">Payment settings</h2>
+      <button class="key key--sm" type="button" data-close-sheet>Close</button>
+    </div>
+    <div class="sheet__body" id="sheet-body"></div>
+  </div>
+</dialog>
+
+<p class="sr" id="say" role="status" aria-live="polite"></p>
+<noscript><p class="noscript">Ask runs in this page: the agent, the quotes and the payments need JavaScript.</p></noscript>
+<script type="module" src="/src/ask/main.ts"></script>
+</body>
+</html>

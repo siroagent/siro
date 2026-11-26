@@ -1,0 +1,12 @@
+{
+  "chainId": 4663,
+  "token": {
+    "ticker": "SIRO",
+    "chain": "Robinhood Chain",
+    "ca": "0x4471866fee3309c542386ff2a2ffa755e8298497",
+    "explorer": "https://robinhoodchain.blockscout.com/token/0x4471866fee3309c542386ff2a2ffa755e8298497",
+    "chart": null,
+    "added": "2026-11-25T15:46:48Z"
+  },
+  "note": "$SIRO on Robinhood Chain is the only token of Siro. Any other contract claiming to be ours is not."
+}

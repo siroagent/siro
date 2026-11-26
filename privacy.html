@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Privacy · Siro</title>
+  <meta name="description" content="Every payment on Siro is public. What your agent asked and got back is not: Siro does not store inputs or text results, keeps generated media for 7 days, and lets the paying wallet delete it sooner.">
+  <link rel="canonical" href="https://siroagent.com/privacy">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://siroagent.com/privacy">
+  <meta property="og:title" content="Privacy · Siro">
+  <meta property="og:description" content="Every payment is public. What your agent asked and got back is not.">
+  <meta property="og:image" content="https://siroagent.com/og.jpg?v=2">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@siro_agent">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <meta name="theme-color" content="#f2f3f5">
+</head>
+<body>
+<main id="main">
+  <div class="wrap">
+    <header class="ship__head grid">
+      <h1>Privacy</h1>
+      <p class="lede">Every payment is public. What your agent asked and got back is not. This page lists what Siro keeps, for how long, and the code that does it.</p>
+    </header>
+
+    <table class="table ship__table ship__table--dated" role="table">
+      <caption class="sr">What Siro keeps about a paid call</caption>
+      <thead role="rowgroup">
+        <tr role="row"><th role="columnheader" scope="col">Kept</th><th role="columnheader" scope="col">What and why</th></tr>
+      </thead>
+      <tbody role="rowgroup">
+        <tr role="row" id="payment">
+          <td role="cell">Public, for good</td>
+          <td role="cell"><p>The payment: tool, network, paying address, amount, transaction hash, run time, and the result's sha256, size and kind. The transfer is on-chain anyway; <a href="/activity">Activity</a> shows the same rows so anyone can check them. The sha256 lets you prove which result you were sold without showing it.</p></td>
+        </tr>
+        <tr role="row" id="inputs">
+          <td role="cell">Not kept</td>
+          <td role="cell"><p>Your input: the prompt, the text, the URL or the address you sent. It goes to the tool, the tool answers, and Siro writes none of it to its database or its logs.</p></td>
+        </tr>
+        <tr role="row" id="text">
+          <td role="cell">Not kept</td>
+          <td role="cell"><p>Text and data results: answers from language models, prices, balances, pages read. They go back in the response and nowhere else.</p></td>
+        </tr>
+        <tr role="row" id="media">
+          <td role="cell">7 days</td>
+          <td role="cell"><p>Generated images, video and audio. Siro copies the file to its own storage under a random link, because the model host deletes its copy within an hour. After 7 days the link stops working and the storage deletes the file. The wallet that paid can delete it sooner: <b>Delete it now</b> under the receipt on a tool page, or the API below.</p></td>
+        </tr>
+        <tr role="row" id="ask">
+          <td role="cell">Your browser only</td>
+          <td role="cell"><p>Ask chats and the Budget key live in this browser's storage. Siro's server sees each message only while it answers it.</p></td>
+        </tr>
+        <tr role="row" id="team">
+          <td role="cell">Public, by choice</td>
+          <td role="cell"><p>Calls paid by Siro's own two wallets (0x7787…70ad and 0xa6f3…ba17) are tests and demos. Their full results are shown on Activity as proof of what a paid call returns. No one else's are.</p></td>
+        </tr>
+        <tr role="row" id="limits">
+          <td role="cell">Up to 1 day</td>
+          <td role="cell"><p>Rate limits for Ask, search, the relay and Sell a tool count requests per place. The counter stores a SHA-256 hash of the IP address and the time window, never the address itself, and is swept after the window ends.</p></td>
+        </tr>
+        <tr role="row" id="holders">
+          <td role="cell">Per day</td>
+          <td role="cell"><p>$SIRO holders' free runs: the wallet address and how many free runs it used that UTC day.</p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <section class="ship__next-wrap" aria-labelledby="others">
+      <h2 id="others" class="ship__sub">Who else sees a call</h2>
+      <table class="table ship__table ship__next" role="table">
+        <caption class="sr">Services that process a call</caption>
+        <tbody role="rowgroup">
+          <tr role="row"><td role="cell">The model host</td><td role="cell"><p>Premium models run on Replicate, which deletes the input and output of API predictions after an hour. The other models run on Cloudflare Workers AI. Each host's own terms apply to the call it runs.</p></td></tr>
+          <tr role="row"><td role="cell">A seller</td><td role="cell"><p>Tools listed through <a href="/sell">Sell a tool</a> run on the seller's own server, which receives your input. Its listing names the host.</p></td></tr>
+          <tr role="row"><td role="cell">The payment rail</td><td role="cell"><p>Payments settle through the x402 facilitator for that network (Coinbase CDP, or HeyElsa's where CDP does not run), which sees the payment, not the input.</p></td></tr>
+          <tr role="row"><td role="cell">Anyone</td><td role="cell"><p>The payment itself is a public transfer on its chain. Siro does not hide who paid.</p></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="ship__next-wrap" aria-labelledby="forget">
+      <h2 id="forget" class="ship__sub">Delete a result</h2>
+      <p class="priv__p">Sign this text with the wallet that paid, with the transaction hash from your receipt in lower case:</p>
+      <pre class="priv__code"><code>Delete my Siro result
+Transaction: 0x…</code></pre>
+      <p class="priv__p">Then send the signature:</p>
+      <pre class="priv__code"><code>curl -X POST https://siroagent.com/v1/results/&lt;tx&gt;/forget \
+  -H 'content-type: application/json' \
+  -d '{"signature":"0x…"}'</code></pre>
+      <p class="priv__p">The stored file is deleted and the row is marked deleted. The payment and its sha256 stay on the ledger. EVM wallets sign with personal_sign; Solana wallets sign the same text with ed25519 and send it in base58.</p>
+      <p class="priv__p">Calls before 27 Nov 2026 did not record which file they made, so they cannot be deleted this way; their files expire on the 7-day rule like every other.</p>
+    </section>
+
+    <section class="ship__next-wrap" aria-labelledby="code">
+      <h2 id="code" class="ship__sub">Where this is in the code</h2>
+      <p class="priv__p">The 7-day rule and the delete text: <code class="inline">shared/privacy.ts</code>. The media copy and its expiry: <code class="inline">worker/premium.ts</code> and the <code class="inline">/media/</code> route in <code class="inline">worker/index.ts</code>. The payment row: <code class="inline">worker/proof.ts</code>. Deleting: <code class="inline">POST /v1/results/:tx/forget</code> in <code class="inline">worker/v1.ts</code>.</p>
+      <p class="priv__p small">Siro has no accounts. Before launch a waitlist collected email addresses; it is closed and the list is not used. This page is not legal advice and was not written by a lawyer.</p>
+    </section>
+  </div>
+</main>
+<script type="module" src="/src/privacy/main.ts"></script>
+</body>
+</html>

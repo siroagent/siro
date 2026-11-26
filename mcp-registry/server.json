@@ -1,0 +1,14 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "com.siroagent/siro",
+  "title": "Siro",
+  "description": "Pay-per-call AI tools for agents over x402: LLMs, image, video, music, market data. USDC/USDG.",
+  "version": "1.0.0",
+  "websiteUrl": "https://siroagent.com/docs#mcp",
+  "icons": [
+    { "src": "https://siroagent.com/icon-512.png", "mimeType": "image/png", "sizes": ["512x512"] }
+  ],
+  "remotes": [
+    { "type": "streamable-http", "url": "https://siroagent.com/mcp" }
+  ]
+}

@@ -1,0 +1,1211 @@
+/* Tools: the price list (/tools) and the spec sheet (/tools/:id). Shared tokens and components come
+   from base.css; everything here is prefixed tl- and belongs to these two views. */
+
+/* The list at /tools */
+
+/* Title band on the bench (the shared 12-column .grid): the name left, what every row means on the right. */
+.tl-band {
+  align-items: end;
+  padding: 64px 0 32px;
+}
+.tl-band h1 {
+  grid-column: 1 / span 5;
+}
+.tl-band__side {
+  grid-column: 7 / -1;
+  display: grid;
+  gap: 10px;
+}
+.tl-band__more {
+  color: var(--ink-2);
+}
+.tl-band__more a {
+  font-weight: 500;
+  white-space: nowrap;
+}
+@media (max-width: 899px) {
+  .tl-band {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 14px;
+    padding: 40px 0 24px;
+  }
+  .tl-band h1,
+  .tl-band__side {
+    grid-column: 1;
+  }
+}
+
+/* Price ruler: a recessed display, one tick per tool on a log scale. */
+.tl-ruler {
+  margin: 0;
+}
+.tl-ruler .display__bar {
+  flex-wrap: wrap;
+  row-gap: 2px;
+  padding-block: 8px;
+}
+.tl-ruler__plot {
+  position: relative;
+  height: calc(var(--stack, 8) * 12px + 64px);
+  margin: 18px 28px 6px;
+}
+.tl-ticks {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 30px;
+  height: calc(var(--stack, 8) * 12px);
+}
+.tl-tick {
+  position: absolute;
+  bottom: calc(var(--k, 0) * 12px);
+  width: 2px;
+  height: 9px;
+  margin-left: -1px;
+  background: var(--on-display);
+}
+/* Past the cap: still drawn, in the display edge grey (4.2:1 on graphite), and right of the rails. */
+.tl-tick.is-over {
+  background: var(--display-edge);
+}
+/* Outside the current filter: shorter and faint, so the filtered set reads as the ruler. */
+.tl-tick.is-out {
+  height: 5px;
+  opacity: 0.3;
+}
+.tl-tick.is-lit {
+  width: 4px;
+  height: 11px;
+  margin-left: -2px;
+  background: #fff;
+  opacity: 1;
+}
+.tl-axis {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 24px;
+  border-top: 1px solid var(--display-edge);
+}
+.tl-axis span {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  padding-top: 8px;
+  font-size: 12px;
+  line-height: 12px;
+  color: var(--on-display-2);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.tl-axis span::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 1px;
+  height: 4px;
+  background: var(--display-edge);
+}
+.tl-axis b {
+  font-weight: 500;
+}
+/* The cap is a boundary, so it is drawn as rails: two 1px lines, 2px apart. */
+.tl-capline {
+  position: absolute;
+  top: 0;
+  bottom: 24px;
+  width: 4px;
+  margin-left: -2px;
+  border-left: 1px solid var(--on-display);
+  border-right: 1px solid var(--on-display);
+}
+.tl-capline span {
+  position: absolute;
+  top: -2px;
+  left: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 16px;
+  color: var(--on-display);
+  white-space: nowrap;
+}
+.tl-capline.is-flip span {
+  left: auto;
+  right: 10px;
+}
+.tl-ruler__sum {
+  position: relative;
+  padding: 12px 16px 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--on-display-2);
+}
+.tl-ruler__sum b {
+  color: var(--on-display);
+  font-weight: 600;
+}
+@media (max-width: 759px) {
+  .tl-ruler__plot {
+    margin: 16px 22px 6px;
+  }
+  .tl-axis .is-minor b {
+    display: none;
+  }
+}
+
+.tl-filters {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 18px;
+  margin: 40px 0 20px;
+}
+.tl-cats {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.tl-cats legend {
+  padding: 0;
+  margin-bottom: 6px;
+}
+/* The tray hugs its keys, so a wide screen shows one bank of keys, not a long empty well. */
+.tl-cats__tray {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  width: fit-content;
+  max-width: 100%;
+  padding: 3px;
+  border-radius: 6px;
+  background: var(--face-lo);
+  box-shadow: var(--well);
+}
+.tl-cat {
+  position: relative;
+  display: inline-flex;
+}
+/* The radio stays in the page for the keyboard and screen readers; the key face is the span. */
+.tl-cat input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  opacity: 0;
+}
+.tl-cat > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 0 10px;
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink-2);
+  white-space: nowrap;
+  cursor: pointer;
+}
+.tl-cat > span:hover {
+  background: rgba(255, 255, 255, 0.6);
+}
+.tl-cat small {
+  font-size: 12px;
+  color: var(--label);
+  font-variant-numeric: tabular-nums;
+}
+.tl-cat input:checked + span {
+  background: var(--face);
+  color: var(--ink);
+  box-shadow: var(--key);
+}
+.tl-cat input:focus-visible + span {
+  position: relative;
+  z-index: 1;
+  box-shadow: var(--ring);
+}
+.tl-cat input:checked:focus-visible + span {
+  box-shadow: var(--key), var(--ring);
+}
+@media (pointer: coarse) {
+  .tl-cat > span {
+    min-height: 44px;
+  }
+}
+/* Below 1240px the keys no longer fit one row, so they set as a two-row keypad (--half columns,
+   from list.ts) instead of a full row and a ragged one. */
+@media (min-width: 760px) and (max-width: 1239px) {
+  .tl-cats__tray {
+    display: grid;
+    grid-template-columns: repeat(var(--half, 6), auto);
+  }
+  .tl-cat > span {
+    flex: 1;
+  }
+}
+.tl-search {
+  max-width: 420px;
+}
+.tl-catsel,
+.tl-sortsel {
+  display: none;
+}
+
+.tl-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 24px;
+  margin-bottom: 10px;
+}
+.tl-count {
+  font-size: 15px;
+  font-weight: 500;
+}
+.tl-livestate {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.tl-table td {
+  line-height: 21px;
+}
+.tl-table th button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  cursor: pointer;
+}
+.tl-table th button:hover {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+@media (pointer: coarse) {
+  .tl-table th button {
+    min-height: 44px;
+  }
+}
+/* Sortable headers carry a small two-way mark; the sorted one shows its direction in ink. */
+.tl-table th button::after {
+  content: "";
+  flex: none;
+  width: 8px;
+  height: 12px;
+  background: no-repeat center / 8px 12px url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='12' viewBox='0 0 8 12'%3E%3Cpath d='M4 0l4 5H0zM4 12L0 7h8z' fill='%23727A84'/%3E%3C/svg%3E");
+}
+.tl-table th[aria-sort] button {
+  color: var(--ink);
+}
+.tl-table th[aria-sort="ascending"] button::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='12' viewBox='0 0 8 12'%3E%3Cpath d='M4 2l4 6H0z' fill='%23101215'/%3E%3C/svg%3E");
+}
+.tl-table th[aria-sort="descending"] button::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='12' viewBox='0 0 8 12'%3E%3Cpath d='M4 10L0 4h8z' fill='%23101215'/%3E%3C/svg%3E");
+}
+.tl-tool {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.tl-tool img {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+.tl-tool__text {
+  min-width: 0;
+}
+.tl-tool a {
+  font-weight: 600;
+  text-decoration: none;
+}
+.tl-tool a:hover {
+  text-decoration: underline;
+}
+.tl-meta {
+  display: none;
+}
+.tl-c-maker,
+.tl-c-cat,
+.tl-c-time {
+  color: var(--ink-2);
+}
+.tl-table .tl-c-price {
+  padding-right: 28px;
+  white-space: nowrap;
+}
+.tl-c-time,
+.tl-c-live {
+  white-space: nowrap;
+}
+.tl-table .tl-c-end {
+  display: none;
+}
+.tl-c-end code {
+  font-size: 13px;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+@media (min-width: 1100px) {
+  .tl-table .tl-c-end {
+    display: table-cell;
+  }
+}
+/* On touch screens the whole row opens the tool, not just the 16px name. */
+@media (pointer: coarse) {
+  .tl-table tbody tr {
+    position: relative;
+  }
+  .tl-tool a::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+}
+@media (hover: hover) {
+  .tl-table tbody tr:hover {
+    background: rgba(16, 20, 26, 0.035);
+  }
+}
+
+.tl-empty {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+  padding: 28px 0;
+  border-top: 1px solid var(--edge);
+  border-bottom: 1px solid var(--hair);
+}
+
+/* Phones: two-line rows that open the tool when tapped anywhere; filters become selects. */
+@media (max-width: 759px) {
+  .tl-filters {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 12px;
+    margin: 28px 0 16px;
+  }
+  .tl-cats {
+    display: none;
+  }
+  .tl-catsel,
+  .tl-sortsel {
+    display: grid;
+    min-width: 0;
+  }
+  /* The same engraved chevron as the other light selects, not the browser's own arrow. */
+  .tl-catsel select,
+  .tl-sortsel select {
+    appearance: none;
+    padding-right: 34px;
+    background: var(--paper) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none' stroke='%23565D67' stroke-width='1.5'%3E%3Cpath d='M1 1l4 4 4-4'/%3E%3C/svg%3E") no-repeat right 12px center;
+    text-overflow: ellipsis;
+    cursor: pointer;
+  }
+  .tl-search {
+    grid-column: 1 / -1;
+    max-width: none;
+  }
+  .tl-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  .tl-table,
+  .tl-table tbody {
+    display: block;
+  }
+  .tl-table tbody {
+    border-top: 1px solid var(--edge);
+  }
+  .tl-table tr {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "tool price"
+      "tool live";
+    column-gap: 12px;
+    row-gap: 2px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--hair);
+  }
+  .tl-table td {
+    display: none;
+    height: auto;
+    padding: 0;
+    border: 0;
+  }
+  .tl-table td.tl-c-tool {
+    display: block;
+    grid-area: tool;
+  }
+  .tl-table td.tl-c-price {
+    display: block;
+    grid-area: price;
+    padding: 0;
+    text-align: right;
+  }
+  .tl-table td.tl-c-live {
+    display: block;
+    grid-area: live;
+    justify-self: end;
+  }
+  .tl-c-live .lamp {
+    font-size: 13px;
+  }
+  .tl-tool {
+    align-items: flex-start;
+  }
+  .tl-tool img {
+    margin-top: 1px;
+  }
+  .tl-meta {
+    display: block;
+    margin-top: 2px;
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--label);
+  }
+  .tl-tool a::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+  .tl-table tbody tr:active {
+    background: rgba(16, 20, 26, 0.06);
+  }
+}
+
+/* The spec sheet at /tools/:id */
+
+.tl-detail {
+  padding-top: 32px;
+}
+.tl-back {
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  min-height: 44px;
+  margin: -12px 0 12px;
+  font-weight: 500;
+  color: var(--ink-2);
+  text-decoration: none;
+}
+.tl-back:hover {
+  color: var(--ink);
+  text-decoration: underline;
+}
+
+/* Desktop: the sheet reads down the left; the Run deck stays in view on the right, its top level with
+   the back link. Phones read in source order: head, price, deck, result, input, returns, code. */
+.tl-sheet {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(340px, 5fr);
+  grid-template-rows: auto auto auto auto auto 1fr;
+  grid-template-areas:
+    "head deck"
+    "quote deck"
+    "result deck"
+    "input deck"
+    "returns deck"
+    "code deck";
+  column-gap: clamp(32px, 4vw, 56px);
+  align-items: start;
+}
+.tl-head {
+  grid-area: head;
+}
+.tl-quote {
+  grid-area: quote;
+  margin-top: 28px;
+}
+.tl-deck {
+  grid-area: deck;
+  position: sticky;
+  top: calc(var(--rail-h) + 16px);
+}
+.tl-result {
+  grid-area: result;
+  margin-top: 28px;
+}
+.tl-spec--in {
+  grid-area: input;
+  margin-top: 64px;
+}
+.tl-spec--out {
+  grid-area: returns;
+  margin-top: 48px;
+}
+.tl-code {
+  grid-area: code;
+  margin-top: 48px;
+}
+@media (max-width: 979px) {
+  .tl-sheet {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+    grid-template-areas: "head" "quote" "deck" "result" "input" "returns" "code";
+  }
+  .tl-deck {
+    position: relative;
+    top: auto;
+    margin-top: 20px;
+  }
+  .tl-spec--in {
+    margin-top: 48px;
+  }
+}
+
+.tl-head__maker {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 14px;
+  font-size: 15px;
+  line-height: 24px;
+  color: var(--ink-2);
+}
+.tl-head__maker img {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+.tl-head h1 {
+  font-size: clamp(36px, 4.4vw, 56px);
+  line-height: 1.02;
+}
+.tl-head .lede {
+  margin-top: 16px;
+}
+
+/* Price faceplate: the price list figure, replaced by a live 402 on request. */
+.tl-quote {
+  padding: 10px;
+}
+.tl-quote__read {
+  position: relative;
+  display: grid;
+  gap: 14px;
+  padding: 20px 20px 18px;
+}
+.tl-quote__price {
+  font-size: clamp(48px, 6vw, 80px);
+  line-height: 1;
+  color: var(--on-display);
+}
+.tl-quote__nets {
+  font-size: 15px;
+  color: var(--on-display);
+}
+.tl-quote__facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 24px;
+  margin: 0;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+.tl-quote__facts div {
+  display: grid;
+  align-content: start;
+  gap: 2px;
+  min-width: 0;
+}
+.tl-quote__facts dt {
+  font-size: 13px;
+  color: var(--on-display-2);
+}
+.tl-quote__facts dd {
+  margin: 0;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--on-display);
+  overflow-wrap: anywhere;
+}
+.tl-quote__facts .live-num {
+  font-size: 18px;
+}
+.tl-quote__facts .live-num small {
+  font-size: 13px;
+}
+.tl-quote__note {
+  color: var(--on-display-2);
+}
+.tl-quote__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  padding: 12px 6px 2px;
+}
+.tl-quote__path {
+  font-size: 13px;
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
+@media (max-width: 559px) {
+  .tl-quote__facts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Run deck: a graphite display set into an aluminium plate, the pay key on the plate. */
+.tl-deck {
+  padding: 10px;
+}
+.tl-deck__display {
+  color-scheme: dark;
+}
+.tl-deck__body {
+  position: relative;
+  display: grid;
+  gap: 16px;
+  padding: 16px;
+}
+.tl-deck fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.tl-deck__inputs,
+.tl-deck__pay {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  min-width: 0;
+}
+.tl-deck .field > span code {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--on-display);
+}
+/* base.css draws the graphite wells and the select chevron; a prompt box only needs its height. */
+.tl-deck textarea {
+  min-height: 96px;
+}
+.tl-deck input::placeholder,
+.tl-deck textarea::placeholder {
+  color: var(--on-display-2);
+  opacity: 1;
+}
+
+.tl-seg legend {
+  padding: 0;
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--on-display-2);
+}
+.tl-seg__tray {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 6px;
+  background: var(--display-bay);
+  box-shadow:
+    inset 0 1px 3px rgba(0, 0, 0, 0.6),
+    inset 0 0 0 1px var(--display-edge);
+}
+.tl-seg label {
+  position: relative;
+  display: flex;
+}
+.tl-seg input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  opacity: 0;
+}
+.tl-seg span {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--on-display-2);
+  cursor: pointer;
+}
+.tl-seg span:hover {
+  color: var(--on-display);
+}
+.tl-seg input:checked + span {
+  background: linear-gradient(180deg, #2a2e34, #202328);
+  color: var(--on-display);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 1px 1px rgba(0, 0, 0, 0.5);
+}
+.tl-seg input:focus-visible + span {
+  position: relative;
+  z-index: 1;
+  box-shadow: var(--ring-display);
+}
+.tl-seg input:checked:focus-visible + span {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    var(--ring-display);
+}
+@media (pointer: coarse) {
+  .tl-seg span {
+    min-height: 44px;
+  }
+}
+.tl-who {
+  margin-top: -8px;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--on-display-2);
+}
+.tl-who b {
+  font-weight: 500;
+  color: var(--on-display);
+}
+/* The verdict sits under the fields, outside their scroll, so the reason for the pay key's state is
+   always next to the key. */
+.tl-verdict {
+  position: relative;
+  display: grid;
+  gap: 4px;
+  margin: 0 16px;
+  padding: 14px 0 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--on-display);
+}
+.tl-verdict .lamp {
+  font-weight: 600;
+}
+.tl-verdict > span:last-child,
+.tl-receipt__msg > span:last-child,
+.tl-quote__note {
+  text-wrap: pretty;
+}
+.tl-deck__foot {
+  display: grid;
+  gap: 10px;
+  padding: 12px 6px 6px;
+}
+.tl-pay {
+  width: 100%;
+  min-height: 48px;
+  font-size: 16px;
+}
+.tl-deck__note {
+  color: var(--ink-2);
+}
+
+/* 560-979: the sheet is one column, so the deck splits into two zones, the input on the left and
+   the payment on the right, with the pay key under the payment zone. */
+@media (min-width: 560px) and (max-width: 979px) {
+  .tl-deck__body {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: 24px;
+    align-items: start;
+  }
+  .tl-deck__foot {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: 24px;
+    align-items: center;
+    padding: 12px 16px 6px;
+  }
+  .tl-deck__foot .tl-pay {
+    grid-area: 1 / 2;
+  }
+  .tl-deck__note {
+    grid-area: 1 / 1;
+  }
+  .tl-receipt {
+    grid-column: 1 / -1;
+  }
+}
+
+/* From 980px the deck never runs past the screen. When the fields need more height than the screen
+   gives, they scroll inside the display, while the verdict and the pay key stay in view under them. */
+@media (min-width: 980px) {
+  .tl-deck {
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - var(--rail-h) - 48px);
+  }
+  .tl-deck__display {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .tl-deck__body {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-bottom: 0;
+    scroll-padding-block: 12px 20px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--display-edge) transparent;
+  }
+  /* The bottom 16px of the field area: empty when everything fits, and an edge that fields fade
+     under when they scroll, so a cut-off field reads as "more below". */
+  .tl-deck__body::after {
+    content: "";
+    position: sticky;
+    bottom: 0;
+    grid-column: 1 / -1;
+    height: 16px;
+    margin-top: -16px;
+    background: linear-gradient(rgba(20, 22, 25, 0), var(--display));
+    pointer-events: none;
+  }
+  .tl-deck__foot,
+  .tl-verdict {
+    flex: none;
+  }
+}
+
+/* Scrolled into view when it appears; on phones the dock covers the bottom of the screen. */
+.tl-receipt {
+  scroll-margin-bottom: calc(var(--dock-h) + 16px);
+}
+.tl-receipt__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 16px;
+  padding: 12px 14px 6px;
+  font-size: 14px;
+}
+.tl-receipt__usd {
+  font-size: 22px;
+}
+.tl-receipt__usd small {
+  font-size: 12px;
+}
+.tl-receipt__more {
+  padding: 0 14px 12px;
+  color: var(--on-display-2);
+}
+.tl-receipt__msg {
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px 14px;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--on-display);
+}
+.tl-receipt__msg .lamp {
+  font-weight: 600;
+}
+
+/* Result: on paper, because results carry their own light-surface tables and images. */
+.tl-result {
+  padding: 20px 22px 22px;
+}
+.tl-result__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 16px;
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--hair);
+}
+.tl-result__body {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.tl-result__body > * + * {
+  margin-top: 12px;
+}
+.tl-result__body ul,
+.tl-result__body ol {
+  margin: 0;
+  padding-left: 22px;
+}
+
+.tl-spec__lede {
+  max-width: 62ch;
+  margin: 8px 0 18px;
+  color: var(--ink-2);
+}
+/* Short code in running text moves to the next line whole instead of splitting its well in two. */
+.tl-spec__lede code.inline,
+.tl-missing code.inline {
+  display: inline-block;
+  max-width: 100%;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+.tl-fields td {
+  vertical-align: top;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+.tl-f-name code {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.tl-f-type {
+  font-size: 14px;
+  color: var(--ink-2);
+}
+.tl-f-type code.inline {
+  display: inline-block;
+  margin: 2px 2px 2px 0;
+}
+.tl-f-req {
+  white-space: nowrap;
+  color: var(--ink-2);
+}
+.tl-returns {
+  display: block;
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  background: var(--paper);
+  box-shadow: var(--well);
+  font: 14px/22px var(--mono);
+  overflow-wrap: anywhere;
+}
+@media (max-width: 759px) {
+  .tl-fields thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  .tl-fields,
+  .tl-fields tbody {
+    display: block;
+  }
+  .tl-fields tbody {
+    border-top: 1px solid var(--edge);
+  }
+  .tl-fields tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "name req"
+      "type type"
+      "desc desc";
+    gap: 4px 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--hair);
+  }
+  .tl-fields td {
+    display: block;
+    height: auto;
+    padding: 0;
+    border: 0;
+  }
+  .tl-f-name {
+    grid-area: name;
+  }
+  .tl-f-req {
+    grid-area: req;
+  }
+  .tl-f-type {
+    grid-area: type;
+  }
+  .tl-f-desc {
+    grid-area: desc;
+  }
+}
+
+/* Code: a display with curl, CLI and MCP keys and a Copy key. */
+.tl-code h2 {
+  margin-bottom: 16px;
+}
+.tl-code .display__bar {
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-block: 6px;
+}
+.tl-tabs {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  border-radius: 6px;
+  background: var(--display-bay);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+.tl-tabs button {
+  min-height: 30px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--on-display-2);
+  font: 600 14px/1 var(--sans);
+}
+.tl-tabs button:hover {
+  color: var(--on-display);
+}
+.tl-tabs button[aria-selected="true"] {
+  background: linear-gradient(180deg, #2a2e34, #202328);
+  color: var(--on-display);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 1px 1px rgba(0, 0, 0, 0.5);
+}
+/* Roving focus lands on the chosen tab, so its raised shadow has to carry the rails as well. */
+.tl-tabs button:focus-visible {
+  position: relative;
+  z-index: 1;
+  box-shadow: var(--ring-display);
+}
+.tl-tabs button[aria-selected="true"]:focus-visible {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    var(--ring-display);
+}
+@media (pointer: coarse) {
+  .tl-tabs button {
+    min-height: 44px;
+  }
+}
+.tl-panel:focus-visible {
+  box-shadow:
+    inset 0 0 0 1px var(--on-display),
+    inset 0 0 0 3px var(--display),
+    inset 0 0 0 4px var(--on-display);
+}
+.tl-pre {
+  margin: 0;
+  padding: 16px 18px;
+  font: 14px/1.7 var(--mono);
+  color: var(--on-display);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+/* A wrapped line continues two characters in from its own indent (--i, set per line). */
+.tl-ln {
+  display: block;
+  padding-left: calc((var(--i, 0) + 2) * 1ch);
+  text-indent: -2ch;
+}
+.tl-nw {
+  white-space: nowrap;
+}
+@media (max-width: 559px) {
+  .tl-pre {
+    padding: 14px;
+    font-size: 13px;
+  }
+}
+.tl-panel__note {
+  padding: 12px 18px 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--on-display-2);
+}
+
+.tl-missing {
+  padding-top: 96px;
+  padding-bottom: 72px;
+}
+.tl-missing h1 {
+  font-size: clamp(36px, 4.4vw, 56px);
+  line-height: 1.02;
+}
+.tl-missing .lede {
+  margin-top: 16px;
+}
+.tl-missing__keys {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 28px;
+}
+@media (max-width: 759px) {
+  .tl-missing {
+    padding-top: 48px;
+    padding-bottom: 48px;
+  }
+}
+
+/* Sold by others: seller listings under the catalog, read from /api/listings. */
+.tl-sellers {
+  padding-bottom: 64px;
+}
+.tl-sellers__head {
+  display: grid;
+  gap: 8px;
+  margin: 32px 0 16px;
+}
+.tl-sellers__note {
+  max-width: 44em;
+  color: var(--ink-2);
+  line-height: 24px;
+}
+.tl-sellers__table td,
+.tl-sellers__table tbody th {
+  height: auto;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  vertical-align: top;
+}
+.tl-sellers__sum {
+  display: block;
+  margin-top: 2px;
+  max-width: 40em;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--label);
+}
+@media (max-width: 759px) {
+  .tl-sellers__table thead {
+    display: none;
+  }
+  .tl-sellers__table tr {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--hair);
+  }
+  .tl-sellers__table td,
+  .tl-sellers__table tbody th {
+    padding: 2px 0;
+    border: 0;
+  }
+  .tl-sellers__table tbody th {
+    grid-column: 1 / -1;
+  }
+}
+
+/* $SIRO holders: the tier line under the payer, and the free-run key under the pay key for Siro's own
+   data tools. The free key is aluminium so the pay key stays the one dark key. */
+.tl-holder {
+  margin-top: -4px;
+}
+.tl-free {
+  width: 100%;
+  min-height: 44px;
+}
+@media (min-width: 560px) and (max-width: 979px) {
+  .tl-deck__foot .tl-free {
+    grid-column: 2;
+  }
+}

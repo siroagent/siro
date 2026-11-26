@@ -1,0 +1,1675 @@
+/* Home (DESIGN.md "Home", sections 1 to 7). Tokens and parts come from base.css and shell.css; this
+   file places them. Sections space themselves by their top padding only, so two paddings never stack. */
+.home-sec {
+  padding-bottom: 0;
+}
+/* A display bar that names its contents and their source: when both do not fit on one line, the source
+   drops whole to a second line instead of both breaking word by word. */
+.rulerd .display__bar,
+.dev__resp .display__bar {
+  flex-wrap: wrap;
+  row-gap: 0;
+  padding-top: 9px;
+  padding-bottom: 9px;
+  line-height: 18px;
+}
+.rulerd .display__bar b,
+.dev__resp .display__bar b {
+  white-space: nowrap;
+}
+/* Short lines in the displays and the transcript end on more than one word. */
+.qd p,
+.hero__sub .lede,
+.home-sec .lede,
+.spec__text,
+.spec__note,
+.dev__how {
+  text-wrap: pretty;
+}
+
+
+/* 1. The quote faceplate */
+.hero {
+  padding-top: 48px;
+}
+.hero__in {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-template-areas:
+    "h h h h h h h s s s s s"
+    "f f f f f f f f f f f f";
+  column-gap: var(--gutter);
+  align-items: start;
+}
+/* The headline is cut from the same chrome as the ball: dark sky, a bright horizon line just
+   under the middle, dark again below. Its lightest band (#6B737D) still holds 4.4:1 on the bench. */
+.hero__h {
+  grid-area: h;
+  max-width: 9em;
+  font-size: clamp(48px, 6.2vw, 96px);
+  line-height: 0.94;
+  letter-spacing: -0.04em;
+  font-weight: 650;
+  color: var(--ink);
+  padding-bottom: 0.06em;
+}
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .hero__h {
+    background: linear-gradient(180deg, #3A4048 0%, #101215 30%, #101215 50%, #6B737D 56%, #2A2F36 64%, #101215 100%);
+    background-size: 100% 0.94em;
+    background-repeat: repeat-y;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}
+.hero__sub {
+  grid-area: s;
+  padding-top: 6px;
+}
+.hero__keys {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+}
+.qf {
+  grid-area: f;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  min-height: min(420px, calc(100svh - 300px));
+  margin-top: 40px;
+  padding: 14px;
+}
+.qf__zones {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: var(--gutter);
+}
+
+/* The display: tool and round trip in the top bar, the price as the focus, then the verdict. */
+.qd {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto auto auto auto 1fr auto;
+  grid-template-areas:
+    "tool ms"
+    "price price"
+    "from from"
+    "terms terms"
+    "state state"
+    "note note";
+  container-type: inline-size;
+}
+.qd__tool,
+.qd__name,
+.qd__ms {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 13px;
+  color: var(--on-display-2);
+}
+.qd__tool {
+  grid-area: tool;
+  gap: 10px;
+  min-width: 0;
+  padding: 0 8px 0 14px;
+}
+.qd__tool select {
+  min-width: 0;
+  max-width: 100%;
+  min-height: 32px;
+  padding: 0 32px 0 10px;
+  border: 0;
+  border-radius: var(--radius);
+  appearance: none;
+  background: var(--display-bay) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none' stroke='%239EA6AF' stroke-width='1.5'%3E%3Cpath d='M1 1l4 4 4-4'/%3E%3C/svg%3E") no-repeat right 11px center;
+  box-shadow:
+    inset 0 1px 3px rgba(0, 0, 0, 0.6),
+    inset 0 0 0 1px var(--display-edge);
+  color: var(--on-display);
+  font: 600 14px/1.2 var(--sans);
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+.qd__tool select:hover:not(:focus-visible) {
+  box-shadow:
+    inset 0 1px 3px rgba(0, 0, 0, 0.6),
+    inset 0 0 0 1px var(--on-display-2);
+}
+.qd__tool select:disabled {
+  cursor: not-allowed;
+  color: var(--on-display-2);
+}
+@media (pointer: coarse) {
+  .qd__tool select {
+    min-height: 44px;
+  }
+}
+.qd__tool option {
+  color: var(--ink);
+  background: var(--paper);
+}
+.qd__name {
+  grid-area: name;
+  display: none;
+  min-width: 0;
+  padding: 0 8px 0 16px;
+  color: var(--on-display);
+  font-weight: 600;
+  font-size: 14px;
+}
+.qd__ms {
+  grid-area: ms;
+  justify-content: flex-end;
+  padding: 0 14px 0 8px;
+  white-space: nowrap;
+}
+.qd__ms b {
+  color: var(--on-display);
+}
+.qd__price {
+  grid-area: price;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 0.12em;
+  padding: 26px 20px 0;
+  font-size: clamp(56px, 7vw, 104px);
+  font-size: clamp(56px, 15cqi, 104px);
+  line-height: 0.95;
+  color: var(--on-display);
+}
+/* A price-list number has not been read from the server yet: set narrow and dim until the 402 lands. */
+.qd__price.is-list {
+  font-stretch: 100%;
+  color: var(--on-display-2);
+}
+.qd__price small {
+  margin-left: 0;
+  color: var(--on-display-2);
+}
+.qd__from {
+  grid-area: from;
+  max-width: 44em;
+  padding: 14px 20px 0;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--on-display-2);
+}
+.qd__terms {
+  grid-area: terms;
+  padding: 4px 20px 0;
+  min-height: 23px;
+  font-size: 13px;
+  line-height: 19px;
+  color: var(--on-display-2);
+}
+.qd__terms.is-held {
+  visibility: hidden;
+}
+.qd__terms code {
+  color: var(--on-display);
+  font-size: 12.5px;
+}
+.qd__state {
+  grid-area: state;
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: 6px;
+  padding: 18px 20px 0;
+}
+.qd__verdict {
+  align-items: flex-start;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--on-display);
+}
+.qd__verdict::before {
+  margin-top: 7px;
+}
+.qd__src {
+  max-width: 44em;
+  font-size: 13px;
+  line-height: 19px;
+  color: var(--on-display-2);
+}
+.qd__state .key {
+  margin-top: 6px;
+}
+/* The quote rewrites the source line, adds the terms and lands the verdict; each would push the zones under
+   it down. Their space is held from the first paint at the height the 402 fills: one line of source on a
+   wide faceplate, more as the display zone narrows (narrowest at 560 to 599, zones side by side).
+   From 760 to 1239 the state stretches to its row already. */
+.qd__from {
+  min-height: 56px;
+}
+.qd__state {
+  min-height: 65px;
+}
+@media (max-width: 759px) {
+  .qd__from {
+    min-height: 77px;
+  }
+  .qd__state {
+    min-height: 106px;
+  }
+}
+@media (min-width: 560px) and (max-width: 699px), (max-width: 359px) {
+  .qd__terms {
+    min-height: 42px;
+  }
+}
+/* The quoted price is set wider than the list price; where that pushes "per call" onto a second line,
+   the second line is held too. */
+@media (max-width: 349px) {
+  .qd__price {
+    min-height: 94px;
+  }
+}
+@media (min-width: 600px) and (max-width: 669px) {
+  .qd__price {
+    min-height: 96px;
+  }
+}
+@media (min-width: 560px) and (max-width: 599px) {
+  .qd__from {
+    min-height: 98px;
+  }
+  .qd__state {
+    min-height: 147px;
+  }
+}
+.qd__note {
+  grid-area: note;
+  margin-top: 18px;
+  padding: 12px 20px 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 13px;
+  line-height: 19px;
+  color: var(--on-display-2);
+}
+
+/* The route zone: the engraved S with its stations, or the strip on phones, and the two rail meters. */
+.qr {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas:
+    "gauge meters"
+    "gauge later";
+  align-content: center;
+  align-items: center;
+  column-gap: 12px;
+  row-gap: 18px;
+  padding: 6px 6px 6px 0;
+}
+.gauge-wrap {
+  grid-area: gauge;
+  padding: 26px 44px 28px 52px;
+}
+.gauge {
+  position: relative;
+  width: 172px;
+  aspect-ratio: 741 / 980;
+}
+.gauge__s {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  /* Engraved: a dark cut with a light lip under it, like the S in the rail. */
+  filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.9));
+}
+.gauge__rails {
+  fill: #2a2e34;
+}
+.gauge__later {
+  fill: none;
+  stroke: var(--edge);
+  stroke-width: 5;
+  stroke-dasharray: 16 18;
+}
+.gauge__stn {
+  position: absolute;
+  transform: translate(-50%, -50%);
+}
+.gauge__stn,
+.strip__stn i {
+  width: 7px;
+  height: 7px;
+  background: var(--face-hi);
+  box-shadow: inset 0 0 0 1px var(--ink-2);
+}
+.gauge__stn.is-on,
+.strip__stn.is-on i {
+  background: var(--ink-2);
+}
+.gauge__stn.is-later,
+.strip__stn.is-later i,
+.qr__later i {
+  background: transparent;
+  box-shadow: none;
+  outline: 1px dashed var(--edge);
+  outline-offset: -1px;
+}
+.gauge__stn.is-over,
+.strip__stn.is-over i {
+  background: var(--refused);
+  box-shadow: inset 0 0 0 1px var(--refused);
+}
+.gauge__lbl {
+  position: absolute;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  color: var(--label);
+  white-space: nowrap;
+}
+.gauge__lbl--r {
+  margin-left: 9px;
+  transform: translateY(-50%);
+}
+.gauge__lbl--l {
+  margin-right: 9px;
+  transform: translateY(-50%);
+}
+.gauge__lbl--t {
+  margin-bottom: 7px;
+  transform: translateX(-50%);
+}
+.gauge__lbl--b {
+  margin-top: 7px;
+  transform: translateX(-50%);
+}
+.gauge__lbl.is-on,
+.strip__stn.is-on {
+  color: var(--ink);
+  font-weight: 600;
+}
+.gauge__lbl.is-over,
+.strip__stn.is-over {
+  color: var(--refused);
+}
+.gauge__ball,
+.strip__ball {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+/* A touch wider than the lane, as in the render, so the ball reads against the aluminium. */
+.gauge__ball {
+  width: 7.6%;
+  min-width: 11px;
+}
+.gauge__ball svg,
+.strip__ball svg {
+  width: 100%;
+  height: auto;
+}
+.strip {
+  grid-area: strip;
+  display: none;
+  position: relative;
+}
+/* The channel: two rails with the stations between them. */
+.strip::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 4px;
+  height: 13px;
+  border-top: 1px solid var(--edge);
+  border-bottom: 1px solid var(--edge);
+}
+.strip__stns {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.strip__stn {
+  display: grid;
+  justify-items: center;
+  row-gap: 9px;
+  padding-top: 7px;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  color: var(--label);
+}
+.strip__ball {
+  top: 10.5px;
+  width: 14px;
+}
+.qr__later {
+  grid-area: later;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--label);
+}
+.qr__later i {
+  flex: none;
+  width: 7px;
+  height: 7px;
+}
+.qm {
+  grid-area: meters;
+  display: grid;
+  gap: 16px;
+  width: 100%;
+}
+.qm__m {
+  display: grid;
+  gap: 9px;
+}
+.qm__lbl {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--label);
+}
+.qm__lbl span + span {
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.qm__lbl b {
+  color: var(--ink);
+  font-size: 15px;
+}
+.qm__m.is-over .qm__lbl span + span,
+.qm__m.is-over .qm__lbl b {
+  color: var(--refused);
+}
+.qm .ball {
+  transition: left 0.28s ease;
+}
+.qf__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  margin-top: 14px;
+  padding: 12px 4px 0;
+  border-top: 1px solid var(--hair);
+}
+.qf__spec {
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--label);
+}
+.qf__spec code {
+  color: var(--ink-2);
+  font-size: 12.5px;
+}
+
+@media (max-width: 1239px) {
+  .qr {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "gauge"
+      "later"
+      "meters";
+    padding: 4px 4px 4px 0;
+  }
+  .gauge-wrap {
+    justify-self: center;
+    padding: 22px 44px 26px 50px;
+  }
+  .gauge {
+    width: 140px;
+  }
+  .qr__later {
+    justify-self: center;
+  }
+}
+@media (max-width: 1099px) {
+  .hero {
+    padding-top: 40px;
+  }
+}
+@media (max-width: 899px) {
+  .hero__in {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "h"
+      "s"
+      "f";
+  }
+  .hero__sub {
+    max-width: 34em;
+    margin-top: 18px;
+    padding-top: 0;
+  }
+  .hero__keys {
+    margin-top: 20px;
+  }
+  .qf {
+    margin-top: 32px;
+  }
+}
+/* Phones: H1, then the price and its verdict, the sub under the faceplate; the dock carries Ask. */
+@media (max-width: 759px) {
+  .hero {
+    padding-top: 20px;
+  }
+  .hero__in {
+    grid-template-areas:
+      "h"
+      "f"
+      "s";
+  }
+  .hero__keys {
+    display: none;
+  }
+  .hero__sub {
+    margin-top: 22px;
+  }
+  .qf {
+    min-height: 0;
+    margin-top: 18px;
+    padding: 10px;
+  }
+  .qf__zones {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 16px;
+  }
+  .qd {
+    grid-template-areas:
+      "name ms"
+      "price price"
+      "from from"
+      "terms terms"
+      "state state"
+      "tool tool"
+      "note note";
+  }
+  .qd__name {
+    display: flex;
+  }
+  .qd__tool {
+    display: grid;
+    gap: 6px;
+    min-height: 0;
+    padding: 18px 20px 0;
+    border-bottom: 0;
+  }
+  .qd__tool select {
+    width: 100%;
+    min-height: 44px;
+  }
+  .qd__price {
+    padding-top: 20px;
+  }
+  .gauge-wrap {
+    padding: 22px 42px 26px 48px;
+  }
+  .gauge {
+    width: 118px;
+  }
+}
+@media (max-width: 559px) {
+  .hero__h {
+    font-size: 40px;
+    line-height: 0.94;
+    letter-spacing: -0.04em;
+  }
+  .qf__zones {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .qd__name,
+  .qd__price,
+  .qd__from,
+  .qd__terms,
+  .qd__state,
+  .qd__tool,
+  .qd__note {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .qd__ms {
+    padding-right: 14px;
+  }
+  .qd__price {
+    padding-top: 18px;
+  }
+  .qr {
+    grid-template-areas:
+      "strip"
+      "later"
+      "meters";
+    row-gap: 14px;
+    padding: 14px 6px 2px;
+  }
+  .gauge-wrap {
+    display: none;
+  }
+  .strip {
+    display: block;
+  }
+  .qr__later {
+    justify-self: start;
+  }
+  .qf__foot .key {
+    margin-left: auto;
+  }
+}
+
+/* 2. Two rails, one route */
+.rails2__in {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--gutter);
+  align-items: center;
+}
+.rails2__text {
+  grid-column: 1 / 5;
+}
+.rails2__text .lede {
+  margin-top: 18px;
+}
+.lead {
+  position: relative;
+  grid-column: 5 / 13;
+  justify-self: end;
+  width: 100%;
+  max-width: 900px;
+  margin: 0;
+  overflow: hidden;
+}
+.lead__art {
+  position: relative;
+}
+.lead__art img {
+  width: 100%;
+}
+.lead__lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.9));
+}
+.lead__lines path {
+  fill: none;
+  stroke: var(--ink-2);
+  stroke-width: 1;
+}
+.lead__end {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  transform: translate(-50%, -50%);
+  background: var(--paper);
+  box-shadow: inset 0 0 0 1px var(--ink);
+}
+.lead__cap {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.lead__keys {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+/* Labels end where their leader starts (x 790 of 1672 in the source render). */
+.lead__key {
+  position: absolute;
+  right: 60.6%;
+  top: calc(var(--y) * 1%);
+  transform: translateY(-50%);
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.lead__key b {
+  color: var(--ink);
+  font-weight: 600;
+}
+.lead__n {
+  display: none;
+}
+@media (max-width: 1099px) {
+  .rails2__in {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 32px;
+  }
+  .rails2__text,
+  .lead {
+    grid-column: 1 / -1;
+  }
+  .rails2__text {
+    max-width: 36em;
+  }
+  .lead {
+    justify-self: start;
+  }
+}
+/* Too narrow for labels on the plate: numbers mark the leaders and the labels list under the render. */
+@media (max-width: 639px) {
+  .lead__cap {
+    position: static;
+    padding: 14px 16px 16px;
+    pointer-events: auto;
+  }
+  .lead__keys {
+    display: grid;
+    gap: 8px;
+    counter-reset: lead;
+  }
+  .lead__key {
+    position: relative;
+    top: auto;
+    right: auto;
+    padding-left: 26px;
+    transform: none;
+    white-space: normal;
+  }
+  .lead__key::before {
+    position: absolute;
+    left: 0;
+    top: 2px;
+    counter-increment: lead;
+    content: counter(lead);
+  }
+  /* Leaders 3 and 4 run 15px apart at this width, so the markers stay a little smaller than that. */
+  .lead__n {
+    position: absolute;
+    left: 40%;
+    display: block;
+    margin-left: -3px;
+    transform: translate(-100%, -50%);
+  }
+  .lead__n,
+  .lead__key::before {
+    width: 14px;
+    height: 14px;
+    border-radius: 2px;
+    background: var(--ink-2);
+    color: var(--paper);
+    font: 600 10px/14px var(--sans);
+    text-align: center;
+  }
+}
+
+/* 3. Turn the cap */
+.caps__head {
+  max-width: 40rem;
+}
+.caps__head .lede {
+  margin-top: 16px;
+}
+.capf {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: var(--gutter);
+  margin-top: 40px;
+  padding: 18px;
+}
+/* The knob's render is baked onto the faceplate mid tone, so its seat is flat in that tone. */
+.capf__knob {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 16px;
+  padding: 20px 16px 18px;
+  border-radius: var(--radius);
+  background: var(--face-mid);
+  box-shadow: inset 0 0 0 1px rgba(16, 20, 26, 0.06);
+}
+.seat {
+  position: relative;
+  width: min(100%, 320px);
+  aspect-ratio: 1;
+  border-radius: var(--radius);
+  touch-action: none;
+  user-select: none;
+}
+.seat[role="slider"] {
+  cursor: grab;
+}
+.seat.is-turning {
+  cursor: grabbing;
+}
+.seat img {
+  position: absolute;
+  left: 10%;
+  top: 10%;
+  width: 80%;
+  height: 80%;
+  clip-path: circle(44% at 50.1% 49.1%);
+  transform-origin: 50.1% 49.1%;
+  transition: transform 0.12s ease;
+  pointer-events: none;
+  -webkit-user-drag: none;
+}
+.seat.is-turning img {
+  transition: none;
+}
+.seat__ticks {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.seat__ticks line {
+  stroke: var(--edge);
+  stroke-width: 1.5;
+}
+.seat__ticks line.on {
+  stroke: var(--ink);
+}
+.seat__lbl {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  color: var(--label);
+  white-space: nowrap;
+  pointer-events: none;
+}
+.capf__set {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.capf__step {
+  width: 44px;
+  min-height: 44px;
+  padding: 0;
+  font-size: 20px;
+  font-weight: 500;
+}
+/* Wide enough for "$0.001 a call", so the − and + keys stay put while the knob turns. */
+.capf__val {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 6px;
+  min-width: 160px;
+}
+.capf__val b {
+  font-size: 30px;
+  line-height: 1;
+}
+.capf__val span {
+  font-size: 14px;
+  color: var(--label);
+}
+.capf__side {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 16px;
+  min-width: 0;
+}
+.capf__budget {
+  justify-self: end;
+}
+.rulerd {
+  display: grid;
+  grid-template-rows: auto minmax(160px, 1fr) auto;
+}
+/* --step is one tool's height in a stack. Beside the knob the display is tall, so the stacks grow to use it. */
+.ruler {
+  --step: 6px;
+  position: relative;
+  margin: 18px 30px 0;
+}
+@media (min-width: 900px) {
+  .ruler {
+    --step: 9px;
+  }
+}
+.ruler__axis {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 22px;
+  bottom: 34px;
+  border-bottom: 1px solid var(--display-edge);
+}
+.ruler__tick {
+  position: absolute;
+  top: 100%;
+  width: 1px;
+  height: 5px;
+  margin-top: 1px;
+  background: var(--display-edge);
+  transform: translateX(-50%);
+}
+.ruler__tick--decade {
+  height: 9px;
+  background: var(--on-display-2);
+}
+.ruler__stack {
+  position: absolute;
+  bottom: 2px;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 1px;
+  width: 4px;
+  transform: translateX(-50%);
+}
+.ruler__stack i {
+  height: calc(var(--step) - 1px);
+  background: var(--on-display);
+}
+.ruler__stack.is-over i {
+  background: var(--display-edge);
+}
+.ruler__count {
+  position: absolute;
+  bottom: calc(var(--n, 1) * var(--step) + 5px);
+  transform: translateX(-50%);
+  font-size: 11px;
+  line-height: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--on-display-2);
+}
+/* The cap line is a boundary, so it is drawn as rails. */
+.ruler__cap {
+  position: absolute;
+  top: -14px;
+  bottom: -1px;
+  width: 5px;
+  border-left: 1px solid var(--on-display);
+  border-right: 1px solid var(--on-display);
+  transform: translateX(-50%);
+  transition: left 0.12s ease;
+}
+.ruler__cap b {
+  position: absolute;
+  top: -6px;
+  left: calc(100% + 6px);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  color: var(--on-display);
+  white-space: nowrap;
+}
+.ruler__cap.is-flip b {
+  left: auto;
+  right: calc(100% + 6px);
+}
+.ruler__scale {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 18px;
+}
+.ruler__scale span {
+  position: absolute;
+  transform: translateX(-50%);
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--on-display-2);
+  white-space: nowrap;
+}
+.rulerd__sum {
+  padding: 14px 18px 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--on-display);
+}
+.rulerd__sum b {
+  font-weight: 600;
+  font-stretch: 100%;
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 899px) {
+  .capf {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 559px) {
+  .capf {
+    margin-top: 28px;
+    padding: 10px;
+  }
+  .seat {
+    width: min(100%, 264px);
+  }
+  .ruler {
+    margin: 16px 24px 0;
+  }
+  .ruler__stack {
+    width: 3px;
+  }
+  .capf__budget {
+    justify-self: stretch;
+  }
+}
+/* The narrowest phones: the − value + row tightens so the + key stays on the plate. */
+@media (max-width: 359px) {
+  .capf__knob {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+  .capf__set {
+    gap: 8px;
+  }
+  .capf__val {
+    min-width: 140px;
+  }
+  .capf__val b {
+    font-size: 26px;
+  }
+}
+
+/* 4. Asking is free: a specimen transcript with margin notes */
+.spec__h {
+  max-width: 18em;
+}
+.spec__log {
+  display: grid;
+  row-gap: 26px;
+  margin-top: 40px;
+}
+.spec__row {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  column-gap: var(--gutter);
+  align-items: start;
+}
+.spec__turn {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  column-gap: 20px;
+  max-width: 720px;
+}
+.spec__who {
+  padding-top: 5px;
+}
+.spec__text {
+  font-size: 17px;
+  line-height: 28px;
+}
+.spec__text .nowrap {
+  white-space: nowrap;
+}
+/* A margin note, joined to its line of the transcript by a hairline across the gutter. */
+.spec__note {
+  position: relative;
+  max-width: 24em;
+  padding: 4px 0 0 48px;
+  color: var(--ink-2);
+}
+.spec__note::before {
+  content: "";
+  position: absolute;
+  top: 15px;
+  left: calc(-1 * var(--gutter));
+  width: calc(var(--gutter) + 36px);
+  border-top: 1px solid var(--edge);
+}
+.spec__try {
+  margin-top: 30px;
+  padding-left: 76px;
+  font-weight: 600;
+}
+.sq {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+  grid-template-areas:
+    "logo tool price"
+    "logo net verdict"
+    "keys keys keys"
+    "spec spec spec";
+  align-items: center;
+  gap: 6px 14px;
+  padding: 16px 18px 14px;
+}
+.sq__logo {
+  grid-area: logo;
+  align-self: start;
+  width: 28px;
+  height: 28px;
+  margin-top: 2px;
+  background: var(--ink);
+  -webkit-mask: var(--logo) center / contain no-repeat;
+  mask: var(--logo) center / contain no-repeat;
+}
+.sq__tool {
+  grid-area: tool;
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.sq__tool b {
+  font-weight: 600;
+}
+.sq__tool span {
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--label);
+}
+.sq__tool code {
+  font-size: 12px;
+}
+.sq__price {
+  grid-area: price;
+  justify-self: end;
+  font-size: 34px;
+  line-height: 1;
+  white-space: nowrap;
+}
+.sq__net {
+  grid-area: net;
+  font-size: 14px;
+  color: var(--ink-2);
+}
+.sq__verdict {
+  grid-area: verdict;
+  justify-self: end;
+  font-size: 13px;
+}
+/* Specimen keys: drawn the way a key that cannot be pressed here is drawn, dashed, with the reason under them. */
+.sq__keys {
+  grid-area: keys;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 10px;
+}
+.sq__key {
+  display: inline-block;
+  padding: 9px 14px;
+  line-height: 18px;
+  border-radius: var(--radius);
+  outline: 1px dashed var(--edge);
+  outline-offset: -1px;
+  color: var(--label);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.sq__spec {
+  grid-area: spec;
+  justify-self: end;
+}
+/* In a narrow transcript column the verdict takes its own line, so the tool and network keep their width. */
+.spec__turn {
+  container: turn / inline-size;
+}
+@container turn (max-width: 640px) {
+  .sq {
+    grid-template-areas:
+      "logo tool price"
+      "logo net net"
+      "logo verdict verdict"
+      "keys keys keys"
+      "spec spec spec";
+  }
+  .sq__verdict {
+    justify-self: start;
+  }
+}
+/* Narrower still (phones, and the 900px column), the price drops under the tool name too. */
+@container turn (max-width: 520px) {
+  .sq {
+    grid-template-columns: 24px minmax(0, 1fr);
+    grid-template-areas:
+      "logo tool"
+      "price price"
+      "net net"
+      "verdict verdict"
+      "keys keys"
+      "spec spec";
+    padding: 14px;
+  }
+  .sq__logo {
+    width: 24px;
+    height: 24px;
+  }
+  .sq__price,
+  .sq__spec {
+    justify-self: start;
+  }
+  .sq__price {
+    margin-top: 6px;
+  }
+  .sq__keys {
+    justify-content: flex-start;
+  }
+}
+@media (max-width: 899px) {
+  .spec__row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .spec__note {
+    max-width: 32em;
+    margin: 10px 0 0 76px;
+    padding: 0;
+  }
+  /* Under its line the note hangs from it: an elbow down from the turn and into the note, not a dash. */
+  .spec__note::before {
+    top: -7px;
+    left: -20px;
+    width: 12px;
+    height: 18px;
+    border-top: 0;
+    border-left: 1px solid var(--edge);
+    border-bottom: 1px solid var(--edge);
+  }
+}
+@media (max-width: 559px) {
+  .spec__turn {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 2px;
+  }
+  .spec__who {
+    padding-top: 0;
+  }
+  .spec__note {
+    margin-left: 22px;
+  }
+  .spec__try {
+    padding-left: 0;
+  }
+}
+
+/* 5. No result, no charge, and the newest settlements. The photo is shown no wider than 1200px, so the
+   heading, text and strip under it keep that measure too and the block shares the grid's left edge. */
+.nr .wrap > * {
+  max-width: 1200px;
+}
+.nr__fig {
+  margin: 0;
+  overflow: hidden;
+}
+.nr__fig img {
+  width: 100%;
+}
+.nr__text {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--gutter);
+  row-gap: 16px;
+  align-items: end;
+  margin-top: 40px;
+}
+.nr__text h2 {
+  grid-column: 1 / 6;
+}
+.nr__text .lede {
+  grid-column: 6 / 12;
+}
+.act {
+  margin-top: 28px;
+}
+.act__line {
+  padding: 12px 18px 14px;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--on-display);
+}
+.act__table {
+  font-size: 14px;
+}
+/* The strip does not scroll, and .display clips: a sticky header would sit a rail-height down inside it. */
+.act__table th {
+  position: static;
+}
+.act__table th,
+.act__table td {
+  height: 40px;
+  padding: 9px 12px;
+}
+.act__table th:first-child,
+.act__table td:first-child {
+  padding-left: 18px;
+}
+.act__table th:last-child,
+.act__table td:last-child {
+  padding-right: 18px;
+}
+.act__table tr:last-child td {
+  border-bottom: 0;
+}
+.act__time {
+  white-space: nowrap;
+}
+.act__time .ball {
+  margin-right: 8px;
+  vertical-align: -1px;
+}
+.act__retry {
+  margin: 0 18px 14px;
+}
+.act__more {
+  margin-top: 14px;
+  font-weight: 600;
+}
+/* Touch: the standalone links and the links in the strip get a hit area 44px tall; the text stays put. */
+@media (pointer: coarse) {
+  .spec__try a,
+  .act__more a,
+  .act__table a {
+    display: inline-block;
+    padding: 9px 0;
+    margin: -9px 0;
+  }
+}
+@media (max-width: 1099px) {
+  .nr__text h2 {
+    grid-column: 1 / 7;
+  }
+  .nr__text .lede {
+    grid-column: 7 / 13;
+  }
+}
+@media (max-width: 759px) {
+  .nr__text {
+    grid-template-columns: minmax(0, 1fr);
+    margin-top: 28px;
+  }
+  .nr__text h2,
+  .nr__text .lede {
+    grid-column: 1 / -1;
+  }
+  .act__net,
+  .act__payer {
+    display: none;
+  }
+}
+/* Phones: each settlement on two lines (tool and amount, then time and transaction). */
+@media (max-width: 559px) {
+  .act__table,
+  .act__table tbody {
+    display: block;
+  }
+  .act__table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+  .act__table tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 2px 12px;
+    padding: 10px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .act__table tr:last-child {
+    border-bottom: 0;
+  }
+  .act__table td,
+  .act__table td:first-child,
+  .act__table td:last-child {
+    height: auto;
+    padding: 0;
+    border: 0;
+  }
+  .act__table td:nth-child(2) {
+    grid-area: 1 / 1;
+  }
+  .act__table td.num {
+    grid-area: 1 / 2;
+  }
+  .act__table .act__time {
+    grid-area: 2 / 1;
+    font-size: 13px;
+    color: var(--on-display-2);
+  }
+  .act__table td:last-child {
+    grid-area: 2 / 2;
+    font-size: 13px;
+  }
+}
+
+/* 6. Three ways in */
+.dev__head {
+  max-width: 42rem;
+}
+.dev__head .lede {
+  margin-top: 16px;
+}
+.dev__d {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  margin-top: 36px;
+}
+.dev__ways {
+  min-width: 0;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+.dev__bar {
+  flex-wrap: wrap;
+  min-height: 52px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+.dev__tabs {
+  display: flex;
+  gap: 4px;
+}
+.dev__tabs .key {
+  min-width: 58px;
+}
+.dev__tabs .key[aria-selected="true"] {
+  transform: translateY(1px);
+  background: #181a1e;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.7);
+  color: var(--on-display);
+}
+.dev__tabs .key[aria-selected="true"]:focus-visible {
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.7), var(--ring-display);
+}
+.dev__tabs .key[aria-selected="false"] {
+  color: var(--on-display-2);
+}
+.dev__way {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  padding: 18px;
+}
+.dev__way-h {
+  font-size: 15px;
+  line-height: 20px;
+  color: var(--on-display);
+}
+pre.code.dev__code {
+  background: var(--display-bay);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  font-size: 13.5px;
+}
+.dev__how {
+  max-width: 52em;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--on-display-2);
+}
+.dev__how code {
+  color: var(--on-display);
+  white-space: nowrap;
+}
+.dev__copy {
+  justify-self: start;
+}
+.dev__copies {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.dev__resp {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+pre.code.dev__resp-code {
+  max-height: 420px;
+  margin: 18px;
+  overflow: auto;
+}
+/* Commands keep their lines (a wrapped curl hides where each continuation ends) and scroll sideways inside
+   their own well; the response is read, not pasted, so it wraps. */
+pre.code.dev__code:not(.dev__resp-code) {
+  white-space: pre;
+  word-break: normal;
+  overflow-x: auto;
+}
+/* A command that runs past its well fades out at the edge it continues past (dev.ts sets data-more), so a
+   cut line reads as "more this way" instead of clipped. Keyboard focus drops the fade: the ring stays whole. */
+pre.code.dev__code[data-more="right"] {
+  -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 32px), transparent);
+  mask-image: linear-gradient(90deg, #000 calc(100% - 32px), transparent);
+}
+pre.code.dev__code[data-more="left"] {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 32px);
+  mask-image: linear-gradient(90deg, transparent, #000 32px);
+}
+pre.code.dev__code[data-more="both"] {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 32px, #000 calc(100% - 32px), transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 32px, #000 calc(100% - 32px), transparent);
+}
+pre.code.dev__code:focus-visible {
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+/* Side by side, the snippet sets the display's height and the response scrolls inside that height, so a
+   short snippet leaves no empty graphite under it. The 260px floor keeps a dozen lines of the 402 in view. */
+@media (min-width: 900px) {
+  .dev__d.is-tabbed pre.code.dev__resp-code {
+    flex: 1 1 0px;
+    min-height: 260px;
+    max-height: none;
+  }
+}
+@media (max-width: 899px) {
+  .dev__d {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .dev__ways {
+    border-right: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+}
+@media (max-width: 559px) {
+  .dev__way {
+    padding: 14px;
+  }
+  pre.code.dev__resp-code {
+    max-height: 360px;
+    margin: 14px;
+  }
+}
+
+/* 7. Close */
+.home-close {
+  padding-bottom: 0;
+}
+.close {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 28px;
+  padding: 22px 26px;
+}
+.close__h {
+  font-size: clamp(22px, 2.4vw, 30px);
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+}
+.close__keys {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+@media (max-width: 559px) {
+  .close {
+    padding: 18px;
+  }
+  .close__keys {
+    width: 100%;
+  }
+  .close__keys .key {
+    flex: 1;
+  }
+}
+
+/* Hold $SIRO, pay less: the tier table on the bench and the wallet check on a faceplate beside it. */
+.hold__head {
+  max-width: 44rem;
+}
+.hold__head .lede {
+  margin-top: 16px;
+}
+.hold__body {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: var(--gutter);
+  align-items: start;
+  margin-top: 40px;
+}
+.hold__tiers thead th {
+  position: static;
+}
+.hold__tiers td,
+.hold__tiers tbody th {
+  padding: 14px 12px 14px 0;
+  border-bottom: 1px solid var(--hair);
+}
+.hold__check {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: end;
+  padding: 18px;
+  border-radius: 6px;
+}
+.hold__check .field {
+  margin: 0;
+}
+.hold__out {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
+.hold__how {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--gutter);
+  margin: 32px 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--ink-2);
+}
+.hold__how b {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--ink);
+}
+@media (max-width: 899px) {
+  .hold__body,
+  .hold__how {
+    grid-template-columns: 1fr;
+  }
+}

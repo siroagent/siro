@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sell a tool · Siro</title>
+  <meta name="description" content="List your HTTPS API on Siro at a price per call. Buyers pay your own address in USDG or USDC over x402, and a payment settles only when your API returns a result. Siro takes no cut.">
+  <link rel="canonical" href="https://siroagent.com/sell">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://siroagent.com/sell">
+  <meta property="og:title" content="Sell a tool · Siro">
+  <meta property="og:description" content="List your API at a price per call. Buyers pay your address directly; no result, no charge.">
+  <meta property="og:image" content="https://siroagent.com/og.jpg?v=2">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@siro_agent">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <meta name="theme-color" content="#f2f3f5">
+</head>
+<body>
+<main id="main">
+  <div class="wrap">
+    <!-- /sell/<id> swaps this header and the form for one listing. -->
+    <header class="sl__head grid" id="sl-head">
+      <h1>Sell a tool</h1>
+      <p class="lede">List your HTTPS API at a price per call. Buyers pay your own address in USDG or USDC, and a payment settles only when your API returns a result. Siro takes no cut.</p>
+    </header>
+
+    <div id="sl-listing" hidden></div>
+
+    <div id="sl-sell">
+      <section class="sl__how" aria-labelledby="how-h">
+        <h2 id="how-h" class="h3">How it works</h2>
+        <ol class="sl__steps">
+          <li>
+            <b>Prove the host is yours.</b>
+            <p>Publish <code class="inline">/.well-known/siro.json</code> on your API's host, naming the address that gets paid:</p>
+            <pre class="sl__code display"><code>{ "payTo": "0xYourAddress" }</code></pre>
+          </li>
+          <li>
+            <b>Describe the tool.</b>
+            <p>Name, price, endpoint and input fields. Siro sends one test call with your example input and the header <code class="inline">x-siro-test: 1</code>. It must answer with JSON.</p>
+          </li>
+          <li>
+            <b>Keep the secret.</b>
+            <p>Every call from Siro carries it as <code class="inline">x-siro-secret</code>; reject calls without it, so only paid calls get through. It is also the key to pause or remove the listing. Siro shows it once.</p>
+          </li>
+        </ol>
+
+        <h3 class="sl__sub">What your API receives</h3>
+        <dl class="sl__spec">
+          <div><dt>Request</dt><dd><code class="inline">POST</code> to your endpoint, a JSON body with the fields you define, already checked against them.</dd></div>
+          <div><dt>Headers</dt><dd><code class="inline">x-siro-secret</code>, <code class="inline">x-siro-payer</code> (the buyer's address) and <code class="inline">x-siro-network</code>.</dd></div>
+          <div><dt>Answer</dt><dd>A 2xx JSON response within 60 seconds, 1 MB at most. That is the result the buyer gets.</dd></div>
+          <div><dt>Money</dt><dd>The buyer signs a transfer to your address for the exact price. It settles after your answer, on Robinhood Chain (USDG) or Base, Arbitrum or Polygon (USDC). Nothing passes through Siro.</dd></div>
+          <div><dt>Failures</dt><dd>An error, a timeout or a non-JSON answer is not charged. Five failures in a row pause the listing until you resume it.</dd></div>
+        </dl>
+      </section>
+
+      <div class="rails sl__rails" aria-hidden="true"></div>
+
+      <section class="sl__form-wrap" aria-labelledby="form-h">
+        <h2 id="form-h" class="h3">List your tool</h2>
+        <form class="sl__form face" id="sl-form" novalidate>
+          <div class="sl__row">
+            <label class="field"><span>Endpoint</span><input name="endpoint" type="url" inputmode="url" autocomplete="off" spellcheck="false" placeholder="e.g. https://api.example.com/summarize" required></label>
+            <label class="field"><span>Payout address (EVM)</span><input name="payTo" autocomplete="off" spellcheck="false" placeholder="0x…" required></label>
+          </div>
+          <div class="sl__check">
+            <button class="key key--sm" type="button" id="sl-check">Check siro.json</button>
+            <p class="sl__note" id="sl-check-out" role="status"></p>
+          </div>
+
+          <div class="sl__row">
+            <label class="field"><span>Name</span><input name="name" maxlength="48" required placeholder="e.g. Contract summarizer"></label>
+            <label class="field sl__price"><span>Price per call, USD</span><input name="price" inputmode="decimal" required placeholder="e.g. 0.02"></label>
+          </div>
+          <label class="field"><span>Summary, one or two sentences</span><textarea name="summary" rows="2" maxlength="240" required placeholder="e.g. Reads a verified contract and explains what it can do with your tokens."></textarea></label>
+          <div class="sl__row">
+            <label class="field"><span>Category</span><select name="category" id="sl-cat"></select></label>
+            <label class="field"><span>What it returns</span><input name="returns" maxlength="120" required placeholder="e.g. { summary, risks[] }"></label>
+          </div>
+
+          <fieldset class="sl__fields">
+            <legend class="label">Input fields</legend>
+            <p class="sl__note">Up to 8. Required fields need an example; Siro uses it for the test call.</p>
+            <div id="sl-fields"></div>
+            <button class="key key--sm" type="button" id="sl-add">Add a field</button>
+          </fieldset>
+
+          <div class="sl__submit" data-quiet-ask>
+            <button class="key key--ink" type="submit" id="sl-submit">List the tool</button>
+            <p class="sl__note" id="sl-out" role="status" aria-live="polite"></p>
+          </div>
+        </form>
+
+        <div class="sl__done display" id="sl-done" hidden tabindex="-1"></div>
+      </section>
+
+      <div class="rails sl__rails" aria-hidden="true"></div>
+
+      <section class="sl__manage" aria-labelledby="manage-h">
+        <h2 id="manage-h" class="h3">Manage a listing</h2>
+        <form class="sl__form face" id="sl-own" novalidate>
+          <div class="sl__row">
+            <label class="field"><span>Listing id</span><input name="id" autocomplete="off" spellcheck="false" required placeholder="e.g. contract-summarizer"></label>
+            <label class="field"><span>Secret</span><input name="secret" type="password" autocomplete="off" spellcheck="false" required placeholder="sk_siro_…"></label>
+          </div>
+          <div class="sl__keys">
+            <button class="key key--sm" type="submit" value="paused">Pause</button>
+            <button class="key key--sm" type="submit" value="live">Resume</button>
+            <button class="key key--sm" type="submit" value="removed">Remove</button>
+            <p class="sl__note" id="sl-own-out" role="status" aria-live="polite"></p>
+          </div>
+        </form>
+      </section>
+    </div>
+  </div>
+</main>
+<script type="module" src="/src/sell/main.ts"></script>
+</body>
+</html>

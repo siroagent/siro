@@ -1,0 +1,20 @@
+/* Privacy reuses the Shipped tables; these are the prose and code blocks under them. */
+.ship__sub {
+  margin: 48px 0 12px;
+}
+.priv__p {
+  max-width: 44em;
+  margin: 0 0 12px;
+  color: var(--ink-2);
+}
+.priv__code {
+  max-width: 44em;
+  margin: 0 0 16px;
+  padding: 14px 16px;
+  overflow-x: auto;
+  border-radius: 12px;
+  background: var(--display);
+  color: var(--on-display);
+  box-shadow: var(--l-1), var(--bezel);
+  font: 13px/1.6 var(--mono);
+}

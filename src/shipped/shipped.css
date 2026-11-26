@@ -1,0 +1,130 @@
+/* Shipped: what is live, dated by the day it went live, then what comes next without dates. Two tables
+   on the bench; the double rail between them is the boundary between live and not live yet. */
+
+.ship__head {
+  row-gap: 16px;
+  align-items: end;
+  padding: 64px 0 40px;
+}
+.ship__head h1 {
+  grid-column: 1 / span 6;
+}
+.ship__head .lede {
+  grid-column: 7 / -1;
+}
+
+.ship__table td {
+  height: auto;
+  padding-top: 14px;
+  padding-bottom: 14px;
+  vertical-align: top;
+}
+.ship__table th:first-child,
+.ship__table td:first-child {
+  width: 1%;
+  padding-right: 32px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+/* The hairlines run the full width; the text keeps a reading measure. */
+.ship__table td > p {
+  max-width: 44em;
+}
+.ship__next td p {
+  margin-top: 4px;
+  color: var(--ink-2);
+}
+.ship__table b {
+  font-weight: 600;
+}
+.ship__table code {
+  overflow-wrap: anywhere;
+}
+/* Arriving from /shipped#sell-a-tool: the row you were sent to sits on paper. It is the first row under a
+   sticky header, so it stops one header height lower or the header would cover it. */
+.ship__table tr:target td {
+  background: var(--paper);
+}
+#sell-a-tool {
+  scroll-margin-top: 56px;
+}
+
+.ship__rails {
+  margin: 56px 0;
+}
+.ship__next h2 {
+  margin-bottom: 12px;
+}
+.ship__next > p {
+  max-width: 40em;
+  margin-bottom: 24px;
+  color: var(--ink-2);
+}
+.ship__soon {
+  font-weight: 600;
+}
+.ship__later {
+  color: var(--label);
+}
+
+@media (max-width: 899px) {
+  .ship__head {
+    row-gap: 14px;
+    padding: 40px 0 24px;
+  }
+  .ship__head h1,
+  .ship__head .lede {
+    grid-column: 1 / -1;
+  }
+}
+@media (max-width: 759px) {
+  .ship__table th:first-child,
+  .ship__table td:first-child {
+    padding-right: 16px;
+  }
+  .ship__rails {
+    margin: 40px 0;
+  }
+}
+/* Phones: a date column would leave the text a third of the screen, so each dated row stacks, the date
+   as a label over its text. The Next table keeps its columns: Soon and Later are one short word. */
+@media (max-width: 559px) {
+  .ship__table--dated thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  .ship__table--dated,
+  .ship__table--dated tbody,
+  .ship__table--dated tr,
+  .ship__table--dated td {
+    display: block;
+  }
+  /* The column heads are gone, so their double rail opens the list instead. */
+  .ship__table--dated tbody {
+    padding-top: 4px;
+    background:
+      linear-gradient(var(--edge), var(--edge)) 0 0 / 100% 1px no-repeat,
+      linear-gradient(var(--edge), var(--edge)) 0 3px / 100% 1px no-repeat;
+  }
+  .ship__table--dated tr {
+    padding: 16px 0;
+    border-bottom: 1px solid var(--hair);
+  }
+  .ship__table--dated td,
+  .ship__table--dated td:first-child {
+    width: auto;
+    padding: 0;
+    border: 0;
+  }
+  .ship__table--dated td:first-child {
+    margin-bottom: 6px;
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 500;
+    color: var(--label);
+  }
+}

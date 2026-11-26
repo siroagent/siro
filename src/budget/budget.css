@@ -1,0 +1,1366 @@
+/* Budget: a numbered setup sheet before the key exists, then an index of instruments. Built from the
+   tokens and components in base.css; every class here starts with bd- so nothing leaks to other pages. */
+
+/* ---- Head ---- */
+.bd-head {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--gutter);
+  row-gap: 16px;
+  align-items: end;
+  padding-top: 56px;
+  padding-bottom: 40px;
+}
+.bd-head h1 {
+  grid-column: 1 / 6;
+}
+.bd-head .lede {
+  grid-column: 6 / 13;
+  justify-self: end;
+}
+/* Focused only by script (after the setup or after Forget), so it carries no ring of its own. */
+.bd-head h1:focus-visible {
+  box-shadow: none;
+}
+
+/* ---- Small shared pieces ---- */
+/* Explanations end on a full line, not one orphaned word (headings keep their own balance). */
+.bd,
+.bd-dialog {
+  text-wrap: pretty;
+}
+/* A lamp that wraps keeps its square on the first line instead of between the lines. Browsers without
+   the lh unit keep the shared centring. */
+@supports (margin-top: 1lh) {
+  .bd .lamp,
+  .bd-dialog .lamp {
+    align-items: flex-start;
+  }
+  .bd .lamp::before,
+  .bd-dialog .lamp::before {
+    margin-top: calc((1lh - 8px) / 2);
+  }
+}
+/* A command or flag in a sentence stays one chip instead of splitting across lines. */
+.bd code.inline,
+.bd-dialog code.inline {
+  white-space: nowrap;
+}
+.bd-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+/* A typed number reads from the right, like every other amount on the page. */
+.bd-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.lamp.bd-quiet {
+  color: var(--label);
+}
+.bd-h3 {
+  margin: 28px 0 6px;
+  font-size: 17px;
+  line-height: 24px;
+}
+.bd label[for],
+.bd summary {
+  cursor: pointer;
+}
+.bd .field select {
+  appearance: none;
+  padding-right: 34px;
+  background: var(--paper) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none' stroke='%23565D67' stroke-width='1.5'%3E%3Cpath d='M1 1l4 4 4-4'/%3E%3C/svg%3E") no-repeat right 12px center;
+  cursor: pointer;
+}
+/* A USD field: the number right-aligned, the unit at the end of the well. */
+.bd-money {
+  position: relative;
+  display: block;
+}
+.bd-money input {
+  padding-right: 52px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.bd-money i {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-style: normal;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--label);
+  pointer-events: none;
+}
+
+/* Focus rails on this page's own shadowed controls: the index entries, wells outside a .field and the
+   Autopay switch. Keys, segments and .field wells get theirs from base.css. */
+.bd .bd-index a:focus-visible {
+  box-shadow: var(--ring);
+}
+.bd :is(input, select, textarea, .bd-switch):not(.display *):focus-visible {
+  box-shadow: var(--well), var(--ring);
+}
+
+/* ---- Setup sheet: one faceplate, four numbered steps ---- */
+.bd-sheet {
+  overflow: hidden;
+}
+.bd-sheet__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px 24px;
+  padding: 22px 32px 20px;
+  border-bottom: 1px solid var(--hair);
+}
+.bd-sheet__title {
+  font-size: 22px;
+  line-height: 28px;
+}
+.bd-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.bd-step {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  gap: 20px 40px;
+  padding: 32px;
+}
+.bd-step + .bd-step {
+  border-top: 1px solid var(--hair);
+}
+.bd-step__head {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 14px;
+  row-gap: 6px;
+  align-content: start;
+}
+/* Numerals engraved like the S: dark fill with a light lip under it. */
+.bd-step__n {
+  grid-row: span 2;
+  font-size: 52px;
+  line-height: 0.9;
+  font-weight: 600;
+  color: #2a2e34;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.85);
+  font-variant-numeric: tabular-nums;
+}
+.bd-step__name {
+  font-size: 22px;
+  line-height: 26px;
+}
+.bd-step__head .lamp {
+  font-size: 13px;
+  line-height: 18px;
+}
+.bd-step__body {
+  display: grid;
+  gap: 18px;
+  align-content: start;
+  min-width: 0;
+}
+.bd-step__body > p {
+  max-width: 62ch;
+}
+.bd-sheet__end {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+  padding: 24px 32px 28px;
+  border-top: 1px solid var(--hair);
+}
+.bd-sheet__end p {
+  max-width: 60ch;
+  color: var(--ink-2);
+}
+.bd-import {
+  display: grid;
+  gap: 12px;
+  max-width: 560px;
+  padding: 16px;
+  border-radius: 6px;
+  background: var(--paper);
+  box-shadow: 0 0 0 1px var(--hair);
+}
+/* One grid for both addresses, so each Copy key sits right after its address and the two line up. */
+.bd-addrs {
+  margin: 0;
+  display: grid;
+  grid-template-columns: 120px minmax(0, max-content) auto;
+  justify-content: start;
+  align-items: center;
+  gap: 10px 16px;
+}
+.bd-addrs div {
+  display: contents;
+}
+.bd-addrs dt {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--label);
+}
+.bd-addrs dd {
+  margin: 0;
+}
+.bd-addrs__a {
+  font: 14px/1.5 var(--mono);
+  overflow-wrap: anywhere;
+}
+
+/* ---- Budget view: index on the left, instruments on the right ---- */
+.bd-view {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--gutter);
+  align-items: start;
+}
+.bd-index {
+  grid-column: 1 / 3;
+  position: sticky;
+  top: calc(var(--rail-h) + 32px);
+  z-index: 2;
+}
+.bd-index ol {
+  list-style: none;
+  margin: 0;
+  padding: 4px;
+  display: grid;
+  gap: 2px;
+  border-radius: 6px;
+  background: var(--face-lo);
+  box-shadow: var(--well);
+}
+.bd-index a {
+  display: flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: var(--radius);
+  color: var(--ink-2);
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+}
+.bd-index a:hover {
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.45);
+}
+.bd-index a[aria-current="true"] {
+  background: var(--face);
+  box-shadow: var(--key);
+  color: var(--ink);
+  font-weight: 600;
+}
+.bd-index a:active {
+  transform: translateY(1px);
+  box-shadow: var(--key-down);
+}
+.bd-index__today {
+  display: grid;
+  gap: 6px;
+  margin-top: 24px;
+  padding: 0 6px;
+}
+.bd-index__today .num {
+  font-weight: 600;
+}
+.bd-index__today .meter {
+  margin-top: 4px;
+}
+.bd-secs {
+  grid-column: 3 / 13;
+  min-width: 0;
+  display: grid;
+  gap: 88px;
+}
+.bd-sec {
+  min-width: 0;
+}
+.bd-sec__head {
+  display: grid;
+  gap: 6px;
+  max-width: 52em;
+  margin-bottom: 24px;
+}
+.bd-sec__head h2 {
+  font-size: clamp(26px, 2.6vw, 34px);
+  line-height: 1.1;
+}
+.bd-sec__head p {
+  color: var(--ink-2);
+}
+.bd-sec__face {
+  padding: 28px 32px 24px;
+}
+/* The key zone sits behind a boundary: the double rail. */
+.bd-boundary {
+  margin-bottom: 28px;
+}
+
+/* ---- Caps: knob, readout, fields, Autopay, save state ---- */
+.bd-caps {
+  display: grid;
+  grid-template-columns: minmax(240px, 340px) minmax(0, 1fr);
+  gap: 28px 40px;
+  align-items: start;
+}
+.bd-caps__dial {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+}
+.bd-caps__name {
+  justify-self: start;
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 500;
+  color: var(--label);
+}
+.bd-dial {
+  position: relative;
+  width: 100%;
+  max-width: 340px;
+  aspect-ratio: 1;
+}
+.bd-dial__scale {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.bd-dial__tick {
+  stroke: var(--edge);
+  stroke-width: 1.5px;
+  vector-effect: non-scaling-stroke;
+}
+.bd-dial__tick.is-major {
+  stroke: var(--ink-2);
+  stroke-width: 2px;
+}
+.bd-dial__tick.is-on {
+  stroke: var(--ink);
+  stroke-width: 3px;
+}
+.bd-dial__mark {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  font-size: 12px;
+  line-height: 1;
+  font-weight: 500;
+  color: var(--label);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+/* The slider is the circle just outside the knob's rim, centred on the render's axis (50.1%, 49.1%
+   of its 100-unit box inside the 140-unit scale), so the focus ring hugs the knob. */
+.bd-knob {
+  position: absolute;
+  left: 21.5%;
+  top: 20.786%;
+  width: 57.143%;
+  height: 57.143%;
+  border-radius: 50%;
+  cursor: grab;
+  touch-action: none;
+}
+.bd-knob.is-turning {
+  cursor: grabbing;
+}
+/* The render overflows the slider and would paint over a box-shadow ring, so the double rail is drawn
+   on a layer above it, just outside the knob's rim. */
+.bd-knob::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.bd-knob:focus-visible {
+  box-shadow: none;
+}
+.bd-knob:focus-visible::after {
+  box-shadow:
+    0 0 0 2px var(--bench),
+    0 0 0 3px var(--ink),
+    0 0 0 5px var(--bench),
+    0 0 0 6px var(--ink);
+}
+.bd-knob img {
+  position: absolute;
+  left: -12.625%;
+  top: -11.375%;
+  width: 125%;
+  height: 125%;
+  max-width: none;
+  clip-path: circle(44% at 50.1% 49.1%);
+  transform-origin: 50.1% 49.1%;
+  transition: transform 0.12s ease-out;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.bd-knob.is-turning img {
+  transition: none;
+}
+.bd-dial__turn {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 340px;
+}
+.bd-dial__turn .key {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  font-size: 20px;
+}
+.bd-dial__turn span {
+  text-align: center;
+}
+.bd-caps__side {
+  display: grid;
+  gap: 24px;
+  min-width: 0;
+}
+.bd-readout {
+  padding-bottom: 18px;
+}
+.bd-readout__num {
+  position: relative;
+  padding: 20px 18px 0;
+  font-size: clamp(44px, 4.4vw, 64px);
+  line-height: 1;
+}
+.bd-readout__meter {
+  margin: 18px 18px 0;
+}
+.bd-readout__line {
+  position: relative;
+  padding: 12px 18px 0;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--on-display-2);
+}
+.bd-caps__fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px 24px;
+}
+/* Keep both wells on one line when one note runs longer than the other. */
+.bd-caps__fields .field {
+  align-content: start;
+}
+.bd-auto {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px 16px;
+  padding-top: 18px;
+  border-top: 1px solid var(--hair);
+}
+/* Autopay: two segment keys in a recessed tray, the live position raised. */
+.bd-switch {
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  padding: 3px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--face-lo);
+  box-shadow: var(--well);
+}
+.bd-switch span {
+  display: grid;
+  place-items: center;
+  min-width: 52px;
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink-2);
+}
+.bd-switch[aria-checked="false"] span:first-child,
+.bd-switch[aria-checked="true"] span:last-child {
+  background: var(--face);
+  box-shadow: var(--key);
+  color: var(--ink);
+  font-weight: 600;
+}
+.bd-switch:hover span {
+  color: var(--ink);
+}
+.bd-switch:active {
+  transform: translateY(1px);
+}
+.bd-caps__state {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--hair);
+}
+.bd-caps__state .lamp {
+  max-width: 64ch;
+}
+.bd-caps__keys {
+  display: flex;
+  gap: 8px;
+}
+
+/* ---- Funds ---- */
+.bd-funds {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 200px;
+  gap: 24px 32px;
+  align-items: start;
+}
+.bd-funds__main {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+/* On the setup faceplate the five rows never scroll under anything, and a bench-coloured head
+   would show as a pale band on the aluminium. */
+.bd-sheet .table thead th {
+  position: static;
+  background-color: transparent;
+}
+.bd-ft tbody th {
+  position: static;
+  background: none;
+  box-shadow: none;
+  padding: 10px 12px 10px 0;
+  border-bottom: 1px solid var(--hair);
+  font-size: 15px;
+  color: var(--ink);
+  vertical-align: middle;
+}
+.bd-ft__net b {
+  display: block;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.bd-ft__net span {
+  display: block;
+  font-weight: 400;
+}
+.bd-ft__send {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.bd-addr {
+  min-width: 0;
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+.bd-addr__phone {
+  display: none;
+}
+.bd-ft__bal,
+.bd-ft__q {
+  white-space: nowrap;
+}
+/* A right-aligned amount needs air before the column that follows it, or "$0.00" runs into "quoting". */
+@media (min-width: 760px) {
+  .bd .table :is(th, td).num:not(:last-child) {
+    padding-right: 28px;
+  }
+}
+.bd-bal {
+  display: block;
+  font-size: 17px;
+  line-height: 22px;
+}
+.bd-gas {
+  display: block;
+}
+.bd-unread {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--refused);
+}
+.bd-funds__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+.bd-funds__total {
+  font-weight: 500;
+}
+/* Square markers: on this page only the ball and the knob are round. */
+.bd-notes {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 4px;
+  color: var(--ink-2);
+  list-style: square;
+}
+.bd-plate {
+  margin: 0;
+  padding: 18px 16px 14px;
+}
+.bd-plate img {
+  width: 100%;
+  max-width: 168px;
+  margin: 0 auto;
+}
+.bd-plate figcaption {
+  margin-top: 12px;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--label);
+}
+
+/* ---- Spend ---- */
+.bd-spend__top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+}
+.bd-spend__sum {
+  font-size: 19px;
+  line-height: 28px;
+  font-weight: 500;
+}
+.bd-spend__src {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-top: 16px;
+}
+.bd-pt__when,
+.bd-st__when {
+  white-space: nowrap;
+}
+.bd-pt__when .ball {
+  margin-right: 8px;
+  vertical-align: -1px;
+}
+.bd-pt__tx a,
+.bd-st__tx a,
+.bd-ext {
+  font-family: var(--mono);
+  font-size: 13px;
+}
+/* Links that are a whole cell get a taller hit area on touch screens without moving the row. */
+@media (pointer: coarse) {
+  .bd-pt__tx a,
+  .bd-st__tx a,
+  .bd-pt__tool a,
+  .bd-tt a {
+    display: inline-block;
+    padding-block: 12px;
+    margin-block: -12px;
+  }
+}
+.bd-ext {
+  overflow-wrap: anywhere;
+}
+.bd-empty {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+  margin-top: 16px;
+  padding: 20px;
+  border-radius: 6px;
+  background: var(--paper);
+  box-shadow: 0 0 0 1px var(--hair);
+}
+.bd-empty p {
+  max-width: 56ch;
+  color: var(--ink-2);
+}
+.bd-more {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  margin-top: 12px;
+}
+.bd-outside {
+  display: grid;
+  gap: 12px;
+  margin-top: 48px;
+  padding-top: 32px;
+  border-top: 1px solid var(--hair);
+}
+.bd-outside > h3 {
+  font-size: 22px;
+  line-height: 28px;
+}
+.bd-outside > p {
+  max-width: 62ch;
+  color: var(--ink-2);
+}
+.bd-find {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 12px;
+  max-width: 720px;
+}
+/* The key stands as tall as the well beside it. */
+.bd-find .key {
+  min-height: 44px;
+}
+/* The status line and the results keep their distance from the search form; both stay in place while
+   empty, because the status line is a live region. */
+.bd-find + [data-status]:not(:empty) {
+  margin-top: 12px;
+}
+.bd-svcs {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.bd-svcs:not(:empty) {
+  margin-top: 16px;
+}
+.bd-svc {
+  display: grid;
+  gap: 6px;
+  padding: 16px 0;
+  border-top: 1px solid var(--hair);
+  min-width: 0;
+}
+.bd-svc__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+.bd-svc__name {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.bd-svc__price {
+  font-size: 17px;
+  white-space: nowrap;
+}
+/* The shared unit size (0.42em) suits big readouts; at 17px it would shrink "a call" to 7px. */
+.bd-svc__price small {
+  font-size: 13px;
+}
+.bd-svc__desc {
+  max-width: 72ch;
+  color: var(--ink-2);
+}
+.bd-svc__url {
+  font: 13px/1.5 var(--mono);
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
+.bd-svc.is-off .bd-svc__name,
+.bd-svc.is-off .bd-svc__price {
+  color: var(--label);
+}
+.bd-svc__try {
+  display: grid;
+  gap: 12px;
+  max-width: 720px;
+  margin-top: 8px;
+  padding: 16px;
+  border-radius: 6px;
+  background: var(--paper);
+  box-shadow: 0 0 0 1px var(--hair);
+}
+.bd-svc__try textarea {
+  font-size: 14px;
+}
+.bd-svc__out {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  overflow-x: auto;
+}
+/* Nothing has come back yet: no empty band under the key. */
+.bd-svc__out:empty {
+  display: none;
+}
+
+/* ---- Move ---- */
+/* Withdraw and Swap are two modules of one rack: side by side they share a height. */
+.bd-move {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+.bd-move > div {
+  display: grid;
+}
+.bd-mform {
+  display: grid;
+  gap: 16px;
+  align-content: start;
+  padding: 24px 28px 28px;
+}
+/* The quote panel, its Swap now key and the outcome line each keep a gap. */
+.bd-quote + .bd-row,
+[data-swap-out]:not(:empty) {
+  margin-top: 12px;
+}
+.bd-mform h3 {
+  font-size: 22px;
+  line-height: 28px;
+}
+.bd-mform__lead {
+  color: var(--ink-2);
+}
+.bd-mform__have {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 12px;
+  min-height: 34px;
+}
+.bd-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+/* The two amounts get the wider columns so a number and its unit share a line; Cost is words and wraps. */
+.bd-quote__grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 6fr) minmax(0, 6fr) minmax(0, 5fr);
+  gap: 16px;
+  margin: 0;
+  padding: 16px 16px 4px;
+}
+.bd-quote__grid dt {
+  font-size: 13px;
+  color: var(--on-display-2);
+}
+.bd-quote__grid dd {
+  margin: 4px 0 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--on-display-2);
+}
+.bd-quote__grid dd.live-num {
+  font-size: 22px;
+  line-height: 1.15;
+  color: var(--on-display);
+  overflow-wrap: anywhere;
+}
+/* A unit too wide for its column drops below the number whole ("USDG", never "USD" + "G"). */
+.bd-quote__grid dd.live-num small {
+  font-size: 12px;
+  white-space: nowrap;
+}
+.bd-quote__cap {
+  padding: 10px 16px 16px;
+}
+
+/* ---- Use and Code ---- */
+.bd-use {
+  display: grid;
+}
+.bd-use__row {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 12px 24px;
+  padding: 20px 0;
+}
+.bd-use__row:first-child {
+  padding-top: 0;
+}
+.bd-use__row + .bd-use__row {
+  border-top: 1px solid var(--hair);
+}
+.bd-use__name {
+  font-size: 17px;
+  line-height: 24px;
+}
+.bd-use__body {
+  display: grid;
+  gap: 12px;
+  justify-items: start;
+  min-width: 0;
+}
+.bd-use__body > * {
+  max-width: 100%;
+}
+.bd-code {
+  width: 100%;
+}
+/* The display clips at its edge, so a key in its bar needs room above it for the focus rails. */
+.bd-code__bar {
+  padding-block: 8px;
+}
+.bd-cmds {
+  position: relative;
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+}
+.bd-cmd {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 4px 12px;
+  padding: 12px 14px;
+}
+.bd-cmd + .bd-cmd {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+.bd-cmd code {
+  font: 14px/1.6 var(--mono);
+  color: var(--on-display);
+  overflow-wrap: anywhere;
+}
+.bd-cmd__prompt {
+  color: var(--on-display-2);
+  user-select: none;
+  -webkit-user-select: none;
+}
+.bd-word {
+  white-space: nowrap;
+}
+.bd-cmd p {
+  grid-column: 1;
+  font-size: 13px;
+  line-height: 19px;
+  color: var(--on-display-2);
+}
+.bd-code__pre {
+  position: relative;
+  margin: 0;
+  padding: 14px 16px 16px;
+  font: 14px/1.6 var(--mono);
+  color: var(--on-display);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.bd-code__pre code {
+  font-size: inherit;
+}
+
+/* ---- Key zone ---- */
+.bd-keyzone {
+  display: grid;
+  gap: 16px;
+}
+.bd-keyzone > p {
+  max-width: 62ch;
+  color: var(--ink-2);
+}
+.bd-keyrows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--hair);
+}
+.bd-keyrows li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--hair);
+}
+.bd-keyrows li > div {
+  display: grid;
+  gap: 2px;
+  max-width: 58ch;
+}
+
+/* ---- Dialog contents ---- */
+.bd-dialog__title {
+  padding: 22px 24px 10px;
+  font-size: 22px;
+  line-height: 28px;
+}
+.bd-dialog__body {
+  display: grid;
+  gap: 12px;
+  padding: 0 24px;
+  overflow-y: auto;
+  color: var(--ink-2);
+}
+.bd-dialog__addr {
+  font-family: var(--mono);
+  font-size: 14px;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.bd-dialog__keys {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 20px 24px 24px;
+}
+.bd-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 16px 24px 0;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink);
+  cursor: pointer;
+}
+.bd-check input {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin: 1px 0 0;
+  accent-color: var(--ink);
+  cursor: pointer;
+}
+.bd-secret {
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: 6px;
+  background: var(--display);
+  color: var(--on-display);
+  box-shadow: var(--l-1);
+  font: 15px/1.6 var(--mono);
+  white-space: pre-wrap;
+  word-break: break-all;
+  user-select: all;
+}
+
+/* ---- 1099 and under: the index becomes a tray under the rail ---- */
+@media (max-width: 1099px) {
+  .bd-head {
+    padding-top: 40px;
+    padding-bottom: 32px;
+  }
+  .bd-head h1,
+  .bd-head .lede {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+  /* --bd-tray: the tray's height, so section anchors and sticky table heads clear it. */
+  .bd-view {
+    display: block;
+    --bd-tray: 61px;
+  }
+  .bd-index {
+    top: var(--rail-h);
+    z-index: 40;
+    margin: 0 calc(-1 * var(--margin)) 28px;
+    padding: 6px var(--margin);
+    background: var(--bench);
+    border-bottom: 1px solid var(--hair);
+  }
+  .bd-index ol {
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+  }
+  .bd-index a {
+    justify-content: center;
+    padding: 0 4px;
+  }
+  .bd-index__today {
+    display: none;
+  }
+  .bd-secs {
+    gap: 64px;
+  }
+  .bd-sec {
+    scroll-margin-top: calc(var(--bd-tray) + 4px);
+  }
+  .bd-view .table th {
+    top: calc(var(--rail-h) + var(--bd-tray));
+  }
+}
+
+/* ---- 899 and under: instruments stack ---- */
+@media (max-width: 899px) {
+  .bd-step {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 24px;
+  }
+  .bd-step__n {
+    font-size: 40px;
+  }
+  .bd-caps {
+    grid-template-columns: 1fr;
+  }
+  .bd-caps__dial {
+    justify-self: center;
+    width: 100%;
+    max-width: 340px;
+  }
+  .bd-funds {
+    grid-template-columns: 1fr;
+  }
+  /* A small label plate that fits its render and caption, not a wide empty bar. */
+  .bd-plate {
+    order: -1;
+    display: grid;
+    grid-template-columns: 72px minmax(0, auto);
+    align-items: center;
+    justify-self: start;
+    max-width: 100%;
+    gap: 16px;
+    padding: 12px 20px 12px 16px;
+  }
+  .bd-plate img {
+    max-width: 72px;
+  }
+  .bd-plate figcaption {
+    margin: 0;
+  }
+  .bd-move {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---- 900 to 1099: the steps stack too, so the caps get the full width ---- */
+@media (min-width: 900px) and (max-width: 1099px) {
+  .bd-step {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+/* ---- 760 to 1099: the knob and its readout stay side by side, the fields run under both ---- */
+@media (min-width: 760px) and (max-width: 1099px) {
+  .bd-caps {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    align-items: center;
+  }
+  .bd-caps__side {
+    display: contents;
+  }
+  .bd-caps__fields,
+  .bd-auto {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ---- Phones: the rail scrolls away, tables turn into two-line rows ---- */
+@media (max-width: 759px) {
+  .bd-head {
+    padding-top: 28px;
+    padding-bottom: 24px;
+  }
+  .bd-view {
+    --bd-tray: 65px;
+  }
+  .bd-index {
+    top: 0;
+  }
+  .bd-index a {
+    min-height: 44px;
+    font-size: 14px;
+  }
+  .bd-secs {
+    gap: 48px;
+  }
+  /* The rail scrolls away on phones, so only the tray sits over the content. */
+  .bd-sec {
+    scroll-margin-top: 0;
+  }
+  .bd .table th {
+    top: 0;
+  }
+  .bd-view .table th {
+    top: var(--bd-tray);
+  }
+  .bd-sec__face {
+    padding: 20px 16px;
+  }
+  .bd-grid-rows thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+  .bd-grid-rows,
+  .bd-grid-rows tbody {
+    display: block;
+  }
+  .bd-grid-rows tr {
+    display: grid;
+    gap: 6px 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--hair);
+  }
+  .bd-grid-rows tbody th,
+  .bd-grid-rows td {
+    display: block;
+    height: auto;
+    padding: 0;
+    border: 0;
+  }
+  .bd-ft tr {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "net bal" "addr q";
+  }
+  .bd-ft__net {
+    grid-area: net;
+  }
+  .bd-addr__wide {
+    display: none;
+  }
+  .bd-addr__phone {
+    display: inline;
+  }
+  .bd-ft__bal {
+    grid-area: bal;
+    text-align: right;
+  }
+  .bd-ft__addr {
+    grid-area: addr;
+  }
+  .bd-ft__q {
+    grid-area: q;
+    align-self: center;
+  }
+  .bd-pt tr {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas: "tool tool usd" "when net tx";
+  }
+  .bd-pt__tool {
+    grid-area: tool;
+  }
+  .bd-pt__usd {
+    grid-area: usd;
+  }
+  .bd-pt__when {
+    grid-area: when;
+  }
+  .bd-pt__net {
+    grid-area: net;
+    color: var(--label);
+  }
+  .bd-pt__tx {
+    grid-area: tx;
+  }
+  .bd-st tr {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas: "what what tx" "when net net";
+  }
+  .bd-st__what {
+    grid-area: what;
+  }
+  .bd-st__tx {
+    grid-area: tx;
+  }
+  .bd-st__when {
+    grid-area: when;
+  }
+  .bd-st__net {
+    grid-area: net;
+    color: var(--label);
+  }
+  .bd-use__row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 559px) {
+  .bd-step,
+  .bd-sheet__bar,
+  .bd-sheet__end {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .bd-addrs {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .bd-addrs div {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 4px 12px;
+  }
+  .bd-addrs dt {
+    grid-column: 1 / -1;
+  }
+  /* Each command gets the display's full width; Copy moves down beside what the command does. */
+  .bd-cmd {
+    row-gap: 8px;
+  }
+  .bd-cmd code {
+    grid-column: 1 / -1;
+  }
+  .bd-cmd p {
+    grid-row: 2;
+    align-self: center;
+  }
+  .bd-cmd .key {
+    grid-row: 2;
+    grid-column: 2;
+  }
+  .bd-cmd code,
+  .bd-code__pre {
+    font-size: 13px;
+  }
+  .bd-dial {
+    max-width: 264px;
+  }
+  .bd-caps__fields,
+  .bd-find {
+    grid-template-columns: 1fr;
+  }
+  .bd-auto {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .bd-auto p {
+    grid-column: 1 / -1;
+  }
+  .bd-mform {
+    padding: 20px 16px;
+  }
+  .bd-quote__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .bd-dialog__keys .key {
+    flex: 1 1 auto;
+  }
+}
+
+/* Touch: every key in a tray, and every index entry, is a full 44px target. */
+@media (pointer: coarse) {
+  .bd-switch span,
+  .bd .seg button,
+  .bd-index a {
+    min-height: 44px;
+  }
+  /* 44px entries make the tray 65px tall at every width it appears. */
+  .bd-view {
+    --bd-tray: 65px;
+  }
+}
