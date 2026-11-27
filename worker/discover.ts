@@ -33,9 +33,23 @@ export type Service = {
   input: unknown;
   outputExample: unknown;
   icon: string | null;
+  /** Set for a partner service Siro features: the partner's name. */
+  featured?: string;
 };
 
-function normalize(it: any): Service | null {
+/** Partner x402 services Siro shows first when a search matches. Each one is probed for its real 402
+ *  before it is shown, so a partner appears only while its endpoint is up and payable. */
+export const FEATURED: { partner: string; name: string; url: string; words: string[] }[] = [
+  {
+    partner: "ApexFaucet",
+    name: "Robinhood Chain launch feed with a real sell test",
+    url: "https://apexfaucet.xyz/api/x402/robinhood-launch-feed",
+    words: ["robinhood", "launch", "launches", "new token", "new tokens", "sell test", "can sell", "honeypot", "rug", "exit", "trap", "memecoin", "pool", "pools"],
+  },
+];
+const PROBE_FOR = 600;
+
+export function normalize(it: any): Service | null {
   if (!it?.resource || !/^https:\/\//.test(it.resource)) return null;
   const info = it.extensions?.bazaar?.info ?? {};
   const payable = (it.accepts ?? []).filter((a: any) => {
@@ -62,13 +76,72 @@ function normalize(it: any): Service | null {
  *  is down, listings that match are still returned. */
 export async function discover(env: Env, query: string, limit = 12): Promise<Service[]> {
   const own = await searchListings(env, query, Math.min(limit, 5)).catch(() => [] as Service[]);
+  const partners = await featured(env, query).catch(() => [] as Service[]);
+  const first = [...own, ...partners];
   try {
-    const rest = await discoverBazaar(env, query, limit);
-    return [...own, ...rest].slice(0, limit);
+    const rest = (await discoverBazaar(env, query, limit)).filter((s) => !first.some((f) => f.url === s.url));
+    return [...first, ...rest].slice(0, limit);
   } catch (e) {
-    if (own.length) return own;
+    if (first.length) return first.slice(0, limit);
     throw e;
   }
+}
+
+/** The featured partners a query is about: one of their words, as whole words. */
+export function matchFeatured(query: string) {
+  const q = ` ${query.toLowerCase().replace(/[^a-z0-9]+/g, " ")} `;
+  return FEATURED.filter((f) => f.words.some((w) => q.includes(` ${w} `)));
+}
+
+/** Featured partners whose words match the query, each with the terms from its live 402. */
+export async function featured(env: Env, query: string): Promise<Service[]> {
+  const found = await Promise.all(
+    matchFeatured(query).map(async (f): Promise<Service | null> => {
+      const s = await probe(f.url);
+      return s?.payable ? { ...s, name: `${f.name} (${f.partner})`, featured: f.partner } : null;
+    }),
+  );
+  const out = found.filter((s): s is Service => s !== null);
+  await remember(env, out);
+  return out;
+}
+
+/** The service as its own 402 describes it, or null when it does not answer with a payable 402. */
+async function probe(url: string): Promise<Service | null> {
+  const cache = caches.default;
+  const key = new Request(`https://siroagent.com/__featured-probe?u=${encodeURIComponent(url)}`);
+  const hit = await cache.match(key);
+  if (hit) return (await hit.json()) as Service | null;
+  const res = await fetch(url, { headers: { accept: "application/json", "user-agent": "SiroDiscovery/1.0 (+https://siroagent.com)" }, signal: AbortSignal.timeout(8_000) }).catch(() => null);
+  let svc: Service | null = null;
+  if (res?.status === 402) {
+    let req: any = null;
+    const header = res.headers.get("payment-required");
+    try {
+      req = header ? JSON.parse(atob(header)) : await res.json();
+    } catch {
+      req = null;
+    }
+    if (req?.accepts) {
+      const r = typeof req.resource === "object" ? req.resource : {};
+      svc = normalize({ ...req, resource: url, description: r.description ?? req.description, serviceName: r.serviceName ?? null });
+    }
+  }
+  await cache.put(key, new Response(JSON.stringify(svc), { headers: { "content-type": "application/json", "cache-control": `max-age=${PROBE_FOR}` } }));
+  return svc;
+}
+
+/** Lets the relay forward to these services. */
+async function remember(env: Env, list: Service[]) {
+  if (!list.length) return;
+  const now = Math.floor(Date.now() / 1000);
+  await env.DB.batch(
+    list.map((s) =>
+      env.DB.prepare(
+        "INSERT INTO x402_services (url, method, name, description, price_usd, networks, payable, seen_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8) ON CONFLICT (url) DO UPDATE SET method = ?2, name = ?3, description = ?4, price_usd = ?5, networks = ?6, payable = ?7, seen_at = ?8",
+      ).bind(s.url, s.method, s.name, s.description, s.priceUsd, s.networks.join(","), s.payable ? 1 : 0, now),
+    ),
+  );
 }
 
 async function discoverBazaar(env: Env, query: string, limit: number): Promise<Service[]> {
@@ -95,15 +168,7 @@ async function discoverBazaar(env: Env, query: string, limit: number): Promise<S
     .filter((s) => !s.url.startsWith("https://siroagent.com/") && !seen.has(s.url) && seen.add(s.url))
     .sort((a, b) => Number(b.payable) - Number(a.payable))
     .slice(0, limit);
-  const now = Math.floor(Date.now() / 1000);
-  if (list.length)
-    await env.DB.batch(
-      list.map((s) =>
-        env.DB.prepare(
-          "INSERT INTO x402_services (url, method, name, description, price_usd, networks, payable, seen_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8) ON CONFLICT (url) DO UPDATE SET method = ?2, name = ?3, description = ?4, price_usd = ?5, networks = ?6, payable = ?7, seen_at = ?8",
-        ).bind(s.url, s.method, s.name, s.description, s.priceUsd, s.networks.join(","), s.payable ? 1 : 0, now),
-      ),
-    );
+  await remember(env, list);
   return list;
 }
 
@@ -122,7 +187,7 @@ discovery.get("/discover", async (c) => {
   try {
     const services = await discover(c.env, q, Math.min(Number(c.req.query("limit")) || 12, 20));
     c.header("Access-Control-Allow-Origin", "*");
-    return c.json({ query: q, source: "x402 Bazaar (Coinbase CDP)", services });
+    return c.json({ query: q, source: "Sold on Siro, featured partners, then the x402 Bazaar (Coinbase CDP)", services });
   } catch (e) {
     const { body, status } = err(e);
     return c.json(body, status);

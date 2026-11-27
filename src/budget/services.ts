@@ -33,6 +33,7 @@ function item(s: Service, i: number) {
     : `<p class="small muted bd-svc__act">Not payable from this budget: it takes ${esc(nets.join(", ") || "other networks")} only.</p>`;
   return `<li class="bd-svc${s.payable ? "" : " is-off"}">
     <div class="bd-svc__head"><b class="bd-svc__name">${esc(s.name ?? hostOf(s.url))}</b>${price}</div>
+    ${s.featured ? `<p class="small muted">Featured partner: ${esc(s.featured)}</p>` : ""}
     <p class="bd-svc__desc small">${esc(blurb(s.description || "No description given."))}</p>
     <code class="bd-svc__url">${esc(s.method)} ${esc(s.url)}</code>
     ${act}

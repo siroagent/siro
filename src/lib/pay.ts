@@ -410,7 +410,7 @@ const relayFetch: typeof fetch = async (input, init) => {
   return new Response(j.status === 204 ? null : body, { status: j.status, headers: j.headers });
 };
 
-export type Service = { url: string; method: string; name: string | null; description: string; priceUsd: number | null; networks: string[]; payable: boolean; input: unknown; outputExample: unknown; icon: string | null };
+export type Service = { url: string; method: string; name: string | null; description: string; priceUsd: number | null; networks: string[]; payable: boolean; input: unknown; outputExample: unknown; icon: string | null; featured?: string };
 
 export async function discoverServices(q: string): Promise<Service[]> {
   const r = await fetch(`/api/discover?q=${encodeURIComponent(q)}&limit=12`);

@@ -2,6 +2,10 @@
 
 Dates are UTC.
 
+## 2026-11-28
+
+- Featured partners in discovery: partner x402 services come right after tools sold on Siro when a search matches, each shown only while its own 402 is live and payable. First partner: ApexFaucet's Robinhood Chain launch feed with a real sell test.
+
 ## 2026-11-27
 
 - Cheapest Model (`/v1/llm-auto`): Siro picks the cheapest language model that fits a tier, a maker and a price ceiling, and names it in the 402 quote.
