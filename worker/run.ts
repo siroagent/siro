@@ -6,7 +6,8 @@ import { Fail } from "./fail";
 import { findMarket, normalizeMarket, predictionMarkets, priceHistory, stockQuote, stockTokens } from "./markets";
 import { addressOf, contractCheck, gasNow, networkOf, poolList, readToken, tokenMarket, walletBalances } from "./onchain";
 import { premiumReady, runPremium } from "./premium";
-import { PickError, pickModel, pickSummary, type Pick } from "../shared/router";
+import { PickError, RETRY_DAILY_UNITS, checkAnswer, pickModel, pickSummary, readCheck, retryLadder, type Check, type Pick } from "../shared/router";
+import { toUnits } from "../shared/catalog";
 
 export type Input = Record<string, unknown>;
 
@@ -177,13 +178,66 @@ export function routerPick(env: Env, input: Input): Pick {
   }
 }
 
-export async function execute(env: Env, r: Resource, input: Input): Promise<unknown> {
-  if (r.id === "llm-auto") {
-    const pick = routerPick(env, input);
-    const { tier: _t, maker: _m, max_price: _p, ...rest } = input;
+/** The checks the router input asks for. Throws Fail (400) before any payment. */
+export function routerCheck(input: Input): Check | null {
+  try {
+    return readCheck(input);
+  } catch (e) {
+    if (e instanceof PickError) throw new Fail(400, e.code, e.message);
+    throw e;
+  }
+}
+
+/** Books one retry against the day's budget; false once the budget is spent. */
+async function takeRetry(env: Env, units: bigint): Promise<boolean> {
+  const day = new Date().toISOString().slice(0, 10);
+  const row = await env.DB.prepare(
+    "INSERT INTO router_retries (day, units) VALUES (?1, ?2) ON CONFLICT (day) DO UPDATE SET units = units + ?2 WHERE units + ?2 <= ?3 RETURNING units",
+  )
+    .bind(day, Number(units), Number(RETRY_DAILY_UNITS))
+    .first<{ units: number }>()
+    .catch(() => null);
+  return !!row && BigInt(row.units) <= RETRY_DAILY_UNITS;
+}
+
+type Attempt = { model: string; name: string; priceUsd: number; passed: boolean; reason?: string; paidBy: "you" | "siro" };
+
+/** Runs the router: the cheapest fitting model, and when the input sets a check, the next models up the same
+ *  tier until one passes. The caller pays the first model's quoted price only; retries are Siro's. If no answer
+ *  passes, this throws, so the payment is never settled. */
+async function runRouter(env: Env, input: Input): Promise<unknown> {
+  const pick = routerPick(env, input);
+  const check = routerCheck(input);
+  const { tier: _t, maker: _m, max_price: _p, must_include: _i, min_chars: _c, json: _j, json_keys: _k, ...rest } = input;
+  if (!check) {
     const out = (await execute(env, pick.resource, rest)) as Record<string, unknown>;
     return { ...out, picked: pickSummary(pick) };
   }
+  const run: Input = check.json ? { ...rest, system: [rest.system, "Reply with JSON only, no other text."].filter(Boolean).join("\n\n") } : rest;
+  const attempts: Attempt[] = [];
+  for (const [i, m] of retryLadder(pick).entries()) {
+    const a = { model: m.id, name: m.name, priceUsd: Number(m.price), paidBy: i === 0 ? "you" : "siro" } as const;
+    if (i > 0 && !(await takeRetry(env, toUnits(m.price)))) {
+      attempts.push({ ...a, passed: false, reason: "not tried: today's retry budget is used" });
+      break;
+    }
+    let out: Record<string, unknown>;
+    try {
+      out = (await execute(env, m, run)) as Record<string, unknown>;
+    } catch (e) {
+      if (!(e instanceof Fail)) throw e;
+      attempts.push({ ...a, passed: false, reason: e.message });
+      continue;
+    }
+    const reason = checkAnswer(String(out.text ?? ""), check);
+    attempts.push({ ...a, passed: !reason, ...(reason ? { reason } : {}) });
+    if (!reason) return { ...out, picked: pickSummary(pick), check: { passed: true, attempts } };
+  }
+  throw new Fail(422, "no_answer_passed", `No answer passed your check (${attempts.map((a) => `${a.name}: ${a.reason}`).join("; ")}). You were not charged.`);
+}
+
+export async function execute(env: Env, r: Resource, input: Input): Promise<unknown> {
+  if (r.id === "llm-auto") return runRouter(env, input);
   if (r.via) return runPremium(env, r, input);
 
   if (r.category === "llm") {

@@ -42,6 +42,8 @@ export type Pick = {
   maker: Maker;
   /** The models that fitted, cheapest first, so the receipt can show what the pick saved. */
   candidates: { id: string; name: string; price: string }[];
+  /** Every model in the tier and maker, cheapest first, ceiling or not: the retry ladder Siro pays for. */
+  ladder: Resource[];
 };
 
 const units = (r: Resource) => toUnits(r.price);
@@ -72,7 +74,7 @@ export function pickModel(input: Record<string, unknown>, ready: (r: Resource) =
       cheapest ? `The cheapest ${tier} model${maker === "any" ? "" : ` from ${maker}`} is ${cheapest.name} at $${cheapest.price}, above max_price.` : `No ${tier} model${maker === "any" ? "" : ` from ${maker}`} is available right now.`,
     );
   }
-  return { resource: affordable[0], tier, maker, candidates: affordable.map((r) => ({ id: r.id, name: r.name, price: r.price })) };
+  return { resource: affordable[0], tier, maker, candidates: affordable.map((r) => ({ id: r.id, name: r.name, price: r.price })), ladder: fits };
 }
 
 /** What the result and the receipt say about the pick. */
@@ -87,4 +89,64 @@ export function pickSummary(p: Pick) {
     consideredModels: p.candidates.length,
     mostExpensiveFit: top && top.id !== p.resource.id ? { model: top.id, name: top.name, priceUsd: Number(top.price) } : null,
   };
+}
+
+// ---- Checks (phase 2): the answer must pass these, or Siro tries the next model at its own cost ----
+
+/** At most this many retries after the first model, each one paid by Siro, never by the agent. */
+export const RETRIES = 2;
+/** What Siro will spend on retries in one UTC day, across all callers, at list price (6-decimal units). */
+export const RETRY_DAILY_UNITS = 3_000_000n;
+
+export type Check = { mustInclude: string[]; minChars: number | null; json: boolean; jsonKeys: string[] };
+
+const list = (v: unknown) =>
+  String(v ?? "")
+    .split(",")
+    .map((x) => x.trim())
+    .filter(Boolean);
+
+/** The checks this input asks for, or null when it asks for none. */
+export function readCheck(input: Record<string, unknown>): Check | null {
+  const mustInclude = list(input.must_include);
+  const jsonKeys = list(input.json_keys);
+  const json = input.json === "yes" || jsonKeys.length > 0;
+  const minChars = input.min_chars === undefined ? null : Number(input.min_chars);
+  if (minChars !== null && (!Number.isInteger(minChars) || minChars < 1)) throw new PickError("invalid_field", "min_chars must be a whole number above 0");
+  if (mustInclude.length > 10 || jsonKeys.length > 20) throw new PickError("invalid_field", "Up to 10 phrases in must_include and 20 keys in json_keys.");
+  if (!mustInclude.length && !json && minChars === null) return null;
+  return { mustInclude, minChars, json, jsonKeys };
+}
+
+/** The JSON in an answer, with a ``` fence around it allowed. */
+function parseJson(text: string): unknown {
+  const t = text.trim();
+  const fenced = /^```(?:json)?\s*([\s\S]*?)\s*```$/i.exec(t);
+  return JSON.parse(fenced ? fenced[1] : t);
+}
+
+/** Why the answer fails the check, or null when it passes. */
+export function checkAnswer(text: string, c: Check): string | null {
+  if (c.minChars !== null && text.trim().length < c.minChars) return `shorter than ${c.minChars} characters`;
+  const lower = text.toLowerCase();
+  const missing = c.mustInclude.filter((m) => !lower.includes(m.toLowerCase()));
+  if (missing.length) return `missing ${missing.map((m) => `"${m}"`).join(", ")}`;
+  if (c.json) {
+    let v: unknown;
+    try {
+      v = parseJson(text);
+    } catch {
+      return "not valid JSON";
+    }
+    if (v === null || typeof v !== "object") return "JSON is not an object or array";
+    const keys = c.jsonKeys.filter((k) => Array.isArray(v) || !(k in (v as Record<string, unknown>)));
+    if (keys.length) return `JSON lacks ${keys.join(", ")}`;
+  }
+  return null;
+}
+
+/** The models to try, in order: the pick first, then the next ones up the ladder. */
+export function retryLadder(p: Pick): Resource[] {
+  const after = p.ladder.filter((r) => r.id !== p.resource.id && toUnits(r.price) >= toUnits(p.resource.price));
+  return [p.resource, ...after].slice(0, 1 + RETRIES);
 }

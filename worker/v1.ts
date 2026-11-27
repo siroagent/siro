@@ -15,7 +15,7 @@ import { ed25519 } from "@noble/curves/ed25519";
 import { base58 } from "@scure/base";
 import { giveBackFree, holderTier, readPass, takeFree } from "./holder";
 import { FREE_TOOLS, discounted } from "../shared/holder";
-import { execute, prepare, routerPick } from "./run";
+import { execute, prepare, routerCheck, routerPick } from "./run";
 import { pickSummary } from "../shared/router";
 import { callListing, describeListing } from "./sell";
 import {
@@ -199,6 +199,7 @@ v1.post("/:id", async (c) => {
   if (r.id === ROUTER.id && input && !inputError) {
     try {
       picked = pickSummary(routerPick(c.env, input));
+      routerCheck(input);
     } catch (e) {
       if (!(e instanceof Fail)) throw e;
       inputError = e;
