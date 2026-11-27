@@ -4,6 +4,7 @@ import { CATEGORIES, PAY_KEYS, PAY_NETWORKS, RESOURCES, formatPrice, toUnits, is
 import { PayError, agentAccount, agentAddresses, callFree, callResource, forgetResult, connect, connectedWallet, holderInfo, payingAddress, dataNetwork, injectedWallets, liveNetworks, liveNetworkText, liveSelect, netOptions, network, setNetwork, spentToday, type Receipt } from "../lib/pay";
 import { pickWallet } from "../lib/walletpick";
 import { FREE_TOOLS, TIERS, discounted } from "../../shared/holder";
+import { pickModel } from "../../shared/router";
 import { RESULT_TTL_DAYS } from "../../shared/privacy";
 
 /** A stablecoin amount to its last unit: 750 units is $0.00075, never rounded up to $0.0008. Two decimals at least. */
@@ -313,8 +314,31 @@ function wireDeck(r: Resource) {
   const verdictBox = el("verdict");
   const note = el("note");
   const receipt = el("receipt");
-  const price = Number(r.price);
-  const p = formatPrice(r.price);
+  let price = Number(r.price);
+  let p = formatPrice(r.price);
+  // The router is priced at the model it picks for the tier, maker and ceiling in the deck. The server makes the
+  // same pick; if a model is switched off there, its quote is higher and the confirm step refuses to sign it.
+  const router = r.id === "llm-auto";
+  let pickLine: HTMLElement | null = null;
+  if (router) {
+    pickLine = document.createElement("p");
+    pickLine.className = "tl-who";
+    pickLine.id = "pick-line";
+    el("who").before(pickLine);
+  }
+  const reprice = () => {
+    if (!router || !pickLine) return;
+    const val = (n: string) => form.querySelector<HTMLInputElement | HTMLSelectElement>(`[name="${n}"]`)?.value.trim() || undefined;
+    try {
+      const pk = pickModel({ tier: val("tier"), maker: val("maker"), max_price: val("max_price") });
+      price = Number(pk.resource.price);
+      p = formatPrice(pk.resource.price);
+      pickLine.innerHTML = `Picks <b>${esc(pk.resource.name)}</b> at <b>${p}</b>, the cheapest of ${pk.candidates.length} that fit.`;
+    } catch (e) {
+      pickLine.textContent = e instanceof Error ? e.message : String(e);
+    }
+  };
+  if (router) form.addEventListener("input", () => paint());
   const st = { payer: (agentAccount() ? "agent" : "connected") as PayerKind, live: null as boolean | null, busy: false };
   const hasExtension = () => injectedWallets().length > 0 || !!(window as unknown as { ethereum?: unknown }).ethereum;
   const selected = (): PayNetworkKey => (isPayKey(sel.value) ? sel.value : network());
@@ -371,6 +395,7 @@ function wireDeck(r: Resource) {
 
   let shownVerdict = "";
   const paint = () => {
+    reprice();
     paintWhoAndHolder();
     const v = verdict();
     // The space keeps the pay key's description (aria-describedby) from reading "Within caps$0.02".

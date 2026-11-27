@@ -5,7 +5,8 @@ import type { Field, Resource } from "../shared/catalog";
 import { Fail } from "./fail";
 import { findMarket, normalizeMarket, predictionMarkets, priceHistory, stockQuote, stockTokens } from "./markets";
 import { addressOf, contractCheck, gasNow, networkOf, poolList, readToken, tokenMarket, walletBalances } from "./onchain";
-import { runPremium } from "./premium";
+import { premiumReady, runPremium } from "./premium";
+import { PickError, pickModel, pickSummary, type Pick } from "../shared/router";
 
 export type Input = Record<string, unknown>;
 
@@ -166,7 +167,23 @@ const FAST_MODEL = "@cf/openai/gpt-oss-120b";
 
 // ---- Execute ----
 
+/** The model the router picks for this input, among the models switched on right now. Throws Fail (400) before any payment. */
+export function routerPick(env: Env, input: Input): Pick {
+  try {
+    return pickModel(input, (m) => premiumReady(env, m));
+  } catch (e) {
+    if (e instanceof PickError) throw new Fail(400, e.code, e.message);
+    throw e;
+  }
+}
+
 export async function execute(env: Env, r: Resource, input: Input): Promise<unknown> {
+  if (r.id === "llm-auto") {
+    const pick = routerPick(env, input);
+    const { tier: _t, maker: _m, max_price: _p, ...rest } = input;
+    const out = (await execute(env, pick.resource, rest)) as Record<string, unknown>;
+    return { ...out, picked: pickSummary(pick) };
+  }
   if (r.via) return runPremium(env, r, input);
 
   if (r.category === "llm") {

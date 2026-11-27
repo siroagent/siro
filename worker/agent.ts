@@ -3,14 +3,14 @@
 // propose a third-party x402 service found through discovery, or a token swap. The agent never
 // holds funds and never pays on anyone's behalf: the browser signs, or nothing happens.
 import { Hono } from "hono";
-import { RESOURCES, byId, formatPrice } from "../shared/catalog";
+import { RESOURCES, ROUTER, byId, formatPrice } from "../shared/catalog";
 import { premiumReady } from "./premium";
 import { TOKEN } from "../shared/token";
 import { discover, type Service } from "./discover";
 import { Fail } from "./fail";
 import { overLimit } from "./ratelimit";
 import { clientIp, hashIp, originAllowed } from "./request";
-import { prepare } from "./run";
+import { prepare, routerPick } from "./run";
 
 export const agent = new Hono<{ Bindings: Env }>();
 
@@ -19,7 +19,7 @@ const MAX_TURNS = 24;
 
 // Only resources that can be paid right now are offered to the model.
 const tools = (env: Env) =>
-  RESOURCES.filter((r) => premiumReady(env, r)).map(
+  [...RESOURCES.filter((r) => premiumReady(env, r)), ROUTER].map(
   (r) => `- ${r.id} (${r.name}, ${formatPrice(r.price)}): ${r.summary} Fields: ${r.fields.map((f) => `${f.name}${f.required ? "*" : ""}${f.options ? `[${f.options.join("|")}]` : ""}`).join(", ")}`,
 ).join("\n");
 
@@ -38,6 +38,7 @@ ${TOKEN ? `- Siro's only token is $${TOKEN.ticker} on ${TOKEN.chain}, contract $
 Rules:
 - Answer simple questions yourself, for free, in a few sentences. Only propose a resource when it clearly helps (fresh on-chain data, images, audio, a stronger model, reading a page).
 - Propose at most ONE action per turn. Fill every required field from the conversation; if something required is missing, ask for it instead of proposing.
+- For writing, answering or summarising when the user names no model, propose llm-auto (it picks the cheapest model that fits, priced at that model): tier fast for short everyday tasks, balanced for harder reasoning, frontier only when asked for the best. When the user names a model, use that model.
 - Prefer a Siro resource when one fits. When none does, search third-party x402 services with {"discover":"<3-6 word query>"}.
 - For a swap the user asked for, propose {"swap":{"network":"robinhood|base","from":"ETH","to":"USDG","amount":"0.01"}} with the amount in units of the "from" token. Symbols: ETH, WETH, USDG (Robinhood), USDC (Base), Robinhood stock tickers like TSLA, or a 0x address. Never suggest a trade on your own initiative; only when the user asks.
 - network is "robinhood" unless the user says Base.
@@ -162,7 +163,10 @@ agent.post("/", async (c) => {
     const r = byId(call.resource);
     if (r) {
       try {
-        proposal = { kind: "resource", resource: r.id, name: r.name, price: r.price, category: r.category, input: prepare(r, call.input) };
+        const input = prepare(r, call.input);
+        // The router is priced at the model it picks; the proposal shows that model and its price.
+        const pick = r.id === ROUTER.id ? routerPick(c.env, input) : null;
+        proposal = { kind: "resource", resource: r.id, name: pick ? `${r.name}: ${pick.resource.name}` : r.name, price: pick ? pick.resource.price : r.price, category: r.category, input };
       } catch (e) {
         if (!(e instanceof Fail)) throw e;
         // The agent filled a field badly; say so instead of proposing a call that will fail.

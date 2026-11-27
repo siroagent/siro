@@ -26,6 +26,7 @@ siro balance
 siro limits --per-payment 0.1 --per-day 1 --per-swap 25 --network robinhood
 siro resources stock
 siro call prediction-markets query="fed rates"
+siro call llm-auto prompt="Summarise this in two lines" tier=fast   # cheapest model that fits
 siro call flux-2-dev prompt="a chrome ball on brushed aluminium" --out tile.png
 siro discover weather
 siro pay https://x402.agentindex.world/weather city=Jakarta
