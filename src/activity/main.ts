@@ -4,7 +4,7 @@
 import { CATEGORIES, PAY_KEYS, PAY_NETWORKS, RESOURCES, byId, isPayKey, payNetworkOf, type Category, type PayNetworkKey } from "../../shared/catalog";
 import { esc, mountShell } from "../shell";
 import "./activity.css";
-import { paintProofs, size } from "./proofs";
+import { size } from "./proofs";
 
 mountShell("activity");
 
@@ -313,7 +313,7 @@ const matches = (s: Settlement) => (!view.network || payNetworkOf(s.network) ===
 /** Under the hash: the fingerprint of what the call returned, linked to the full result when it is shown. */
 function resultLine(r: Result, tx: string) {
   const text = `result ${size(r.bytes)} · ${r.sha.slice(0, 8)}`;
-  return `<span class="act__result" title="sha256 ${esc(r.sha)}">${r.shown ? `<a href="#r-${esc(tx)}">${text}<span class="sr">, shown in full above</span></a>` : text}</span>`;
+  return `<span class="act__result" title="sha256 ${esc(r.sha)}">${r.shown ? `<a href="/api/proofs/${encodeURIComponent(tx)}" target="_blank" rel="noopener noreferrer">${text}<span class="sr">, the full result as JSON, opens in a new tab</span></a>` : text}</span>`;
 }
 
 function rowHtml(s: Settlement) {
@@ -631,4 +631,3 @@ paintRows();
 paintFeed();
 if (view.payer !== null) void readPayer(false);
 void tick();
-void paintProofs(when, dollars);

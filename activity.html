@@ -28,15 +28,6 @@
 
     <noscript><p class="act__nojs">This page reads the settlements table live and needs JavaScript. The same rows are at <a href="/api/ledger?limit=500">/api/ledger</a> as JSON, with totals, and paid results shown in full are at <a href="/api/proofs">/api/proofs</a>.</p></noscript>
 
-    <section class="display act proofs" id="proofs" aria-labelledby="proofs-name" hidden>
-      <div class="display__bar act__bar">
-        <h2 class="act__name" id="proofs-name">Paid results, shown in full</h2>
-        <p class="act__feed"><span class="mono">/api/proofs</span></p>
-      </div>
-      <p class="proofs__lede">Calls the Siro team paid for from its own wallet, with exactly what each one returned. Every other payer's result stays private: the ledger keeps only its sha256, so the payer can check that what they received is what was recorded. As JSON: <a href="/api/proofs">/api/proofs</a>, or one result at /api/proofs/&lt;tx&gt;.</p>
-      <ol class="proofs__list" id="proofs-list"></ol>
-    </section>
-
     <section class="display act" id="act-deck" aria-labelledby="act-name">
       <div class="display__bar act__bar">
         <h2 class="act__name" id="act-name" tabindex="-1">Settlements</h2>
