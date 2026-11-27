@@ -3,7 +3,7 @@
 // signature and settles only when the work succeeded, so a failed call is never charged.
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import { CATEGORIES, RESOURCES, byId, toUnits } from "../shared/catalog";
+import { CATEGORIES, RESOURCES, ROUTER, byId, toUnits } from "../shared/catalog";
 import { bazaarExtension } from "./bazaar";
 import { Fail } from "./fail";
 import { premiumReady, SLOW_PAYMENT_SECONDS } from "./premium";
@@ -15,7 +15,8 @@ import { ed25519 } from "@noble/curves/ed25519";
 import { base58 } from "@scure/base";
 import { giveBackFree, holderTier, readPass, takeFree } from "./holder";
 import { FREE_TOOLS, discounted } from "../shared/holder";
-import { execute, prepare } from "./run";
+import { execute, prepare, routerPick } from "./run";
+import { pickSummary } from "../shared/router";
 import { callListing, describeListing } from "./sell";
 import {
   allRequirements,
@@ -70,7 +71,9 @@ const liveNetworks = async (env: Env) => (await allRequirements(env, 1000n)).map
 
 v1.get("/resources", async (c) => {
   c.header("Cache-Control", "public, max-age=300");
-  return c.json({ data: RESOURCES.map(describe(c.env, new URL(c.req.url).origin, await liveNetworks(c.env))), count: RESOURCES.length });
+  const d = describe(c.env, new URL(c.req.url).origin, await liveNetworks(c.env));
+  // The router is listed apart: it is not a tool of its own but picks one of the language models above.
+  return c.json({ data: RESOURCES.map(d), count: RESOURCES.length, routers: [{ ...d(ROUTER), priceFrom: true }] });
 });
 
 v1.get("/resources/:id", async (c) => {
@@ -191,7 +194,18 @@ v1.post("/:id", async (c) => {
   // A wallet holding $SIRO gets its tier's discount. The quote is made for the address in x-siro-holder, and the
   // payment must then come from that same address, so the discount follows the coins on Robinhood Chain.
   const holder = await holderTier(c.env, c.req.header("x-siro-holder"));
-  const full = toUnits(r.price);
+  // The router is priced at the model it picks, which the quote names; an input the pick refuses is an input error.
+  let picked: ReturnType<typeof pickSummary> | null = null;
+  if (r.id === ROUTER.id && input && !inputError) {
+    try {
+      picked = pickSummary(routerPick(c.env, input));
+    } catch (e) {
+      if (!(e instanceof Fail)) throw e;
+      inputError = e;
+      if (paying) return err(c, e.status, e.code, e.message);
+    }
+  }
+  const full = picked ? toUnits(String(picked.priceUsd)) : toUnits(r.price);
   const amount = holder ? discounted(full, holder.tier.discountPct) : full;
   // A signed Solana transaction expires in about a minute, so slow renders are offered on EVM chains only.
   // A holder price is offered on EVM chains only, where the payer is the holder address itself.
@@ -201,7 +215,7 @@ v1.post("/:id", async (c) => {
   const description = `${r.name}: ${r.summary}`;
   const ctx = { resource: resourceInfo(c, description), extensions: { bazaar: bazaarExtension(r) } };
   const holderInfo = holder ? { holder: { address: holder.address, siro: Math.floor(holder.siro), tier: holder.tier.name, discountPct: holder.tier.discountPct, fullPriceUsd: Number(full) / 1e6, priceUsd: Number(amount) / 1e6 } } : {};
-  if (payment === null) return paymentRequired(c, reqs, description, { extensions: ctx.extensions, ...holderInfo, ...(inputError ? { inputError: { code: inputError.code, message: inputError.message } } : {}) });
+  if (payment === null) return paymentRequired(c, reqs, description, { extensions: ctx.extensions, ...holderInfo, ...(picked ? { picked } : {}), ...(inputError ? { inputError: { code: inputError.code, message: inputError.message } } : {}) });
   if (payment === "bad") return paymentError(c, "invalid_payment", "PAYMENT-SIGNATURE could not be read");
   const req = pickRequirements(payment, reqs);
   if (typeof req === "string") return paymentError(c, "invalid_payment", req);
@@ -252,6 +266,6 @@ v1.post("/:id", async (c) => {
   return c.json({
     resource: r.id,
     result,
-    receipt: { network: req.network, asset: chain.symbol, amountUsd: Number(amount) / 1e6, payer, tx, ms, resultSha256: rr.sha, ...(holder ? { holderDiscountPct: holder.tier.discountPct, fullPriceUsd: Number(full) / 1e6 } : {}), ...(pending ? { status: "pending" } : {}) },
+    receipt: { network: req.network, asset: chain.symbol, amountUsd: Number(amount) / 1e6, payer, tx, ms, resultSha256: rr.sha, ...(picked ? { model: picked.model } : {}), ...(holder ? { holderDiscountPct: holder.tier.discountPct, fullPriceUsd: Number(full) / 1e6 } : {}), ...(pending ? { status: "pending" } : {}) },
   });
 });

@@ -564,7 +564,28 @@ export const RESOURCES: Resource[] = [
   },
 ];
 
-export const byId = (id: string) => RESOURCES.find((r) => r.id === id);
+/** Not a tool of its own: picks the cheapest language model above that fits the request and runs it. Kept out of
+ *  RESOURCES so the catalog count stays the number of tools; shared/router.ts holds the tiers and the pick. */
+export const ROUTER: Resource = {
+  id: "llm-auto",
+  name: "Cheapest Model",
+  category: "llm",
+  price: "0.002",
+  summary: "Siro picks the cheapest language model that fits your tier, maker and price ceiling, and names it in the quote before you pay.",
+  provider: "Siro",
+  returns: "{ text, model, picked: { model, name, priceUsd, tier, consideredModels, mostExpensiveFit } }",
+  fields: [
+    { ...PROMPT_P },
+    { ...SYSTEM_P },
+    MAX_TOKENS,
+    { name: "tier", type: "enum", description: "fast (small, quick models), balanced (strong general reasoning) or frontier (each maker's top model). fast by default.", options: ["fast", "balanced", "frontier"], example: "fast" },
+    { name: "maker", type: "enum", description: "Only models from this maker, or open-weight models only. any by default.", options: ["any", "anthropic", "openai", "google", "deepseek", "meta", "moonshot", "zai", "alibaba", "nvidia", "open-weight"], example: "any" },
+    { name: "max_price", type: "string", description: "The most you will pay for this call in USD, such as 0.03. The pick never goes above it.", max: 12, example: "0.03" },
+  ],
+  tags: ["chat", "write", "answer", "cheap", "router", "auto"],
+};
+
+export const byId = (id: string) => (id === ROUTER.id ? ROUTER : RESOURCES.find((r) => r.id === id));
 
 /** Official mark of the model maker or data source behind each resource (files in /logos).
  *  Tools Siro composes itself carry the Siro mark. */
