@@ -571,9 +571,9 @@ export const ROUTER: Resource = {
   name: "Cheapest Model",
   category: "llm",
   price: "0.002",
-  summary: "Siro picks the cheapest language model that fits your tier, maker and price ceiling, and names it in the quote before you pay.",
+  summary: "Siro picks the cheapest language model that fits your tier, maker and price ceiling, and names it in the quote before you pay. Set a check, and a failed answer is retried on a stronger model at Siro's cost.",
   provider: "Siro",
-  returns: "{ text, model, picked: { model, name, priceUsd, tier, consideredModels, mostExpensiveFit } }",
+  returns: "{ text, model, picked: { model, name, priceUsd, tier, consideredModels, mostExpensiveFit }, check?: { passed, attempts } }",
   fields: [
     { ...PROMPT_P },
     { ...SYSTEM_P },
@@ -581,6 +581,10 @@ export const ROUTER: Resource = {
     { name: "tier", type: "enum", description: "fast (small, quick models), balanced (strong general reasoning) or frontier (each maker's top model). fast by default.", options: ["fast", "balanced", "frontier"], example: "fast" },
     { name: "maker", type: "enum", description: "Only models from this maker, or open-weight models only. any by default.", options: ["any", "anthropic", "openai", "google", "deepseek", "meta", "moonshot", "zai", "alibaba", "nvidia", "open-weight"], example: "any" },
     { name: "max_price", type: "string", description: "The most you will pay for this call in USD, such as 0.03. The pick never goes above it.", max: 12, example: "0.03" },
+    { name: "must_include", type: "string", description: "Check: words or phrases the answer must contain, comma-separated. If it fails, Siro retries a stronger model at its own cost.", max: 500, example: "risk, price" },
+    { name: "min_chars", type: "number", description: "Check: the answer must be at least this many characters.", max: 20000, example: 200 },
+    { name: "json", type: "enum", description: "Check: the answer must be valid JSON.", options: ["no", "yes"], example: "no" },
+    { name: "json_keys", type: "string", description: "Check: top-level keys the JSON answer must have, comma-separated. Implies json.", max: 500, example: "title, summary" },
   ],
   tags: ["chat", "write", "answer", "cheap", "router", "auto"],
 };
