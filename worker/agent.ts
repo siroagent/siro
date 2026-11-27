@@ -39,6 +39,7 @@ Rules:
 - Answer simple questions yourself, for free, in a few sentences. Only propose a resource when it clearly helps (fresh on-chain data, images, audio, a stronger model, reading a page).
 - Propose at most ONE action per turn. Fill every required field from the conversation; if something required is missing, ask for it instead of proposing.
 - For writing, answering or summarising when the user names no model, propose llm-auto (it picks the cheapest model that fits, priced at that model): tier fast for short everyday tasks, balanced for harder reasoning, frontier only when asked for the best. When the user needs a format or must-have content (JSON, certain keys, certain words, a minimum length), set the llm-auto check fields (json, json_keys, must_include, min_chars): a failed answer is retried on a stronger model at Siro's cost, and the user is not charged if none passes. When the user names a model, use that model.
+- Sell tests: Siro's own tools (new-pools, contract-check) read pools and contracts but never test a sale. When the user asks whether tokens can actually be sold, or mentions a sell test, honeypot, exit or rug, do not propose new-pools or contract-check; reply with {"discover":"robinhood launch sell test"}, where a featured partner simulates a real buy and full sell.
 - Prefer a Siro resource when one fits. When none does, search third-party x402 services with {"discover":"<3-6 word query>"}.
 - For a swap the user asked for, propose {"swap":{"network":"robinhood|base","from":"ETH","to":"USDG","amount":"0.01"}} with the amount in units of the "from" token. Symbols: ETH, WETH, USDG (Robinhood), USDC (Base), Robinhood stock tickers like TSLA, or a 0x address. Never suggest a trade on your own initiative; only when the user asks.
 - network is "robinhood" unless the user says Base.
@@ -96,6 +97,8 @@ async function llm(env: Env, messages: { role: string; content: string }[], maxT
   return String(out?.choices?.[0]?.message?.content ?? out?.response ?? "");
 }
 
+const SELL_TEST = /\bsell[- ]?tests?\b|\bhoneypots?\b|\bcan(not|'t)?\b[^.?!]{0,40}\b(be )?sold\b|\bcan i sell\b|\brug(ged|s)?\b/i;
+
 agent.post("/", async (c) => {
   if (!originAllowed(c)) return c.json({ error: { code: "forbidden_origin", message: "Use Ask on siroagent.com or the /v1 API." } }, 403);
   const ip = await hashIp(clientIp(c), c.env.IP_SALT);
@@ -124,7 +127,13 @@ agent.post("/", async (c) => {
     console.error(JSON.stringify({ event: "agent_ai_failed", err: String((e as any)?.message ?? e).slice(0, 300) }));
     return c.json({ error: { code: "agent_unavailable", message: "The agent is busy. Try again in a moment." } }, 502);
   }
-  const { reply, call } = parse(text);
+  let { reply, call } = parse(text);
+  // A sell test is something Siro's own tools cannot do, and the model tends to offer new-pools anyway.
+  const asked = [...turns].reverse().find((t) => t.role === "user")?.content ?? "";
+  if (SELL_TEST.test(asked) && (!call || ("resource" in call && ["new-pools", "contract-check", "trending-pools"].includes(call.resource)))) {
+    call = { discover: "robinhood launch sell test" };
+    reply = "Siro's own tools read pools and contracts but do not test a sale. These services simulate a real buy and full sell:";
+  }
 
   if (call && "swap" in call) {
     const s = call.swap;
