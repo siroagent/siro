@@ -26,13 +26,13 @@
     "viem": "^2.56.8"
   },
   "devDependencies": {
-    "@cloudflare/vite-plugin": "^1.57.3",
+    "@cloudflare/vite-plugin": "^1.70.2",
     "@cloudflare/workers-types": "^5.20260922.1",
     "@vitest/coverage-v8": "^4.1.12",
     "typescript": "^7.0.2",
     "vite": "^8.3.0",
     "vitest": "^4.1.12",
-    "wrangler": "^4.136.3"
+    "wrangler": "^4.168.0"
   },
   "allowScripts": {
     "workerd@1.20260921.1": true,
