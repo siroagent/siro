@@ -18,7 +18,7 @@ Every Siro tool answers an unpaid call with an HTTP 402 quote: the amount, the n
 - **Capped budgets**: the wallet refuses a quote above its per-call or daily cap before anything is signed.
 - **Settle on result**: the work runs after the signature is verified; the transfer settles only when the result is ready.
 - **Public ledger**: every settled call is listed with its transaction hash and a sha256 of the result it returned (`/api/ledger`, `/activity`).
-- **Three ways in**: plain HTTP, the `siro` CLI and SDK, or MCP (local through the CLI, remote at `/mcp`).
+- **Three ways in**: plain HTTP (contract at [`/openapi.json`](https://siroagent.com/openapi.json)), the `siro` CLI and SDK, or MCP (local through the CLI, remote at `/mcp`), with a plugin for Claude Code, Cursor and Codex.
 - **Sell a tool**: list your own HTTPS API; buyers pay your address directly over x402 and Siro takes no cut.
 - **$SIRO holder pricing**: a paying wallet holding 1,000,000 $SIRO on Robinhood Chain is quoted 25% less and gets 10 free runs a day of Siro's data tools; 10,000,000 gets 50% and 30. Payments stay in stablecoins; $SIRO is never spent.
 
@@ -49,6 +49,23 @@ siro call gas-now network=robinhood
 
 The SDK and MCP server ship in the same package; see [cli/README.md](cli/README.md).
 
+## Agent plugins and skill
+
+One plugin gives Claude Code, Cursor and Codex the remote catalog (`siro-catalog`), the local wallet (`siro mcp`, which reads `SIRO_PASSWORD` from your environment) and a skill that tells the agent how to pay safely.
+
+```bash
+# Claude Code
+/plugin marketplace add siroagent/siro
+/plugin install siro@siro
+```
+
+```bash
+# Skill only, for any agent that reads skills
+npx skills add siroagent/siro
+```
+
+The same skill is served at [siroagent.com/skill.md](https://siroagent.com/skill.md). Cursor reads `.cursor-plugin/`, Codex reads `.agents/plugins/`. Then run `/siro:setup` to check the wallet. Code samples for agent frameworks are in [examples/](examples/).
+
 ## How a paid call works
 
 ```
@@ -74,12 +91,15 @@ worker/        Cloudflare Worker (Hono): paid API, ledger, holder pricing, MCP, 
   proof.ts       result receipts (sha256 of each result)
   holder.ts      $SIRO balance reads, holder passes, /api/holder
   mcp.ts         remote MCP server at /mcp
+  openapi.ts     /openapi.json, generated from the catalog
 shared/        code used by the Worker, the site and the CLI: catalog, x402 client, tiers
 src/           the site (vanilla TypeScript + Vite): Ask, Tools, Budget, Activity, Docs
 cli/           the siro CLI, SDK and local MCP server (published as siroagent)
 migrations/    D1 schema, applied in order
 test/          unit tests (Vitest), no network
 mcp-registry/  server.json for the official MCP Registry
+plugin/        Claude Code, Cursor and Codex plugin: MCP config, skill, /siro:setup
+examples/      agent framework samples that pay through the local wallet
 ```
 
 ## Develop

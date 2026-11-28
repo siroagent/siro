@@ -63,7 +63,7 @@ const TOOLS: Tool[] = [
   {
     name: "siro_discover",
     title: "Find third-party x402 services",
-    description: "Searches the open x402 Bazaar index (run by Coinbase CDP) for paid APIs outside Siro's own catalog, such as weather, web search, data enrichment or token prices. Returns each service's URL, HTTP method, price, accepted networks, an example input and whether Siro can pay it (payable = accepts USDG on Robinhood Chain or USDC on Solana, Base, Arbitrum or Polygon). Use it when no Siro resource fits the task. Free, no payment needed.",
+    description: "Searches for paid x402 APIs outside Siro's own catalog: tools other sellers list on Siro, featured partners, then the open x402 Bazaar index (run by Coinbase CDP), for needs such as weather, web search, data enrichment or token prices. Returns each service's URL, HTTP method, price, accepted networks, an example input and whether Siro can pay it (payable = accepts USDG on Robinhood Chain or USDC on Solana, Base, Arbitrum or Polygon). Use it when no Siro resource fits the task. Free, no payment needed.",
     inputSchema: {
       type: "object",
       properties: {

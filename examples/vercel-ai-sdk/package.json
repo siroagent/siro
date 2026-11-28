@@ -1,0 +1,12 @@
+{
+  "name": "siro-example-vercel-ai-sdk",
+  "private": true,
+  "type": "module",
+  "scripts": { "start": "node --experimental-strip-types agent.ts" },
+  "dependencies": {
+    "@ai-sdk/mcp": "2.0.106",
+    "@ai-sdk/openai": "4.0.125",
+    "ai": "7.0.184"
+  },
+  "devDependencies": { "@types/node": "^24.0.0", "typescript": "^5.9.0" }
+}

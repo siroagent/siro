@@ -3,7 +3,7 @@
 // declareDiscoveryExtension({ method: "POST", bodyType: "json", ... }) in @x402/extensions.
 import type { Field, Resource } from "../shared/catalog";
 
-function fieldSchema(f: Field): Record<string, unknown> {
+export function fieldSchema(f: Field): Record<string, unknown> {
   const base = { description: f.description };
   switch (f.type) {
     case "number":

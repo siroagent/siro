@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "siro-catalog": { "url": "https://siroagent.com/mcp" },
+    "siro": {
+      "command": "npx",
+      "args": ["-y", "--package=https://siroagent.com/cli/siroagent-0.1.3.tgz", "siro", "mcp"],
+      "env": { "SIRO_PASSWORD": "${env:SIRO_PASSWORD}" }
+    }
+  }
+}
