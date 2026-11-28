@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // The `siro` command. Run `siro help` for the list.
-import { createInterface } from "node:readline";
+import { createInterface } from "node:readline/promises";
+import { Writable } from "node:stream";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { PAY_NETWORKS, payNetworkOf } from "../../shared/catalog";
 import { NETS, SiroError, isNet, type Approval, type Net } from "./core.js";
@@ -50,19 +51,17 @@ function parse(argv: string[]): Args {
   return out;
 }
 
-function ask(question: string, hidden = false): Promise<string> {
-  return new Promise((resolve) => {
-    const rl = createInterface({ input: process.stdin, output: process.stdout, terminal: true });
-    if (hidden) {
-      const out = process.stdout;
-      (rl as any)._writeToOutput = (s: string) => out.write(s.includes(question) ? question : s === "\r\n" || s === "\n" ? s : "");
-    }
-    rl.question(question, (a) => {
-      rl.close();
-      if (hidden) process.stdout.write("\n");
-      resolve(a);
-    });
-  });
+/** One line from the terminal. A hidden answer (password or key) goes to a stream that drops it, so it never shows. */
+async function ask(question: string, hidden = false): Promise<string> {
+  process.stdout.write(question);
+  const quiet = new Writable({ write: (_chunk, _enc, done) => done() });
+  const rl = createInterface({ input: process.stdin, output: hidden ? quiet : process.stdout, terminal: true });
+  try {
+    return await rl.question("");
+  } finally {
+    rl.close();
+    if (hidden) process.stdout.write("\n");
+  }
 }
 
 async function password(): Promise<string> {

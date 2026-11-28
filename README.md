@@ -92,7 +92,8 @@ worker/        Cloudflare Worker (Hono): paid API, ledger, holder pricing, MCP, 
   holder.ts      $SIRO balance reads, holder passes, /api/holder
   mcp.ts         remote MCP server at /mcp
   openapi.ts     /openapi.json, generated from the catalog
-shared/        code used by the Worker, the site and the CLI: catalog, x402 client, tiers
+shared/        code used by the Worker, the site and the CLI: catalog, tiers, and Siro's own x402 client
+               (x402client.ts: x402fetch and X402Error, written for Siro, no x402 SDK dependency)
 src/           the site (vanilla TypeScript + Vite): Ask, Tools, Budget, Activity, Docs
 cli/           the siro CLI, SDK and local MCP server (published as siroagent)
 migrations/    D1 schema, applied in order
@@ -101,6 +102,17 @@ mcp-registry/  server.json for the official MCP Registry
 plugin/        Claude Code, Cursor and Codex plugin: MCP config, skill, /siro:setup
 examples/      agent framework samples that pay through the local wallet
 ```
+
+## Tests and checks
+
+Every pull request and every push to `main` runs:
+
+- **97 unit tests** (Vitest, no network) in [`test/`](test/): x402 payment matching and nonce rules, input validation before payment, holder tiers and passes, result receipts, the Cheapest Model pick and its checks, Solana key derivation, the CLI wallet's caps and signing, featured partners, `/openapi.json` and the agent plugin.
+- **Typecheck and build** of the Worker and the site, with coverage on the payment and receipt modules.
+- **The CLI on 9 combinations**: Ubuntu, macOS and Windows, each on Node 20, 22 and 24.
+- **CodeQL** for JavaScript/TypeScript and the workflows themselves, also weekly; **OpenSSF Scorecard** on the repository settings.
+
+The workflows are in [`.github/workflows/`](.github/workflows/); the badges at the top show their current state.
 
 ## Develop
 
