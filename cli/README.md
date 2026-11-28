@@ -70,7 +70,7 @@ const quote = await wm.swapQuote("ETH", "USDG", "0.01");
 await wm.swap(quote);
 ```
 
-Pass `approve: (a) => boolean` to confirm each payment or swap yourself, and `ledger` to persist spending for the daily cap. Lower level: `x402fetch(url, init, { signer })` pays any x402 v1 or v2 endpoint.
+Pass `approve: (a) => boolean` to confirm each payment or swap yourself, and `ledger` to persist spending for the daily cap. Lower level: `x402fetch(url, init, { signer })` pays any x402 v1 or v2 endpoint. It is Siro's own client (`shared/x402client.ts`), not a wrapper around an x402 SDK.
 
 ## Files
 
