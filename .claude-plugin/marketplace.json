@@ -1,0 +1,19 @@
+{
+  "name": "siro",
+  "owner": { "name": "Siro", "url": "https://siroagent.com" },
+  "metadata": { "description": "Siro for Claude Code: an x402 wallet that pays per call for AI, media, on-chain data, tokenized stocks and prediction markets." },
+  "plugins": [
+    {
+      "name": "siro",
+      "source": "./plugin",
+      "description": "Give your agent an x402 wallet with spending caps: Siro's pay-per-call AI, media, on-chain data, tokenized stocks and prediction markets, plus third-party x402 services, with a receipt and a transaction for every payment.",
+      "version": "0.1.0",
+      "author": { "name": "Siro", "url": "https://siroagent.com" },
+      "homepage": "https://siroagent.com/docs#mcp",
+      "repository": "https://github.com/siroagent/siro",
+      "license": "MIT",
+      "keywords": ["x402","payments","mcp","agents","usdg","usdc","robinhood-chain","base","solana"],
+      "category": "productivity"
+    }
+  ]
+}

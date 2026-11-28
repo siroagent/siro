@@ -1,0 +1,14 @@
+{
+  "name": "siro",
+  "version": "0.1.0",
+  "description": "Give your agent an x402 wallet with spending caps: Siro's pay-per-call AI, media, on-chain data, tokenized stocks and prediction markets, plus third-party x402 services, with a receipt and a transaction for every payment.",
+  "author": { "name": "Siro", "url": "https://siroagent.com" },
+  "homepage": "https://siroagent.com",
+  "repository": "https://github.com/siroagent/siro",
+  "documentationUrl": "https://siroagent.com/docs#mcp",
+  "license": "MIT",
+  "icon": "./assets/logo.png",
+  "keywords": ["x402","payments","mcp","agents","usdg","usdc","robinhood-chain","base","solana"],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json"
+}

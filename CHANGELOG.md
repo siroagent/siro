@@ -4,6 +4,10 @@ Dates are UTC.
 
 ## 2026-11-28
 
+- Agent plugin for Claude Code, Cursor and Codex (`plugin/`): the remote catalog, the local wallet over `siro mcp` and a skill with the money rules. The skill is also at `/skill.md` and installs with `npx skills add siroagent/siro`.
+- `examples/`: Vercel AI SDK, LangChain and OpenAI Agents SDK agents that pay for `gas-now` and `llm-auto` through the local wallet.
+- `/openapi.json`: every live tool as an OpenAPI 3.1 operation with its x402 price, generated from the catalog.
+- MCP `siro_discover` now says it searches tools sold on Siro and featured partners before the Bazaar.
 - Featured partners in discovery: partner x402 services come right after tools sold on Siro when a search matches, each shown only while its own 402 is live and payable. First partner: ApexFaucet's Robinhood Chain launch feed with a real sell test.
 
 ## 2026-11-27

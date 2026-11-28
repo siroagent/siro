@@ -1,0 +1,6 @@
+{
+  "name": "siro",
+  "owner": { "name": "Siro" },
+  "metadata": { "description": "Siro for Cursor: an x402 wallet with spending caps for your agent", "version": "0.1.0" },
+  "plugins": [ { "name": "siro", "source": "./plugin", "description": "Give your agent an x402 wallet with spending caps: Siro's pay-per-call AI, media, on-chain data, tokenized stocks and prediction markets, plus third-party x402 services, with a receipt and a transaction for every payment." } ]
+}

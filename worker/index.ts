@@ -11,6 +11,7 @@ import { allRequirements } from "./x402";
 import { marketHealth } from "./onchain";
 import { TOKENS } from "../shared/swap";
 import { mcp, serverCard } from "./mcp";
+import { openapi } from "./openapi";
 import { v1 } from "./v1";
 import { sell } from "./sell";
 import { RESULT_TTL_SECONDS } from "../shared/privacy";
@@ -188,10 +189,18 @@ app.get("/.well-known/mcp-registry-auth", (c) => {
 
 // Glama ownership claim (var GLAMA_CLAIM), set once Glama hands one out. Must stay published after that.
 app.get("/.well-known/glama.json", (c) => {
-  const claim = c.env.GLAMA_CLAIM;
-  if (!claim) return c.notFound();
+  const claim = c.env.GLAMA_CLAIM?.trim();
+  // Glama tokens are glama_claim_ + 32 characters; anything else would publish a claim Glama rejects.
+  if (!claim || !/^glama_claim_[A-Za-z0-9_-]{32}$/.test(claim)) return c.notFound();
   c.header("Cache-Control", "public, max-age=3600");
   return c.json({ $schema: "https://glama.ai/mcp/schemas/connector.json", claim });
+});
+
+// OpenAPI contract for directories such as x402scan, generated from the catalog that prices the quotes.
+app.get("/openapi.json", (c) => {
+  c.header("Access-Control-Allow-Origin", "*");
+  c.header("Cache-Control", "public, max-age=600");
+  return c.json(openapi(c.env, "1.0.0"));
 });
 
 app.get("/.well-known/mcp/server-card.json", (c) => {
